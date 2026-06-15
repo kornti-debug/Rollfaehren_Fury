@@ -20,7 +20,9 @@
 *.booproj
 *.svd
 *.pdb
+*.pdb.meta
 *.mdb
+*.mdb.meta
 *.opendb
 *.VC.db
 
@@ -28,6 +30,17 @@
 sysinfo.txt
 *.stackdump
 *.raw
+
+# Wwise local setup/cache files
+logRunSetup.txt
+WwiseUnityIntegration_*_Src.zip
+*.validationcache
+*.akd
+*.prof
+*.wsettings
+AkWwiseProjectData.asset
+IncrementalSoundBankData.xml
+**/.cache/
 
 # IDE/editor folders
 .vs/
