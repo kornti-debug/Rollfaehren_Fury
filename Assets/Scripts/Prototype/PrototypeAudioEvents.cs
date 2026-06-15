@@ -7,6 +7,7 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private GameManager gameManager;
         [SerializeField] private HitscanWeapon weapon;
+        [SerializeField] private bool postEvents;
         [SerializeField] private string weaponShootEvent = "Play_Weapon_Shoot";
         [SerializeField] private string enemyHitEvent = "Play_Enemy_Hit";
         [SerializeField] private string enemyDeathEvent = "Play_Enemy_Death";
@@ -110,8 +111,18 @@ namespace RollfaehrenFury.Prototype
             Post(upgradeBoughtEvent, gameObject);
         }
 
-        private static void Post(string eventName, GameObject emitter)
+        public void SetPostingEnabled(bool isEnabled)
         {
+            postEvents = isEnabled;
+        }
+
+        private void Post(string eventName, GameObject emitter)
+        {
+            if (!postEvents)
+            {
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(eventName))
             {
                 return;

@@ -296,6 +296,7 @@ namespace RollfaehrenFury.Editor
             PrototypeAudioEvents audioEvents = EnsureComponent<PrototypeAudioEvents>(gameManager.gameObject);
             SetObject(audioEvents, "gameManager", gameManager);
             SetObject(audioEvents, "weapon", weapon);
+            SetBool(audioEvents, "postEvents", false);
         }
 
         private static SimpleHUD EnsureHud()
