@@ -9,6 +9,7 @@ Status: in progress.
 - Git LFS configured.
 - Wwise integrated.
 - Project documentation added.
+- `codex/playable-mvp` branch contains the first generated playable slice.
 
 Exit criteria:
 
@@ -20,13 +21,12 @@ Goal: prove the whole game loop with placeholder geometry.
 
 Tasks:
 
-- Create menu flow.
+- Use one-scene flow first; add menu later if time allows.
 - Create placeholder ferry deck and river crossing space.
 - Add FPS player movement and look.
 - Add one weapon.
 - Add one enemy.
 - Add ferry health.
-- Add cargo health.
 - Add score/money.
 - Add game over.
 - Add simple shop/upgrade phase.
@@ -41,7 +41,8 @@ Goal: make the prototype feel like Rollfaehren Fury, not just a test scene.
 
 Tasks:
 
-- Replace key placeholders with low-poly ferry, shore, cargo, weapon, and enemy assets.
+- Replace key placeholders with low-poly ferry, shore, weapon, and enemy assets.
+- Add cargo only after the ferry-only loop is stable.
 - Add at least two enemy types or variants.
 - Add basic UI styling.
 - Add Wwise events for major gameplay feedback.

@@ -1,20 +1,20 @@
 # Rollfaehren Fury
 
-Rollfaehren Fury is a Unity 3D first-person ferry-defense prototype. The player protects a cable ferry while it crosses a river, shoots incoming enemies, earns money, saves cargo, and spends rewards on upgrades before the next harder round.
+Rollfaehren Fury is a Unity 3D first-person ferry-defense prototype. The player protects a cable ferry while it crosses a river, shoots incoming enemies, earns money, and spends rewards on upgrades before the next harder round.
 
 Project page: https://kornti-debug.github.io/Rollfaehren_Fury/
 
 ## Current Prototype Goal
 
-Build a small but complete vertical slice with placeholder low-poly assets first:
+Build a small but complete ferry-only vertical slice with placeholder low-poly assets first:
 
-- Main menu with New Game and Quit
-- FPS player on a moving ferry
-- Enemies attacking the ferry, cargo, and player
-- Weapon/shooting loop
-- Ferry and cargo health as the main fail condition
-- Score and money from enemy kills and surviving cargo
-- Shop/upgrades between rounds
+- One playable scene: `Assets/Scenes/Main.unity`
+- FPS player on a prototype ferry deck
+- Enemies approaching the ferry
+- Enemies damage only the ferry on contact, then disappear
+- Weapon/shooting loop with enemy kill rewards
+- Timed crossing progress
+- Simple shop/upgrades between rounds
 - Next round with higher difficulty
 - Game over when the ferry is destroyed
 
@@ -69,13 +69,28 @@ Open the folder in Unity `6000.3.6f1`. Unity will rebuild `Library/` locally. Do
 
 For Wwise setup details, see [docs/WWISE.md](docs/WWISE.md).
 
+## Playable MVP Workflow
+
+On the `codex/playable-mvp` branch, open `Assets/Scenes/Main.unity` and press Play.
+
+Controls:
+
+- `WASD`: move
+- Mouse: look
+- Left click: shoot
+- `Shift`: sprint
+- `Space`: jump
+- `Esc`: unlock mouse cursor
+
+If the scene gets broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` in the Unity menu to regenerate the prototype player, ferry damage target, enemy spawner, HUD, shop, and Wwise hook component.
+
 ## Team Workflow
 
 - Keep `main` working and openable in Unity.
 - Use feature branches for gameplay, art, audio, or documentation work.
 - Commit Unity `.meta` files together with their assets.
 - Avoid multiple people editing the same Unity scene at the same time.
-- Prefer prefabs for shared objects such as ferry, enemies, cargo, weapons, shop, and NPCs.
+- Prefer prefabs for shared objects such as ferry, enemies, weapons, shop, and NPCs.
 - Pull before starting work and before merging.
 
 Useful branch examples:
@@ -91,4 +106,4 @@ docs/project-structure
 
 ## Next Milestone
 
-The next milestone is the bootstrap playable loop: a main menu starts the game scene, the ferry crosses the river, enemies spawn, the player can shoot them, cargo/ferry health can be lost, and the round ends in either shop progression or game over.
+The next milestone is testing and tuning the playable loop in Unity: enemy speed, spawn timing, ferry health, weapon damage, shop prices, and whether a simple main menu is worth adding before art polish.
