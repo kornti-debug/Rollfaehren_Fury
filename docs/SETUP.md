@@ -27,6 +27,31 @@ git lfs pull
 
 Do not commit `Library/`, `Logs/`, `UserSettings/`, generated `.csproj` files, or `.sln` files.
 
+## Play the Current MVP
+
+1. Pull the `codex/playable-mvp` branch.
+2. Open `Assets/Scenes/Main.unity`.
+3. Press Play.
+4. Test the loop:
+   - `WASD` moves.
+   - Mouse looks.
+   - Left click shoots.
+   - Enemies approach the ferry.
+   - Ferry health drops when enemies touch it.
+   - Killing enemies grants money.
+   - Crossing completion opens the shop.
+   - Ferry health reaching zero opens game over.
+
+If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, and Wwise hook component.
+
+When tuning, start with Inspector values on:
+
+- `Prototype Game Manager`
+- `EnemySpawner`
+- `PrototypeEnemy` prefab
+- `Prototype Player`
+- `Ferry` / `Ferry Damage Target`
+
 ## Wwise First Run
 
 1. Install Wwise `2025.1.5 Build 9095`.

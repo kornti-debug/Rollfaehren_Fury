@@ -2,7 +2,7 @@
 
 ## Core Idea
 
-Rollfaehren Fury is a first-person ferry-defense shooter. The player protects a cable ferry while it crosses a river. Enemies attack the ferry, cargo, and player. The player earns money by killing enemies and preserving cargo, then spends that money on upgrades between rounds.
+Rollfaehren Fury is a first-person ferry-defense shooter. The player protects a cable ferry while it crosses a river. In the first MVP, enemies attack only the ferry. The player earns money by killing enemies and surviving the crossing, then spends that money on upgrades between rounds.
 
 The first target is a prototype, not a content-heavy finished game. Placeholder low-poly shapes are preferred until the loop is fun and reliable.
 
@@ -14,10 +14,10 @@ The first target is a prototype, not a content-heavy finished game. Placeholder 
 4. Enemies spawn and attack.
 5. Player shoots enemies.
 6. Kills grant money.
-7. Surviving cargo grants extra money at the end of the crossing.
+7. Surviving the crossing grants a small round reward.
 8. Player reaches shop/upgrade phase.
 9. Player buys upgrades.
-10. Next round begins with harder enemies and/or more cargo.
+10. Next round begins with harder enemies.
 11. Ferry destruction triggers game over.
 
 ## Scenes and States
@@ -29,7 +29,7 @@ Main Menu -> Game Scene -> Shop/Upgrade -> Game Scene
                          -> Game Over
 ```
 
-Implementation can use separate scenes or UI overlays. For the prototype, separate `MainMenu` and `Game` scenes are enough if shop and game over are implemented as UI panels.
+The current MVP uses `Assets/Scenes/Main.unity` only. Shop and game over are UI panels. A separate main menu can be added later if the playable loop is stable.
 
 ## Player Fantasy
 
@@ -41,10 +41,10 @@ Primary protected object:
 
 - Ferry hull/structure
 
-Secondary protected objects:
+Postponed protected objects:
 
 - Cargo crates
-- Optional civilian NPCs later
+- Optional civilian NPCs
 
 Failure condition:
 
@@ -52,13 +52,14 @@ Failure condition:
 
 Reward condition:
 
-- Each surviving cargo item pays money at the end of the round.
+- Kills pay money immediately.
+- Crossing completion pays a small round reward.
 
 ## Enemies
 
 Prototype enemy priority:
 
-1. One simple flying enemy that approaches and damages ferry/cargo/player.
+1. One simple enemy that approaches and damages the ferry.
 2. One variation with more health or faster movement.
 3. Later: birds, bats, vampires, swimming enemies, or small boats.
 
@@ -66,7 +67,7 @@ Enemy behavior should be simple:
 
 - Spawn outside the ferry area.
 - Move toward a target.
-- Attack or collide.
+- Collide with the ferry.
 - Take damage.
 - Die and reward money.
 
@@ -94,14 +95,14 @@ Weapon rules:
 Money sources:
 
 - Enemy kills
-- Surviving cargo at round end
+- Round completion reward
 
 Upgrade examples:
 
 - More weapon damage
 - Faster fire rate
 - More ferry health
-- More cargo reward
+- Ferry repair or max health
 - Faster player movement
 - Faster repair or passive recovery
 
@@ -115,12 +116,11 @@ Prototype shop:
 
 Must exist for the first vertical slice:
 
-- Main menu
 - Ferry deck
 - Player movement/look
 - Shooting
 - One enemy
-- Ferry/cargo health
+- Ferry health
 - Money/score
 - Round end
 - One upgrade
@@ -134,3 +134,4 @@ Do not block the MVP on:
 - Perfect balancing
 - Full UI polish
 - More than one weapon
+- Cargo, until the ferry-only loop is stable
