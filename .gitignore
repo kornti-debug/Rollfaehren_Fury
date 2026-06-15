@@ -23,6 +23,9 @@
 *.pdb.meta
 *.mdb
 *.mdb.meta
+*.dSYM/
+*.dSYM.meta
+*.dSYM/**/*.meta
 *.opendb
 *.VC.db
 
