@@ -22,12 +22,11 @@ namespace RollfaehrenFury.Editor
 
             Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
 
-            Material deckMaterial = EnsureMaterial("Assets/Materials/PrototypeDeck.mat", new Color(0.55f, 0.36f, 0.2f));
             Material waterMaterial = EnsureMaterial("Assets/Materials/PrototypeWater.mat", new Color(0.05f, 0.35f, 0.7f, 0.75f));
             Material shoreMaterial = EnsureMaterial("Assets/Materials/PrototypeShore.mat", new Color(0.32f, 0.62f, 0.26f));
             Material enemyMaterial = EnsureMaterial("Assets/Materials/PrototypeEnemy.mat", new Color(0.85f, 0.12f, 0.18f));
 
-            GameObject ferry = EnsureFerry(deckMaterial);
+            GameObject ferry = EnsureFerry();
             Health ferryHealth = EnsureComponent<Health>(ferry);
             SetFloat(ferryHealth, "maxHealth", 100f);
             FerryDamageTarget ferryTarget = EnsureFerryDamageTarget(ferry, ferryHealth);
@@ -70,7 +69,7 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "UI");
         }
 
-        private static GameObject EnsureFerry(Material deckMaterial)
+        private static GameObject EnsureFerry()
         {
             GameObject ferry = GameObject.Find("Ferry");
             if (ferry == null)
@@ -80,20 +79,33 @@ namespace RollfaehrenFury.Editor
             }
 
             GameObject deck = FindChild(ferry.transform, "Prototype Ferry Deck");
-            if (deck == null)
+            if (deck != null)
             {
-                deck = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                deck.name = "Prototype Ferry Deck";
-                deck.transform.SetParent(ferry.transform, false);
+                Object.DestroyImmediate(deck);
             }
 
-            deck.transform.localPosition = new Vector3(0f, 0f, 0f);
-            deck.transform.localScale = new Vector3(10f, 0.35f, 6f);
-            Renderer renderer = deck.GetComponent<Renderer>();
-            renderer.sharedMaterial = deckMaterial;
-            deck.GetComponent<Collider>().isTrigger = false;
+            EnsureInvisibleWalkCollider(ferry);
 
             return ferry;
+        }
+
+        private static void EnsureInvisibleWalkCollider(GameObject ferry)
+        {
+            GameObject walkColliderObject = FindChild(ferry.transform, "Ferry Walk Collider");
+            if (walkColliderObject == null)
+            {
+                walkColliderObject = new GameObject("Ferry Walk Collider");
+                walkColliderObject.transform.SetParent(ferry.transform, false);
+            }
+
+            walkColliderObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+            walkColliderObject.transform.localRotation = Quaternion.identity;
+            walkColliderObject.transform.localScale = Vector3.one;
+
+            BoxCollider walkCollider = EnsureComponent<BoxCollider>(walkColliderObject);
+            walkCollider.isTrigger = false;
+            walkCollider.center = new Vector3(0f, 0.1f, 0f);
+            walkCollider.size = new Vector3(20f, 0.35f, 45f);
         }
 
         private static FerryDamageTarget EnsureFerryDamageTarget(GameObject ferry, Health ferryHealth)
@@ -114,7 +126,7 @@ namespace RollfaehrenFury.Editor
             aimPoint.localPosition = new Vector3(0f, 3f, 0f);
 
             BoxCollider collider = EnsureComponent<BoxCollider>(ferry);
-            collider.isTrigger = true;
+            collider.isTrigger = false;
             if (collider.size.x < 12f || collider.size.z < 20f)
             {
                 collider.center = new Vector3(0f, 3f, 0f);
