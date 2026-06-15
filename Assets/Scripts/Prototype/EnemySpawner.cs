@@ -18,6 +18,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float speedScalePerRound = 0.15f;
         [SerializeField] private float spawnDelayReductionPerRound = 0.18f;
         [SerializeField] private float fallbackSpawnRadius = 65f;
+        [SerializeField] private bool useFixedSpawnHeight = true;
+        [SerializeField] private float spawnHeight = 1f;
 
         private readonly List<SimpleEnemy> aliveEnemies = new List<SimpleEnemy>();
         private Coroutine spawnRoutine;
@@ -118,13 +120,23 @@ namespace RollfaehrenFury.Prototype
                 Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
                 if (point != null)
                 {
-                    return point.position;
+                    return ApplySpawnHeight(point.position);
                 }
             }
 
             Vector2 randomCircle = Random.insideUnitCircle.normalized * fallbackSpawnRadius;
             Vector3 center = ferryTarget != null ? ferryTarget.transform.position : transform.position;
-            return center + new Vector3(randomCircle.x, 3f, randomCircle.y);
+            return ApplySpawnHeight(center + new Vector3(randomCircle.x, 0f, randomCircle.y));
+        }
+
+        private Vector3 ApplySpawnHeight(Vector3 position)
+        {
+            if (useFixedSpawnHeight)
+            {
+                position.y = spawnHeight;
+            }
+
+            return position;
         }
 
         private float GetSpawnDelay()

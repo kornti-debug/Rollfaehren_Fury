@@ -14,6 +14,7 @@ namespace RollfaehrenFury.Editor
     {
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
+        private const float EnemySpawnHeight = 1f;
 
         [MenuItem("Rollfaehren Fury/Build Prototype Scene")]
         public static void BuildPrototypeScene()
@@ -201,12 +202,12 @@ namespace RollfaehrenFury.Editor
             parent = new GameObject("Enemy Spawn Points");
             Vector3[] positions =
             {
-                new Vector3(-58f, 3f, -34f),
-                new Vector3(58f, 3f, -34f),
-                new Vector3(-65f, 4f, 0f),
-                new Vector3(65f, 4f, 0f),
-                new Vector3(-58f, 3f, 34f),
-                new Vector3(58f, 3f, 34f)
+                new Vector3(-58f, 0f, -34f),
+                new Vector3(58f, 0f, -34f),
+                new Vector3(-65f, 0f, 0f),
+                new Vector3(65f, 0f, 0f),
+                new Vector3(-58f, 0f, 34f),
+                new Vector3(58f, 0f, 34f)
             };
 
             Transform[] points = new Transform[positions.Length];
@@ -214,7 +215,10 @@ namespace RollfaehrenFury.Editor
             {
                 GameObject point = new GameObject($"Enemy Spawn {i + 1}");
                 point.transform.SetParent(parent.transform, false);
-                point.transform.position = center.position + positions[i];
+                point.transform.position = new Vector3(
+                    center.position.x + positions[i].x,
+                    EnemySpawnHeight,
+                    center.position.z + positions[i].z);
                 points[i] = point.transform;
             }
 
@@ -340,6 +344,8 @@ namespace RollfaehrenFury.Editor
             SetFloat(spawner, "speedScalePerRound", 0.15f);
             SetFloat(spawner, "spawnDelayReductionPerRound", 0.18f);
             SetFloat(spawner, "fallbackSpawnRadius", 65f);
+            SetBool(spawner, "useFixedSpawnHeight", true);
+            SetFloat(spawner, "spawnHeight", EnemySpawnHeight);
 
             return gameManager;
         }
