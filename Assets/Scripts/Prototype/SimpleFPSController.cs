@@ -10,7 +10,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float sprintMultiplier = 1.35f;
         [SerializeField] private float mouseSensitivity = 0.12f;
-        [SerializeField] private float pitchClamp = 82f;
+        [SerializeField] private float pitchClamp = 60f;
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float jumpHeight = 1.1f;
         [SerializeField] private bool lockCursorOnPlay = true;
@@ -18,12 +18,14 @@ namespace RollfaehrenFury.Prototype
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
+        private Animator _animator;
 
         public bool InputEnabled { get; private set; } = true;
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            _animator = GetComponent<Animator>();
             if (cameraRoot == null)
             {
                 Camera childCamera = GetComponentInChildren<Camera>();
@@ -116,9 +118,21 @@ namespace RollfaehrenFury.Prototype
             }
 
             moveInput = Vector2.ClampMagnitude(moveInput, 1f);
-            float speed = Keyboard.current.leftShiftKey.isPressed ? moveSpeed * sprintMultiplier : moveSpeed;
+            bool isSprinting = Keyboard.current.leftShiftKey.isPressed;
+            float speed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
             Vector3 movement = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
 
+            if (isSprinting)
+            {
+                _animator.SetBool("IsRunning", true);
+                _animator.SetBool("IsIdle", false);
+            }
+            else
+            {
+                _animator.SetBool("IsRunning", false);
+            }
+            
+            
             if (controller.isGrounded && verticalVelocity < 0f)
             {
                 verticalVelocity = -2f;
