@@ -78,13 +78,14 @@ Do not build gameplay around audio before the gameplay event exists. First creat
 
 ## Starter Event Ideas
 
-- `Play_Player_Shoot`
-- `Play_Player_HitConfirm`
+- `Play_Weapon_Shoot`
+- `Play_Enemy_Hit`
 - `Play_Enemy_Death`
 - `Play_Ferry_Damage`
-- `Play_Cargo_Destroyed`
-- `Play_Round_Start`
 - `Play_Round_Complete`
 - `Play_Game_Over`
+- `Play_UI_Upgrade`
 - `Play_UI_Select`
 - `Play_UI_Confirm`
+
+The playable MVP branch has a `PrototypeAudioEvents` component that already posts the first seven event names above. Missing events should not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.

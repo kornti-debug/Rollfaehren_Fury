@@ -36,7 +36,7 @@ Do not commit generated local folders such as `Library/`, `Logs/`, `UserSettings
 
 Core pitch:
 
-The player stands on a ferry in first person and protects it while it crosses the river. Enemies attack from the air, water, and shore. Killing enemies gives money. Surviving cargo gives extra money. Between rounds, the player reaches a shop and buys upgrades. Each next round is harder.
+The player stands on a ferry in first person and protects it while it crosses the river. Enemies approach the ferry, damage it on contact, and disappear. Killing enemies gives money. Surviving the crossing gives a small round reward. Between rounds, the player buys simple upgrades. Each next round is harder.
 
 Prototype canon:
 
@@ -46,23 +46,24 @@ Prototype canon:
 
 ## MVP Scope
 
-Must-have:
+Current must-have:
 
-- Main menu
-- Game scene
+- One playable scene: `Assets/Scenes/Main.unity`
 - Game over state
-- Shop or upgrade state between rounds
+- Shop or upgrade panel between rounds
 - First-person player controller
 - One weapon with hit/damage behavior
-- Moving or simulated ferry crossing
-- Ferry health and cargo health
+- Simulated ferry crossing timer
+- Ferry health
 - At least one enemy type
-- Enemy spawning and attack behavior
+- Enemy spawning and contact damage behavior
 - Score/money rewards
 - Upgrade that affects gameplay
 
 Nice-to-have after MVP:
 
+- Main menu
+- Cargo crates and cargo rewards
 - Multiple enemy types
 - Civilian NPCs reacting on the ferry
 - Flamethrower or alternate weapon
@@ -86,15 +87,15 @@ Use simple MonoBehaviour-based Unity systems first. Keep systems modular but avo
 Planned high-level systems:
 
 - `GameManager`: controls scene/game state and manager references
-- `RoundManager`: starts, ends, and scales rounds
-- `ScoreManager`: tracks money, kills, cargo rewards
+- `RoundManager`: starts, ends, and scales rounds if this outgrows `GameManager`
+- `ScoreManager`: tracks money, kills, and rewards if this outgrows `GameManager`
 - `UIManager`: menu, HUD, game over, shop UI
 - `SpawnManager`: enemy wave spawning
 - `ShopManager`: upgrade purchase flow
 - `FerryController`: ferry movement, round crossing state, protected-object behavior
-- `HealthSystem`: reusable health/damage for player, enemies, ferry, cargo
+- `HealthSystem`: reusable health/damage for player, enemies, ferry, and later cargo
 - `WeaponSystem`: player weapon handling
-- `UpgradeSystem`: applies upgrades to player, weapons, ferry, or cargo
+- `UpgradeSystem`: applies upgrades to player, weapons, ferry, or later cargo
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before adding new manager-like classes.
 
@@ -110,10 +111,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before adding new manager-like 
 
 ## Current Priorities
 
-1. Confirm Wwise integration opens in Unity without Console errors.
-2. Create clean scene structure: `MainMenu`, `Game`, `Shop` or shop overlay, `GameOver` or game over overlay.
-3. Build bootstrap game flow: menu to game scene to shop/game over.
-4. Add first-person controller and placeholder ferry deck.
-5. Add one enemy and one weapon.
-6. Add ferry/cargo health, money, and one upgrade.
-7. Replace placeholders with team assets after the loop is playable.
+1. Pull and test the `codex/playable-mvp` branch in Unity.
+2. Open `Assets/Scenes/Main.unity` and press Play.
+3. If needed, run `Rollfaehren Fury > Build Prototype Scene`.
+4. Tune enemy speed, spawn timing, ferry health, weapon damage, shop prices, and crossing duration.
+5. Create Wwise events matching the hook names in `PrototypeAudioEvents`.
+6. Replace placeholders with team assets after the loop is playable.

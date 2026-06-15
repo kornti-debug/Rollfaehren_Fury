@@ -9,66 +9,70 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add `.gitignore` and `.gitattributes`.
 - [x] Integrate Wwise.
 - [x] Add project docs.
+- [x] Add first playable MVP branch: `codex/playable-mvp`.
 - [ ] Verify a fresh clone on another machine.
-- [ ] Confirm Unity opens without Console errors after Wwise integration.
+- [x] Confirm Unity batchmode compiles the prototype scene builder.
+- [ ] Confirm Unity Play Mode has no Console errors on a teammate machine.
 - [ ] Decide final team branch rules.
 
 ## Game Flow
 
-- [ ] Create `MainMenu` scene or menu overlay.
-- [ ] Add New Game button.
-- [ ] Add Quit button.
-- [ ] Create `Game` scene flow.
-- [ ] Add game over state.
-- [ ] Add shop/upgrade state.
-- [ ] Add round restart/next round behavior.
+- [ ] Create `MainMenu` scene or menu overlay later if time allows.
+- [ ] Add New Game button later if a menu is added.
+- [ ] Add Quit button later if a menu is added.
+- [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
+- [x] Add game over state.
+- [x] Add shop/upgrade state.
+- [x] Add round restart/next round behavior.
 
 ## Player and Weapons
 
-- [ ] Add FPS movement and camera look.
-- [ ] Add basic crosshair.
-- [ ] Add first weapon.
-- [ ] Add enemy hit detection.
-- [ ] Add weapon cooldown or reload.
-- [ ] Add Wwise event for shooting.
-- [ ] Add Wwise event for hit confirmation.
+- [x] Add FPS movement and camera look.
+- [x] Add basic crosshair.
+- [x] Add first weapon.
+- [x] Add enemy hit detection.
+- [x] Add weapon cooldown.
+- [x] Add Wwise hook for shooting.
+- [x] Add Wwise hook for hit confirmation.
 
 ## Ferry and Cargo
 
-- [ ] Create placeholder ferry deck.
-- [ ] Create river/shore placeholder layout.
-- [ ] Implement ferry crossing progress.
-- [ ] Add ferry health.
-- [ ] Add cargo prefab.
-- [ ] Add cargo health.
-- [ ] Add cargo survival reward.
+- [x] Create placeholder ferry deck.
+- [x] Create river/shore placeholder layout.
+- [x] Implement ferry crossing progress.
+- [x] Add ferry health.
 - [ ] Add visible damage or warning feedback.
+- [ ] Later: add cargo prefab.
+- [ ] Later: add cargo health.
+- [ ] Later: add cargo survival reward.
 
 ## Enemies
 
-- [ ] Create first enemy prefab.
-- [ ] Add enemy health.
-- [ ] Add movement toward ferry/cargo/player.
-- [ ] Add attack/damage behavior.
-- [ ] Add `SpawnManager`.
-- [ ] Add round-based spawn scaling.
+- [x] Create first enemy prefab.
+- [x] Add enemy health.
+- [x] Add movement toward ferry.
+- [x] Add contact damage behavior.
+- [x] Add `EnemySpawner`.
+- [x] Add round-based spawn scaling.
 - [ ] Add second enemy variant if time allows.
 
 ## Score, Money, and Upgrades
 
-- [ ] Add kill reward.
-- [ ] Add cargo survival reward.
-- [ ] Add money display.
-- [ ] Add shop UI.
-- [ ] Add first upgrade: weapon damage.
-- [ ] Add second upgrade: ferry/cargo health or player speed.
-- [ ] Add next-round difficulty increase.
+- [x] Add kill reward.
+- [x] Add round completion reward.
+- [x] Add money display.
+- [x] Add shop UI.
+- [x] Add first upgrade: weapon damage.
+- [x] Add second upgrade: ferry health.
+- [x] Add third upgrade: fire rate.
+- [x] Add next-round difficulty increase.
+- [ ] Later: add cargo survival reward.
 
 ## Art and Scene Props
 
 - [ ] Low-poly ferry model.
-- [ ] Low-poly shore assets.
-- [ ] Cargo crates.
+- [x] Prototype shore placeholders.
+- [ ] Later: cargo crates.
 - [ ] Weapon model.
 - [ ] First enemy model.
 - [ ] Optional shop NPC or vending machine.
@@ -79,15 +83,15 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Confirm Wwise project opens.
 - [ ] Create first test event.
 - [ ] Generate initial soundbanks.
-- [ ] Hook shooting event in Unity.
-- [ ] Hook enemy death event.
-- [ ] Hook ferry damage event.
+- [x] Hook shooting event in Unity.
+- [x] Hook enemy death event.
+- [x] Hook ferry damage event.
 - [ ] Hook UI confirm/cancel events.
 - [ ] Add ambience for river/ferry.
 
 ## Presentation
 
-- [ ] Add controls section to README when controls exist.
+- [x] Add controls section to README when controls exist.
 - [ ] Add screenshots or GIFs when the prototype is visible.
 - [ ] Update GitHub Pages with current prototype status.
 - [ ] Prepare final demo build instructions.

@@ -2,7 +2,7 @@
 
 ## Scene Flow
 
-The intended game flow from the pre-project design is:
+The intended full game flow from the pre-project design is:
 
 ```text
 MainMenu
@@ -12,7 +12,7 @@ MainMenu
       -> GameOver
 ```
 
-For the prototype, `ShopScene` and `GameOver` can be UI overlays inside the game scene. Separate scenes can be introduced later if they make the workflow cleaner.
+The current MVP uses one scene, `Assets/Scenes/Main.unity`. Shop and game over are UI overlays inside that scene. Separate scenes can be introduced later if they make the workflow cleaner.
 
 ## Entity Hierarchy
 
@@ -40,8 +40,8 @@ Implementation guidance:
 Planned managers:
 
 - `GameManager`: owns game state and coordinates other managers.
-- `RoundManager`: handles round start, crossing complete, difficulty scaling.
-- `ScoreManager`: tracks money, score, kills, cargo rewards.
+- `RoundManager`: handles round start, crossing complete, difficulty scaling if this outgrows `GameManager`.
+- `ScoreManager`: tracks money, score, kills, and rewards if this outgrows `GameManager`.
 - `UIManager`: controls menu, HUD, shop, and game over screens.
 - `SpawnManager`: spawns enemies by round rules.
 - `ShopManager`: presents and applies upgrades.
@@ -59,9 +59,9 @@ Planned systems and responsibilities:
 - `Weapon`: base weapon behavior.
 - `Gun`: first simple weapon implementation.
 - `Flamethrower`: later weapon option.
-- `UpgradeSystem`: applies upgrades to player, weapons, ferry, and cargo rewards.
+- `UpgradeSystem`: applies upgrades to player, weapons, ferry, and later cargo rewards.
 - `FerryController`: ferry movement and crossing progress.
-- `Cargo`: destructible cargo with reward value.
+- `Cargo`: later destructible cargo with reward value.
 
 ## Key Relationships
 
@@ -72,10 +72,10 @@ From the pre-project design:
 - `WeaponSystem` contains one or more `Weapon` instances.
 - `SpawnManager` creates enemies.
 - `ShopManager` uses `UpgradeSystem`.
-- `UpgradeSystem` modifies player, weapon, ferry, or cargo values.
-- `Enemy` attacks ferry, cargo, or player.
-- `FerryController` holds cargo and optional civilian NPCs.
-- `ScoreManager` pays rewards for enemy kills and surviving cargo.
+- `UpgradeSystem` modifies player, weapon, ferry, or later cargo values.
+- Current MVP `Enemy` attacks only the ferry.
+- Later `FerryController` can hold cargo and optional civilian NPCs.
+- Current MVP rewards enemy kills and crossing completion.
 
 ## Suggested Project Structure
 
@@ -96,11 +96,11 @@ Create folders when the first script or prefab needs them. Empty folders are not
 ## Bootstrap Implementation Order
 
 1. `GameManager` with basic game states.
-2. Scene loading or UI flow for main menu and game scene.
-3. `FerryController` with crossing progress.
-4. `HealthSystem`.
-5. Player controller and `WeaponSystem`.
-6. One enemy prefab and `SpawnManager`.
-7. `ScoreManager`.
+2. One-scene UI flow for gameplay, shop, and game over.
+3. Timed crossing progress.
+4. Shared `Health`.
+5. Player controller and hitscan weapon.
+6. One enemy prefab and `EnemySpawner`.
+7. Money rewards inside `GameManager`.
 8. Basic shop/upgrade UI.
 9. Wwise events for confirmed gameplay actions.
