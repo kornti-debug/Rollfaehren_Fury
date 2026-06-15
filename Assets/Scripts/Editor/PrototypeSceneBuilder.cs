@@ -126,7 +126,7 @@ namespace RollfaehrenFury.Editor
             aimPoint.localPosition = new Vector3(0f, 3f, 0f);
 
             BoxCollider collider = EnsureComponent<BoxCollider>(ferry);
-            collider.isTrigger = false;
+            collider.isTrigger = true;
             if (collider.size.x < 12f || collider.size.z < 20f)
             {
                 collider.center = new Vector3(0f, 3f, 0f);
