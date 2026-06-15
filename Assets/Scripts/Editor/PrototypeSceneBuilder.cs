@@ -41,6 +41,7 @@ namespace RollfaehrenFury.Editor
 
             SimpleHUD hud = EnsureHud();
             GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weapon, hud, enemyPrefab, spawnPoints);
+            EnsureAudioEvents(gameManager, weapon);
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
             ConfigureBuildSettings();
@@ -288,6 +289,13 @@ namespace RollfaehrenFury.Editor
             SetObjectArray(spawner, "spawnPoints", spawnPoints);
 
             return gameManager;
+        }
+
+        private static void EnsureAudioEvents(GameManager gameManager, HitscanWeapon weapon)
+        {
+            PrototypeAudioEvents audioEvents = EnsureComponent<PrototypeAudioEvents>(gameManager.gameObject);
+            SetObject(audioEvents, "gameManager", gameManager);
+            SetObject(audioEvents, "weapon", weapon);
         }
 
         private static SimpleHUD EnsureHud()
