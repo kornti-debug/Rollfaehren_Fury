@@ -9,14 +9,15 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private SimpleEnemy enemyPrefab;
         [SerializeField] private FerryDamageTarget ferryTarget;
         [SerializeField] private Transform[] spawnPoints;
-        [SerializeField] private float spawnInterval = 2f;
+        [SerializeField] private float spawnInterval = 1.6f;
         [SerializeField] private int baseEnemiesPerRound = 8;
-        [SerializeField] private int extraEnemiesPerRound = 3;
-        [SerializeField] private int maxAliveEnemies = 10;
+        [SerializeField] private int extraEnemiesPerRound = 5;
+        [SerializeField] private int maxAliveEnemies = 14;
         [SerializeField] private int baseKillReward = 10;
-        [SerializeField] private float healthScalePerRound = 0.2f;
-        [SerializeField] private float speedScalePerRound = 0.08f;
-        [SerializeField] private float fallbackSpawnRadius = 28f;
+        [SerializeField] private float healthScalePerRound = 0.35f;
+        [SerializeField] private float speedScalePerRound = 0.15f;
+        [SerializeField] private float spawnDelayReductionPerRound = 0.18f;
+        [SerializeField] private float fallbackSpawnRadius = 65f;
 
         private readonly List<SimpleEnemy> aliveEnemies = new List<SimpleEnemy>();
         private Coroutine spawnRoutine;
@@ -128,7 +129,7 @@ namespace RollfaehrenFury.Prototype
 
         private float GetSpawnDelay()
         {
-            return Mathf.Max(0.45f, spawnInterval - (activeRound - 1) * 0.12f);
+            return Mathf.Max(0.35f, spawnInterval - (activeRound - 1) * spawnDelayReductionPerRound);
         }
 
         private void HandleEnemyRemoved(SimpleEnemy enemy)

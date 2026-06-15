@@ -274,7 +274,9 @@ namespace RollfaehrenFury.Prototype
         {
             float current = ferryHealth != null ? ferryHealth.CurrentHealth : 0f;
             float max = ferryHealth != null ? ferryHealth.MaxHealth : 1f;
-            hud?.SetStats(current, max, money, round, CrossingProgress);
+            float weaponDamage = playerWeapon != null ? playerWeapon.Damage : 0f;
+            float shotsPerSecond = playerWeapon != null ? playerWeapon.ShotsPerSecond : 0f;
+            hud?.SetStats(current, max, money, round, CrossingProgress, weaponDamage, shotsPerSecond);
         }
 
         private void ResolveReferences()

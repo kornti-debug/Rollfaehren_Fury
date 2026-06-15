@@ -13,6 +13,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Text roundText;
         [SerializeField] private Text crossingText;
         [SerializeField] private Image crossingFill;
+        [SerializeField] private Text weaponStatsText;
         [SerializeField] private Text messageText;
 
         [Header("Shop")]
@@ -34,7 +35,7 @@ namespace RollfaehrenFury.Prototype
             gameManager = manager;
         }
 
-        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress)
+        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, float weaponDamage, float shotsPerSecond)
         {
             if (ferryHealthText != null)
             {
@@ -66,6 +67,11 @@ namespace RollfaehrenFury.Prototype
             {
                 crossingFill.fillAmount = Mathf.Clamp01(crossingProgress);
             }
+
+            if (weaponStatsText != null)
+            {
+                weaponStatsText.text = $"Weapon: {weaponDamage:0} dmg | {shotsPerSecond:0.0}/s";
+            }
         }
 
         public void ShowGameplay()
@@ -94,17 +100,17 @@ namespace RollfaehrenFury.Prototype
 
             if (weaponDamageCostText != null)
             {
-                weaponDamageCostText.text = $"Damage Upgrade (${damageCost})";
+                weaponDamageCostText.text = $"Damage +10 (${damageCost})";
             }
 
             if (fireRateCostText != null)
             {
-                fireRateCostText.text = $"Fire Rate Upgrade (${fireRateCost})";
+                fireRateCostText.text = $"Fire rate +18% (${fireRateCost})";
             }
 
             if (ferryHealthCostText != null)
             {
-                ferryHealthCostText.text = $"Ferry Health (${healthCost})";
+                ferryHealthCostText.text = $"Repair + max health (${healthCost})";
             }
         }
 

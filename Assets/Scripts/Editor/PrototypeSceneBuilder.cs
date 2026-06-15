@@ -99,20 +99,31 @@ namespace RollfaehrenFury.Editor
         private static FerryDamageTarget EnsureFerryDamageTarget(GameObject ferry, Health ferryHealth)
         {
             GameObject target = FindChild(ferry.transform, "Ferry Damage Target");
-            if (target == null)
+            if (target != null)
             {
-                target = new GameObject("Ferry Damage Target");
-                target.transform.SetParent(ferry.transform, false);
+                Object.DestroyImmediate(target);
             }
 
-            target.transform.localPosition = new Vector3(0f, 1.5f, 0f);
-            BoxCollider collider = EnsureComponent<BoxCollider>(target);
-            collider.isTrigger = true;
-            collider.size = new Vector3(12f, 4f, 8f);
+            Transform aimPoint = ferry.transform.Find("Ferry Aim Point");
+            if (aimPoint == null)
+            {
+                aimPoint = new GameObject("Ferry Aim Point").transform;
+                aimPoint.SetParent(ferry.transform, false);
+            }
 
-            FerryDamageTarget damageTarget = EnsureComponent<FerryDamageTarget>(target);
+            aimPoint.localPosition = new Vector3(0f, 3f, 0f);
+
+            BoxCollider collider = EnsureComponent<BoxCollider>(ferry);
+            collider.isTrigger = true;
+            if (collider.size.x < 12f || collider.size.z < 20f)
+            {
+                collider.center = new Vector3(0f, 3f, 0f);
+                collider.size = new Vector3(22f, 7f, 48f);
+            }
+
+            FerryDamageTarget damageTarget = EnsureComponent<FerryDamageTarget>(ferry);
             SetObject(damageTarget, "ferryHealth", ferryHealth);
-            SetObject(damageTarget, "aimPoint", target.transform);
+            SetObject(damageTarget, "aimPoint", aimPoint);
             return damageTarget;
         }
 
@@ -160,8 +171,10 @@ namespace RollfaehrenFury.Editor
             HitscanWeapon weapon = EnsureComponent<HitscanWeapon>(camera.gameObject);
             SetObject(weapon, "fireCamera", camera);
             SetFloat(weapon, "damage", 25f);
-            SetFloat(weapon, "range", 120f);
+            SetFloat(weapon, "range", 250f);
+            SetFloat(weapon, "aimAssistRadius", 0.45f);
             SetFloat(weapon, "fireCooldown", 0.2f);
+            SetObject(weapon, "ignoredRoot", playerController.transform);
             return weapon;
         }
 
@@ -176,12 +189,12 @@ namespace RollfaehrenFury.Editor
             parent = new GameObject("Enemy Spawn Points");
             Vector3[] positions =
             {
-                new Vector3(-24f, 3f, -16f),
-                new Vector3(24f, 3f, -16f),
-                new Vector3(-28f, 4f, 0f),
-                new Vector3(28f, 4f, 0f),
-                new Vector3(-24f, 3f, 16f),
-                new Vector3(24f, 3f, 16f)
+                new Vector3(-58f, 3f, -34f),
+                new Vector3(58f, 3f, -34f),
+                new Vector3(-65f, 4f, 0f),
+                new Vector3(65f, 4f, 0f),
+                new Vector3(-58f, 3f, 34f),
+                new Vector3(58f, 3f, 34f)
             };
 
             Transform[] points = new Transform[positions.Length];
@@ -201,17 +214,35 @@ namespace RollfaehrenFury.Editor
             GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath);
             if (existingPrefab != null)
             {
-                return existingPrefab.GetComponent<SimpleEnemy>();
+                GameObject prefabRoot = PrefabUtility.LoadPrefabContents(EnemyPrefabPath);
+                ConfigureEnemyObject(prefabRoot, enemyMaterial);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, EnemyPrefabPath);
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+                return AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath).GetComponent<SimpleEnemy>();
             }
 
             GameObject enemy = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             enemy.name = "PrototypeEnemy";
-            enemy.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
-            enemy.GetComponent<Renderer>().sharedMaterial = enemyMaterial;
+            ConfigureEnemyObject(enemy, enemyMaterial);
 
-            SphereCollider collider = enemy.GetComponent<SphereCollider>();
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
+            Object.DestroyImmediate(enemy);
+            return prefab.GetComponent<SimpleEnemy>();
+        }
+
+        private static void ConfigureEnemyObject(GameObject enemy, Material enemyMaterial)
+        {
+            enemy.transform.localScale = new Vector3(1.35f, 1.35f, 1.35f);
+
+            Renderer renderer = enemy.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = enemyMaterial;
+            }
+
+            SphereCollider collider = EnsureComponent<SphereCollider>(enemy);
             collider.isTrigger = true;
-            collider.radius = 0.55f;
+            collider.radius = 0.8f;
 
             Rigidbody rigidbody = EnsureComponent<Rigidbody>(enemy);
             rigidbody.useGravity = false;
@@ -220,42 +251,44 @@ namespace RollfaehrenFury.Editor
             Health health = EnsureComponent<Health>(enemy);
             SetFloat(health, "maxHealth", 50f);
             EnsureComponent<SimpleEnemy>(enemy);
-
-            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
-            Object.DestroyImmediate(enemy);
-            return prefab.GetComponent<SimpleEnemy>();
         }
 
         private static void CreatePrototypeEnvironment(Material waterMaterial, Material shoreMaterial)
         {
             GameObject parent = GameObject.Find("Prototype Environment");
-            if (parent != null)
+            if (parent == null)
             {
-                Object.DestroyImmediate(parent);
+                parent = new GameObject("Prototype Environment");
             }
 
-            parent = new GameObject("Prototype Environment");
-
-            GameObject river = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            river.name = "River Placeholder";
-            river.transform.SetParent(parent.transform, false);
+            GameObject river = EnsureEnvironmentBlock(parent.transform, "River Placeholder");
             river.transform.position = new Vector3(0f, -0.25f, 0f);
-            river.transform.localScale = new Vector3(70f, 0.1f, 36f);
+            river.transform.localScale = new Vector3(358.71f, 0.1f, 600f);
             river.GetComponent<Renderer>().sharedMaterial = waterMaterial;
 
-            GameObject shoreA = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            shoreA.name = "Shore A Placeholder";
-            shoreA.transform.SetParent(parent.transform, false);
-            shoreA.transform.position = new Vector3(-48f, -0.15f, 0f);
-            shoreA.transform.localScale = new Vector3(22f, 0.25f, 42f);
+            GameObject shoreA = EnsureEnvironmentBlock(parent.transform, "Shore A Placeholder");
+            shoreA.transform.position = new Vector3(-191f, -0.15f, 0f);
+            shoreA.transform.localScale = new Vector3(22f, 0.25f, 600f);
             shoreA.GetComponent<Renderer>().sharedMaterial = shoreMaterial;
 
-            GameObject shoreB = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            shoreB.name = "Shore B Placeholder";
-            shoreB.transform.SetParent(parent.transform, false);
-            shoreB.transform.position = new Vector3(48f, -0.15f, 0f);
-            shoreB.transform.localScale = new Vector3(22f, 0.25f, 42f);
+            GameObject shoreB = EnsureEnvironmentBlock(parent.transform, "Shore B Placeholder");
+            shoreB.transform.position = new Vector3(197.8f, -0.15f, 0f);
+            shoreB.transform.localScale = new Vector3(22f, 0.25f, 600f);
             shoreB.GetComponent<Renderer>().sharedMaterial = shoreMaterial;
+        }
+
+        private static GameObject EnsureEnvironmentBlock(Transform parent, string blockName)
+        {
+            GameObject block = FindChild(parent, blockName);
+            if (block != null)
+            {
+                return block;
+            }
+
+            block = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            block.name = blockName;
+            block.transform.SetParent(parent, false);
+            return block;
         }
 
         private static GameManager EnsureGameManager(
@@ -287,6 +320,14 @@ namespace RollfaehrenFury.Editor
             SetObject(spawner, "enemyPrefab", enemyPrefab);
             SetObject(spawner, "ferryTarget", ferryTarget);
             SetObjectArray(spawner, "spawnPoints", spawnPoints);
+            SetFloat(spawner, "spawnInterval", 1.6f);
+            SetInt(spawner, "baseEnemiesPerRound", 8);
+            SetInt(spawner, "extraEnemiesPerRound", 5);
+            SetInt(spawner, "maxAliveEnemies", 14);
+            SetFloat(spawner, "healthScalePerRound", 0.35f);
+            SetFloat(spawner, "speedScalePerRound", 0.15f);
+            SetFloat(spawner, "spawnDelayReductionPerRound", 0.18f);
+            SetFloat(spawner, "fallbackSpawnRadius", 65f);
 
             return gameManager;
         }
@@ -317,14 +358,15 @@ namespace RollfaehrenFury.Editor
 
             SimpleHUD hud = EnsureComponent<SimpleHUD>(canvasObject);
 
-            GameObject gameplayPanel = CreateUiPanel(canvasObject.transform, "Gameplay Panel", TextAnchor.UpperLeft, new Vector2(24f, -24f), new Vector2(460f, 260f));
+            GameObject gameplayPanel = CreateUiPanel(canvasObject.transform, "Gameplay Panel", TextAnchor.UpperLeft, new Vector2(24f, -24f), new Vector2(520f, 300f));
             Text roundText = CreateText(gameplayPanel.transform, "Round Text", "Round 1", new Vector2(0f, 0f), new Vector2(420f, 34f), 26, TextAnchor.MiddleLeft);
             Text healthText = CreateText(gameplayPanel.transform, "Ferry Health Text", "Ferry: 100 / 100", new Vector2(0f, -42f), new Vector2(420f, 30f), 22, TextAnchor.MiddleLeft);
             Image healthFill = CreateBar(gameplayPanel.transform, "Ferry Health Bar", new Vector2(0f, -78f), new Color(0.1f, 0.85f, 0.45f));
             Text moneyText = CreateText(gameplayPanel.transform, "Money Text", "Money: $0", new Vector2(0f, -118f), new Vector2(420f, 30f), 22, TextAnchor.MiddleLeft);
             Text crossingText = CreateText(gameplayPanel.transform, "Crossing Text", "Crossing: 0%", new Vector2(0f, -154f), new Vector2(420f, 30f), 22, TextAnchor.MiddleLeft);
             Image crossingFill = CreateBar(gameplayPanel.transform, "Crossing Bar", new Vector2(0f, -190f), new Color(0.1f, 0.55f, 0.95f));
-            Text messageText = CreateText(gameplayPanel.transform, "Message Text", string.Empty, new Vector2(0f, -226f), new Vector2(520f, 30f), 20, TextAnchor.MiddleLeft);
+            Text weaponStatsText = CreateText(gameplayPanel.transform, "Weapon Stats Text", "Weapon: 25 dmg | 5.0/s", new Vector2(0f, -226f), new Vector2(520f, 30f), 20, TextAnchor.MiddleLeft);
+            Text messageText = CreateText(gameplayPanel.transform, "Message Text", string.Empty, new Vector2(0f, -258f), new Vector2(520f, 30f), 20, TextAnchor.MiddleLeft);
 
             Text crosshair = CreateText(canvasObject.transform, "Crosshair", "+", Vector2.zero, new Vector2(48f, 48f), 30, TextAnchor.MiddleCenter);
             RectTransform crosshairRect = crosshair.rectTransform;
@@ -357,6 +399,7 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "roundText", roundText);
             SetObject(hud, "crossingText", crossingText);
             SetObject(hud, "crossingFill", crossingFill);
+            SetObject(hud, "weaponStatsText", weaponStatsText);
             SetObject(hud, "messageText", messageText);
             SetObject(hud, "shopPanel", shopPanel);
             SetObject(hud, "shopTitleText", shopTitle);
@@ -616,6 +659,18 @@ namespace RollfaehrenFury.Editor
             if (property != null)
             {
                 property.floatValue = value;
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(target);
+            }
+        }
+
+        private static void SetInt(Object target, string propertyName, int value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                property.intValue = value;
                 serializedObject.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(target);
             }

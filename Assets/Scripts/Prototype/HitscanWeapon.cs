@@ -9,9 +9,11 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private Camera fireCamera;
         [SerializeField] private float damage = 25f;
-        [SerializeField] private float range = 100f;
+        [SerializeField] private float range = 250f;
+        [SerializeField] private float aimAssistRadius = 0.45f;
         [SerializeField] private float fireCooldown = 0.2f;
         [SerializeField] private LayerMask hitMask = ~0;
+        [SerializeField] private Transform ignoredRoot;
         [SerializeField] private UnityEvent fired = new UnityEvent();
         [SerializeField] private UnityEvent hitSomething = new UnityEvent();
         [SerializeField] private UnityEvent hitHealth = new UnityEvent();
@@ -25,12 +27,20 @@ namespace RollfaehrenFury.Prototype
         public bool InputEnabled { get; private set; } = true;
         public float Damage => damage;
         public float FireCooldown => fireCooldown;
+        public float ShotsPerSecond => fireCooldown <= 0f ? 0f : 1f / fireCooldown;
+        public float Range => range;
+        public float AimAssistRadius => aimAssistRadius;
 
         private void Awake()
         {
             if (fireCamera == null)
             {
                 fireCamera = GetComponentInParent<Camera>();
+            }
+
+            if (ignoredRoot == null && fireCamera != null)
+            {
+                ignoredRoot = fireCamera.transform.root;
             }
         }
 
@@ -76,7 +86,7 @@ namespace RollfaehrenFury.Prototype
             Ray ray = new Ray(fireCamera.transform.position, fireCamera.transform.forward);
             Debug.DrawRay(ray.origin, ray.direction * range, Color.yellow, 0.08f);
 
-            if (!Physics.Raycast(ray, out RaycastHit hit, range, hitMask, QueryTriggerInteraction.Collide))
+            if (!TryFindHit(ray, out RaycastHit hit))
             {
                 return true;
             }
@@ -93,6 +103,49 @@ namespace RollfaehrenFury.Prototype
             }
 
             return true;
+        }
+
+        private bool TryFindHit(Ray ray, out RaycastHit selectedHit)
+        {
+            RaycastHit[] hits = aimAssistRadius > 0f
+                ? Physics.SphereCastAll(ray, aimAssistRadius, range, hitMask, QueryTriggerInteraction.Collide)
+                : Physics.RaycastAll(ray, range, hitMask, QueryTriggerInteraction.Collide);
+
+            Array.Sort(hits, (left, right) => left.distance.CompareTo(right.distance));
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (ShouldIgnoreHit(hit.collider))
+                {
+                    continue;
+                }
+
+                selectedHit = hit;
+                return true;
+            }
+
+            selectedHit = default;
+            return false;
+        }
+
+        private bool ShouldIgnoreHit(Collider hitCollider)
+        {
+            if (hitCollider == null)
+            {
+                return true;
+            }
+
+            if (ignoredRoot != null && hitCollider.transform.IsChildOf(ignoredRoot))
+            {
+                return true;
+            }
+
+            if (hitCollider.GetComponentInParent<SimpleFPSController>() != null)
+            {
+                return true;
+            }
+
+            return hitCollider.GetComponentInParent<FerryDamageTarget>() != null;
         }
     }
 }
