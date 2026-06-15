@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rollenfähren-Fury — Danube Rogue-lite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;500;600;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --river:#0a3d4a;          /* deep danube */
+    --river-2:#0e5666;        /* shallower water */
+    --foam:#e8f4f2;           /* pale foam / paper */
+    --hull:#13202b;           /* dark hull / ink */
+    --warning:#ffb627;        /* hazard amber */
+    --warning-deep:#e8920c;
+    --siren:#ff4d2e;          /* alarm vermilion */
+    --rivet:#7d96a1;          /* steel grey */
+    --line: rgba(232,244,242,0.14);
+    --tape:#1a2f3a;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--hull);
+    color:var(--foam);
+    font-family:'Archivo',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;}
+
+  /* ---------- hazard tape divider ---------- */
+  .tape{
+    height:14px;
+    background:repeating-linear-gradient(45deg,
+      var(--warning) 0 22px, var(--hull) 22px 44px);
+    border-top:2px solid var(--hull);
+    border-bottom:2px solid var(--hull);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:92vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:80px 20px 60px;
+    overflow:hidden;
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--river-2) 0%, var(--river) 45%, var(--hull) 100%);
+  }
+  /* layered water bands */
+  .wave{
+    position:absolute;left:-10%;right:-10%;
+    height:40px;opacity:.35;
+    background:radial-gradient(closest-side, var(--foam) 0%, transparent 70%);
+    filter:blur(1px);
+    animation:drift linear infinite;
+  }
+  .wave.w1{bottom:18%;animation-duration:11s;}
+  .wave.w2{bottom:30%;opacity:.18;animation-duration:17s;animation-direction:reverse;}
+  .wave.w3{bottom:8%;opacity:.5;animation-duration:8s;}
+  @keyframes drift{from{transform:translateX(-6%);}to{transform:translateX(6%);}}
+
+  .ticket{
+    position:relative;
+    z-index:2;
+    border:2px solid var(--warning);
+    background:rgba(10,61,74,.55);
+    backdrop-filter:blur(3px);
+    padding:8px 18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--warning);
+    margin-bottom:30px;
+  }
+  .title{
+    position:relative;z-index:2;
+    font-family:'Bungee',sans-serif;
+    font-size:clamp(2.8rem,9vw,7rem);
+    line-height:.92;
+    margin:0;
+    color:var(--foam);
+    text-shadow:
+      4px 4px 0 var(--siren),
+      8px 8px 0 var(--river-2);
+    animation:rock 5s var(--ease) infinite;
+  }
+  .title .hl{color:var(--warning);}
+  @keyframes rock{0%,100%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}}
+
+  .tagline{
+    position:relative;z-index:2;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(1rem,2.4vw,1.5rem);
+    color:var(--foam);
+    margin:26px 0 0;
+    max-width:620px;
+  }
+  .tagline b{color:var(--warning);font-weight:700;}
+
+  .hero-meta{
+    position:relative;z-index:2;
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+    margin-top:34px;
+  }
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+    padding:7px 14px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    color:var(--rivet);
+    background:rgba(255,255,255,.02);
+  }
+  .chip b{color:var(--foam);}
+
+  .scroll-cue{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    z-index:2;
+    font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.3em;
+    color:var(--rivet);text-transform:uppercase;
+    animation:bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
+
+  /* ---------- layout shell ---------- */
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  section.block{padding:84px 0;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--warning);
+    display:flex;align-items:center;gap:12px;
+    margin:0 0 14px;
+  }
+  .eyebrow::before{content:"";width:34px;height:2px;background:var(--warning);}
+  h2{
+    font-family:'Bungee',sans-serif;
+    font-size:clamp(1.7rem,4vw,2.6rem);
+    margin:0 0 34px;
+    line-height:1;
+  }
+  h2 .sub{
+    display:block;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:.95rem;font-weight:400;
+    color:var(--rivet);
+    letter-spacing:0;text-transform:none;
+    margin-top:14px;
+  }
+
+  /* ---------- overview / story ---------- */
+  .story{
+    font-size:1.18rem;
+    max-width:760px;
+    color:#cfe2df;
+  }
+  .story b{color:var(--foam);}
+  .pullquote{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(1.3rem,3vw,2rem);
+    font-weight:700;
+    color:var(--warning);
+    border-left:4px solid var(--siren);
+    padding-left:22px;
+    margin:40px 0 0;
+    line-height:1.25;
+  }
+
+  /* ---------- loop / steps ---------- */
+  .loop{display:grid;gap:2px;background:var(--line);border:1px solid var(--line);}
+  .loop-row{
+    background:var(--hull);
+    display:grid;grid-template-columns:64px 1fr;
+    gap:0;
+    transition:background .25s var(--ease);
+  }
+  .loop-row:hover{background:#16242f;}
+  .loop-num{
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bungee',sans-serif;font-size:1.3rem;
+    color:var(--warning);
+    border-right:2px solid var(--line);
+  }
+  .loop-body{padding:22px 24px;}
+  .loop-body h3{
+    margin:0 0 6px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:1.15rem;font-weight:700;color:var(--foam);
+  }
+  .loop-body p{margin:0;color:#a9c1bd;font-size:.98rem;}
+
+  /* ---------- characters ---------- */
+  .roster{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
+  .crew{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,#16242f 0%, var(--hull) 100%);
+    padding:26px 24px 24px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .3s var(--ease), border-color .3s var(--ease);
+  }
+  .crew:hover{transform:translateY(-6px);border-color:var(--warning);}
+  .crew .role{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+    padding:4px 10px;border-radius:100px;display:inline-block;margin-bottom:16px;
+  }
+  .r-player{background:var(--warning);color:var(--hull);}
+  .r-sky{background:#2f6f86;color:var(--foam);}
+  .r-water{background:var(--siren);color:var(--foam);}
+  .crew h3{font-family:'Bungee',sans-serif;font-size:1.15rem;margin:0 0 10px;line-height:1.1;}
+  .crew p{margin:0;color:#a9c1bd;font-size:.95rem;}
+  .crew .emoji{position:absolute;top:14px;right:16px;font-size:2.4rem;opacity:.9;filter:grayscale(.1);}
+
+  /* ---------- architecture ---------- */
+  .arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
+  .panel{
+    border:1px solid var(--line);
+    padding:28px 26px;
+    background:rgba(255,255,255,.015);
+  }
+  .panel h3{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:1.2rem;margin:0 0 14px;color:var(--warning);
+  }
+  .panel p{margin:0;color:#bcd2ce;font-size:.98rem;}
+  code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.85em;
+    background:rgba(255,182,39,.12);
+    color:var(--warning);
+    padding:2px 6px;border-radius:4px;
+  }
+  .sysgrid{
+    margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;
+  }
+  .node{
+    font-family:'JetBrains Mono',monospace;font-size:.78rem;
+    border:1px solid var(--line);padding:10px 12px;border-radius:6px;
+    color:#cfe2df;background:var(--hull);text-align:center;
+  }
+  .node.singleton{border-color:var(--warning);color:var(--warning);}
+
+  /* ---------- gallery placeholders ---------- */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+  .frame{
+    aspect-ratio:16/10;
+    border:1px solid var(--line);
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 12px, transparent 12px 24px),
+      var(--river);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;color:var(--rivet);
+    position:relative;overflow:hidden;
+  }
+  .frame::before{content:"⛴";font-size:2.2rem;opacity:.35;}
+  .frame span{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;}
+  .frame img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top:2px solid var(--line);
+    padding:50px 24px;
+    text-align:center;
+  }
+  footer .logo{font-family:'Bungee',sans-serif;font-size:1.1rem;color:var(--warning);}
+  footer p{color:var(--rivet);font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.1em;margin:10px 0 0;}
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;}
+    .reveal{opacity:1;transform:none;transition:none;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="wave w1"></div>
+    <div class="wave w2"></div>
+    <div class="wave w3"></div>
+
+    <div class="ticket">Boarding now · Danube line · No refunds</div>
+    <h1 class="title">Rollenfähren<span class="hl">-</span>Fury</h1>
+    <p class="tagline">A chaotic <b>Danube rogue-lite</b>. Defend the ferry, bank to bank, against endless waves of mutated wildlife.</p>
+
+    <div class="hero-meta">
+      <span class="chip"><b>Genre</b> · Wave rogue-lite</span>
+      <span class="chip"><b>Engine</b> · Unity</span>
+      <span class="chip"><b>Captain</b> · Fraunz</span>
+      <span class="chip"><b>Setting</b> · River Danube</span>
+    </div>
+
+    <div class="scroll-cue">scroll to board ↓</div>
+  </header>
+
+  <div class="tape"></div>
+
+  <!-- OVERVIEW -->
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow reveal">The pitch</p>
+      <h2 class="reveal">Tea party? No. Total mayhem.<span class="sub">Project overview</span></h2>
+      <p class="story reveal">
+        Meet <b>Captain Fraunz</b> — the grumpiest, most stubbornly dedicated ferry operator on the river.
+        When the local Danube wildlife mutates into relentless waves of adversaries, there's only one job left:
+        keep the ferry afloat and get it to the other bank. Shoot, shout, and survive.
+      </p>
+      <p class="pullquote reveal">Defend the ferry from bank to bank — or sink trying.</p>
+    </div>
+  </section>
+
+  <div class="tape"></div>
+
+  <!-- GAMEPLAY LOOP -->
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow reveal">How it plays</p>
+      <h2 class="reveal">The core loop<span class="sub">Survive · loot · upgrade · repeat</span></h2>
+
+      <div class="loop reveal">
+        <div class="loop-row">
+          <div class="loop-num">01</div>
+          <div class="loop-body">
+            <h3>Survive the waves</h3>
+            <p>Endless, escalating rounds of increasingly ridiculous enemies. Shoot your way through and collect the cash and items they drop.</p>
+          </div>
+        </div>
+        <div class="loop-row">
+          <div class="loop-num">02</div>
+          <div class="loop-body">
+            <h3>Spend at the vending machine</h3>
+            <p>Between rounds, blow your cash on absurd augments at the onboard vending machine — like <code>Greased Deck</code> for faster movement.</p>
+          </div>
+        </div>
+        <div class="loop-row">
+          <div class="loop-num">03</div>
+          <div class="loop-body">
+            <h3>Protect the hull and cargo</h3>
+            <p>Fast, non-serious action with over-the-top physics. Watch for enemies that go straight for the boat — or your vital cargo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tape"></div>
+
+  <!-- CHARACTERS -->
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow reveal">Who's on board</p>
+      <h2 class="reveal">Cast &amp; threats<span class="sub">One captain, a river full of problems</span></h2>
+
+      <div class="roster">
+        <div class="crew reveal">
+          <span class="emoji">⛴️</span>
+          <span class="role r-player">Player</span>
+          <h3>Captain Fraunz</h3>
+          <p>A grumpy but dedicated ferry captain. His tools are simple: he can shoot, and he can shout. Keep the ferry alive.</p>
+        </div>
+        <div class="crew reveal">
+          <span class="emoji">🕊️</span>
+          <span class="role r-sky">Threat · Sky</span>
+          <h3>Cursed Pöltener Pigeon</h3>
+          <p>Wild, corrupted pigeons from St. Pölten that circle above the ferry and spread chaos with their filthy presence.</p>
+        </div>
+        <div class="crew reveal">
+          <span class="emoji">🐟</span>
+          <span class="role r-water">Threat · Water</span>
+          <h3>Radioactive Tullner Tuna</h3>
+          <p>Glowing fish from near Tulln, mutated by pollution and absolutely ready to ruin Captain Fraunz's day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tape"></div>
+
+  <!-- ARCHITECTURE -->
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow reveal">Under the hood</p>
+      <h2 class="reveal">System architecture<span class="sub">A modular, manager-driven design</span></h2>
+
+      <div class="arch">
+        <div class="panel reveal">
+          <h3>Management layer</h3>
+          <p>A centralized, singleton <code>GameManager</code> oversees the core gameplay flow and coordinates every structural system.</p>
+          <div class="sysgrid">
+            <div class="node singleton">GameManager</div>
+            <div class="node">RoundManager</div>
+            <div class="node">ScoreManager</div>
+            <div class="node">UIManager</div>
+            <div class="node">SpawnManager</div>
+            <div class="node">ShopManager</div>
+          </div>
+        </div>
+        <div class="panel reveal">
+          <h3>Core game systems</h3>
+          <p>Entities interact through a modular architecture. Characters carry a <code>HealthSystem</code>; the player owns a <code>WeaponSystem</code> aggregating weapons and shout abilities; a robust <code>UpgradeSystem</code> modifies key attributes on the fly.</p>
+          <div class="sysgrid">
+            <div class="node">HealthSystem</div>
+            <div class="node">WeaponSystem</div>
+            <div class="node">UpgradeSystem</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tape"></div>
+
+  <!-- GALLERY -->
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow reveal">Look &amp; feel</p>
+      <h2 class="reveal">Gallery &amp; mockups<span class="sub">Screens from the deck</span></h2>
+
+      <div class="gallery">
+        <div class="frame reveal"><img src="gameplay-mockup.png" alt="Arena deck view" onerror="this.style.display='none'"><span>Arena · deck view</span></div>
+        <div class="frame reveal"><img src="augment-shop.jpg" alt="Augment shop UI" onerror="this.style.display='none'"><span>Augment shop UI</span></div>
+        <div class="frame reveal"><img src="system-architecture.png" alt="Class diagram" onerror="this.style.display='none'"><span>Class diagram</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tape"></div>
+
+  <footer>
+    <div class="logo">Rollenfähren-Fury</div>
+    <p>© 2026 Rollenfähren-Fury Dev Team · Built for GitHub Pages</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+    },{threshold:0.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  </script>
+
+</body>
+</html>
