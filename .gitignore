@@ -45,6 +45,8 @@ WwiseUnityIntegration_*_Src.zip
 AkWwiseProjectData.asset
 IncrementalSoundBankData.xml
 **/.cache/
+**/GeneratedSoundBanks/
+/[Aa]ssets/[Ss]treamingAssets/Audio/GeneratedSoundBanks.meta
 
 # IDE/editor folders
 .vs/
