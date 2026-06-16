@@ -70,6 +70,12 @@ namespace RollfaehrenFury.Editor
             BuildPrototypeScene();
         }
 
+        public static void RepairPlayerCharacterVisualFromCommandLine()
+        {
+            EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            RepairPlayerCharacterVisual();
+        }
+
         [MenuItem("Rollfaehren Fury/Repair Player Character Visual")]
         public static void RepairPlayerCharacterVisual()
         {
