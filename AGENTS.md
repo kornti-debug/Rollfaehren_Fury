@@ -2,6 +2,39 @@
 
 This file is the source-of-truth briefing for teammates and AI agents working in this repository.
 
+## Agent Workflow (read this first)
+
+This repo is built by AI agents (Claude Code and Codex) plus human teammates.
+`AGENTS.md` is the master file — if it ever conflicts with another doc, this file
+wins. Follow this loop for every change:
+
+**1. Before implementing — get context.**
+
+- Read this file and the doc(s) relevant to your task (see the map below).
+- Check [docs/TODO.md](docs/TODO.md) for the current task state.
+
+**2. After implementing — update the docs in the same change.**
+
+- Tick or add items in [docs/TODO.md](docs/TODO.md).
+- Update the matching doc when behaviour, structure, or scope changed.
+- Commit doc updates together with the code, not in a separate pass.
+
+### Which doc to update for what
+
+| You changed... | Update... |
+| --- | --- |
+| Finished or added a task | [docs/TODO.md](docs/TODO.md) |
+| Added/renamed a system, manager, or class relationship | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Game loop, enemies, economy, or MVP scope | [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) + `MVP Scope` below |
+| Controls, run instructions, public overview | [README.md](README.md) |
+| Phase progress or milestone | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| Wwise events, banks, or audio workflow | [docs/WWISE.md](docs/WWISE.md) |
+| Clone or onboarding steps | [docs/SETUP.md](docs/SETUP.md) |
+
+A `pre-commit` reminder (and, for Claude Code, a `Stop` hook) nudges you when
+code changes land without doc updates. See [docs/SETUP.md](docs/SETUP.md) to
+enable the git hook.
+
 ## Project Identity
 
 Rollfaehren Fury is a stand-alone Unity 3D first-person shooter prototype for a university class project. The game is about protecting a cable ferry while it travels from one riverbank to the other.

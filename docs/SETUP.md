@@ -60,6 +60,18 @@ When tuning, start with Inspector values on:
 4. If Unity reports missing soundbanks, generate them from Wwise.
 5. See [WWISE.md](WWISE.md) for details.
 
+## Git Hooks (one-time)
+
+The repo ships a soft documentation reminder in `.githooks/`. Enable it once per
+clone so it warns you when gameplay code is committed without doc updates (see
+the Agent Workflow section in [AGENTS.md](../AGENTS.md)):
+
+```powershell
+git config core.hooksPath .githooks
+```
+
+The hook never blocks a commit; it only prints a reminder.
+
 ## Before Committing
 
 Run:

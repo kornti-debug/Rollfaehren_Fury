@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null || true; code=$(git status --porcelain -- Assets/Scripts 2>/dev/null); docs=$(git status --porcelain -- docs README.md AGENTS.md 2>/dev/null); if [ -n \"$code\" ] && [ -z \"$docs\" ]; then printf '%s' '{\"systemMessage\":\"Code under Assets/Scripts changed but docs/TODO were not updated. Per AGENTS.md, update the relevant doc before wrapping up.\"}'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
