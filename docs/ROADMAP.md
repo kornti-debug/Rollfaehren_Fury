@@ -54,7 +54,6 @@ weapon code are not rebuilt twice.
 
 Cheap, unblocks honest testing. Depends on: nothing.
 
-- Generate Wwise SoundBanks and create the events matching the `PrototypeAudioEvents` names → audio actually plays.
 - Visible ferry damage / low-health feedback (uses existing `Health` events).
 - Tuning pass: enemy speed, spawn timing, ferry health, weapon damage, shop prices, crossing duration.
 - Confirm a clean fresh clone + Play Mode (through Bootstrap → Menu → Main) on a teammate machine.
@@ -117,7 +116,7 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 
 - Low-poly ferry, shore, weapon, and enemy models replacing the primitives.
 - Water, lighting, and low-poly art direction.
-- Wwise mix + river/ferry ambience + music.
+- Wwise audio (deferred from Tier 0 — nothing depends on it): generate SoundBanks, wire the events matching `PrototypeAudioEvents`, then mix + river/ferry ambience + music. Until then the `Init.bnk not found` Console errors are expected noise.
 - Animations where they clarify behaviour.
 
 ### Tier 5 — Ship
@@ -128,7 +127,7 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 
 ## Critical path (shortest line to "more than a tech demo")
 
-Tier 0 (audio + damage feedback) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
+Tier 0 (damage feedback + tuning) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
 → Tier 2 (a second weapon + one enemy variant) → Tier 4/5 polish. The main menu
 and scene flow are already in place, so framing is no longer on the critical path.
 
