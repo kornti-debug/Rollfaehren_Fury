@@ -9,7 +9,7 @@ Status: in progress.
 - Git LFS configured.
 - Wwise integrated.
 - Project documentation added.
-- `codex/playable-mvp` branch contains the first generated playable slice.
+- `main` contains the first generated playable slice.
 
 Exit criteria:
 
@@ -21,9 +21,11 @@ Goal: prove the whole game loop with placeholder geometry.
 
 Tasks:
 
-- Use one-scene flow first; add menu later if time allows.
+- Add bootstrap/menu flow with New Game, Settings, and Quit.
+- Use `Main.unity` for gameplay, shop overlay, and game over overlay.
 - Create placeholder ferry deck and river crossing space.
 - Add FPS player movement and look.
+- Refactor gameplay input to project-wide Input System callbacks.
 - Add one weapon.
 - Add one enemy.
 - Add ferry health.

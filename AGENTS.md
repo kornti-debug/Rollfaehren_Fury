@@ -81,7 +81,8 @@ Prototype canon:
 
 Current must-have:
 
-- One playable scene: `Assets/Scenes/Main.unity`
+- Bootstrap/menu flow: `Assets/Scenes/Bootstrap.unity` loads `Assets/Scenes/Menu.unity`, and New Game loads `Assets/Scenes/Main.unity`
+- One playable gameplay scene: `Assets/Scenes/Main.unity`
 - Game over state
 - Shop or upgrade panel between rounds
 - First-person player controller
@@ -95,7 +96,6 @@ Current must-have:
 
 Nice-to-have after MVP:
 
-- Main menu
 - Cargo crates and cargo rewards
 - Multiple enemy types
 - Civilian NPCs reacting on the ferry
@@ -144,9 +144,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before adding new manager-like 
 
 ## Current Priorities
 
-1. Pull and test the `codex/playable-mvp` branch in Unity.
-2. Open `Assets/Scenes/Main.unity` and press Play.
-3. If needed, run `Rollfaehren Fury > Build Prototype Scene`.
-4. Tune enemy speed, spawn timing, ferry health, weapon damage, shop prices, and crossing duration.
-5. Create Wwise events matching the hook names in `PrototypeAudioEvents`.
-6. Replace placeholders with team assets after the loop is playable.
+1. Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity` and press Play.
+2. Use `New Game` to enter `Assets/Scenes/Main.unity`.
+3. Test `WASD`, mouse look, left-click shooting, `Esc`/Cancel return to menu, shop, and game over.
+4. If needed, run `Rollfaehren Fury > Build Prototype Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
+5. Tune enemy speed, spawn timing, ferry health, weapon damage, shop prices, and crossing duration.
+6. Create Wwise events matching the hook names in `PrototypeAudioEvents`.
+7. Replace placeholders with team assets after the loop is playable.

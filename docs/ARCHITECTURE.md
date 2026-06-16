@@ -2,17 +2,19 @@
 
 ## Scene Flow
 
-The intended full game flow from the pre-project design is:
+The current implemented flow is:
 
 ```text
-MainMenu
-  -> GameScene
-      -> ShopScene or ShopOverlay
-          -> GameScene with harder round
-      -> GameOver
+Bootstrap
+  -> Menu
+      -> Main
+          -> Shop overlay
+              -> Main with harder round
+          -> GameOver overlay
+          -> Menu via Cancel/Esc
 ```
 
-The current MVP uses one scene, `Assets/Scenes/Main.unity`. Shop and game over are UI overlays inside that scene. Separate scenes can be introduced later if they make the workflow cleaner.
+`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds. `Assets/Scenes/Menu.unity` has New Game, Settings, and Quit. `Assets/Scenes/Main.unity` stays the gameplay scene; shop and game over are UI overlays inside that scene.
 
 ## Entity Hierarchy
 
@@ -54,6 +56,10 @@ Start simple. A manager can be a MonoBehaviour in the game scene. Convert to per
 
 Planned systems and responsibilities:
 
+- `SceneFlow`: tiny static scene loader for bootstrap, menu, main, and quit.
+- `BootstrapLoader`: redirects the bootstrap scene to the menu scene.
+- `MainMenuController`: handles menu buttons and menu cancel input.
+- `GameplayMenuInput`: listens for UI Cancel/Esc in gameplay and returns to the menu.
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: selected weapon, fire input, ammo/cooldown if needed.
 - `Weapon`: base weapon behavior.
@@ -77,6 +83,19 @@ From the pre-project design:
 - Later `FerryController` can hold cargo and optional civilian NPCs.
 - Current MVP rewards enemy kills and crossing completion.
 
+## Input Layer
+
+The prototype uses the project-wide `Assets/InputSystem_Actions.inputactions` asset. Gameplay scripts subscribe to `InputAction` callbacks and store local input state instead of polling `Keyboard.current` or `Mouse.current` directly.
+
+Current action usage:
+
+- `Player/Move`: movement vector.
+- `Player/Look`: mouse/controller look delta.
+- `Player/Jump`: queued jump.
+- `Player/Sprint`: sprint held state.
+- `Player/Attack`: hold-to-fire weapon input and cursor relock.
+- `UI/Cancel`: menu back action and gameplay return-to-menu action.
+
 ## Suggested Project Structure
 
 ```text
@@ -96,7 +115,7 @@ Create folders when the first script or prefab needs them. Empty folders are not
 ## Bootstrap Implementation Order
 
 1. `GameManager` with basic game states.
-2. One-scene UI flow for gameplay, shop, and game over.
+2. Bootstrap/menu scene flow plus gameplay, shop, and game over overlays.
 3. Timed crossing progress.
 4. Shared `Health`.
 5. Player controller and hitscan weapon.
