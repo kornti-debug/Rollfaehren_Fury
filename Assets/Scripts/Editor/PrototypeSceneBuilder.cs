@@ -47,15 +47,15 @@ namespace RollfaehrenFury.Editor
             FerryDamageTarget ferryTarget = EnsureFerryDamageTarget(ferry, ferryHealth);
 
             SimpleFPSController playerController = EnsurePlayer();
-            HitscanWeapon weapon = EnsureWeapon(playerController);
+            WeaponSystem weaponSystem = EnsureWeapon(playerController);
             Transform[] spawnPoints = EnsureSpawnPoints(ferryTarget.transform);
             SimpleEnemy enemyPrefab = EnsureEnemyPrefab(enemyMaterial);
 
             CreatePrototypeEnvironment(waterMaterial, shoreMaterial);
 
             SimpleHUD hud = EnsureHud();
-            GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weapon, hud, enemyPrefab, spawnPoints);
-            EnsureAudioEvents(gameManager, weapon);
+            GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weaponSystem, hud, enemyPrefab, spawnPoints);
+            EnsureAudioEvents(gameManager, weaponSystem);
             EnsureGameplayMenuInputObject();
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
@@ -130,6 +130,7 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "Prefabs");
             EnsureFolder("Assets", "Materials");
             EnsureFolder("Assets", "UI");
+            EnsureFolder("Assets", "Weapons");
         }
 
         private static void CreateBootstrapScene()
@@ -404,17 +405,66 @@ namespace RollfaehrenFury.Editor
             EditorUtility.SetDirty(animator);
         }
 
-        private static HitscanWeapon EnsureWeapon(SimpleFPSController playerController)
+        private static WeaponSystem EnsureWeapon(SimpleFPSController playerController)
         {
             Camera camera = playerController.GetComponentInChildren<Camera>();
-            HitscanWeapon weapon = EnsureComponent<HitscanWeapon>(camera.gameObject);
-            SetObject(weapon, "fireCamera", camera);
-            SetFloat(weapon, "damage", 25f);
-            SetFloat(weapon, "range", 250f);
-            SetFloat(weapon, "aimAssistRadius", 0.45f);
-            SetFloat(weapon, "fireCooldown", 0.2f);
-            SetObject(weapon, "ignoredRoot", playerController.transform);
+
+            WeaponDefinition pistol = EnsureWeaponDefinition(
+                "Assets/Weapons/Pistol.asset", "Pistol", WeaponFireMode.Hitscan,
+                25f, 250f, 0.2f, 0.45f, 1, 0f);
+            WeaponDefinition shotgun = EnsureWeaponDefinition(
+                "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
+                12f, 60f, 0.7f, 0f, 6, 6f);
+
+            GameObject weaponsParent = FindChild(camera.transform, "Weapons");
+            if (weaponsParent != null)
+            {
+                Object.DestroyImmediate(weaponsParent);
+            }
+
+            weaponsParent = new GameObject("Weapons");
+            weaponsParent.transform.SetParent(camera.transform, false);
+
+            Weapon pistolWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Pistol", pistol);
+            Weapon shotgunWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Shotgun", shotgun);
+
+            WeaponSystem weaponSystem = EnsureComponent<WeaponSystem>(camera.gameObject);
+            SetObject(weaponSystem, "fireCamera", camera);
+            SetObject(weaponSystem, "ignoredRoot", playerController.transform);
+            SetObjectList(weaponSystem, "weapons", new Object[] { pistolWeapon, shotgunWeapon });
+            SetInt(weaponSystem, "startWeaponIndex", 0);
+            return weaponSystem;
+        }
+
+        private static Weapon CreateWeaponObject(Transform parent, string objectName, WeaponDefinition definition)
+        {
+            GameObject weaponObject = new GameObject(objectName);
+            weaponObject.transform.SetParent(parent, false);
+            Weapon weapon = EnsureComponent<Weapon>(weaponObject);
+            SetObject(weapon, "definition", definition);
             return weapon;
+        }
+
+        private static WeaponDefinition EnsureWeaponDefinition(
+            string path, string displayName, WeaponFireMode fireMode,
+            float damage, float range, float fireCooldown, float aimAssistRadius, int pelletsPerShot, float spreadAngle)
+        {
+            WeaponDefinition definition = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(path);
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<WeaponDefinition>();
+                AssetDatabase.CreateAsset(definition, path);
+            }
+
+            SetString(definition, "displayName", displayName);
+            SetEnum(definition, "fireMode", (int)fireMode);
+            SetFloat(definition, "damage", damage);
+            SetFloat(definition, "range", range);
+            SetFloat(definition, "fireCooldown", fireCooldown);
+            SetFloat(definition, "aimAssistRadius", aimAssistRadius);
+            SetInt(definition, "pelletsPerShot", pelletsPerShot);
+            SetFloat(definition, "spreadAngle", spreadAngle);
+            return definition;
         }
 
         private static Transform[] EnsureSpawnPoints(Transform center)
@@ -537,7 +587,7 @@ namespace RollfaehrenFury.Editor
             Health ferryHealth,
             FerryDamageTarget ferryTarget,
             SimpleFPSController playerController,
-            HitscanWeapon weapon,
+            WeaponSystem weaponSystem,
             SimpleHUD hud,
             SimpleEnemy enemyPrefab,
             Transform[] spawnPoints)
@@ -554,7 +604,7 @@ namespace RollfaehrenFury.Editor
             SetObject(gameManager, "ferryHealth", ferryHealth);
             SetObject(gameManager, "enemySpawner", spawner);
             SetObject(gameManager, "playerController", playerController);
-            SetObject(gameManager, "playerWeapon", weapon);
+            SetObject(gameManager, "weaponSystem", weaponSystem);
             SetObject(gameManager, "hud", hud);
             SetBool(gameManager, "startOnPlay", true);
             SetFloat(gameManager, "crossingDuration", 45f);
@@ -576,11 +626,11 @@ namespace RollfaehrenFury.Editor
             return gameManager;
         }
 
-        private static void EnsureAudioEvents(GameManager gameManager, HitscanWeapon weapon)
+        private static void EnsureAudioEvents(GameManager gameManager, WeaponSystem weaponSystem)
         {
             PrototypeAudioEvents audioEvents = EnsureComponent<PrototypeAudioEvents>(gameManager.gameObject);
             SetObject(audioEvents, "gameManager", gameManager);
-            SetObject(audioEvents, "weapon", weapon);
+            SetObject(audioEvents, "weaponSystem", weaponSystem);
             SetBool(audioEvents, "postEvents", false);
         }
 
@@ -907,6 +957,50 @@ namespace RollfaehrenFury.Editor
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
+        }
+
+        private static void SetObjectList(Object target, string propertyName, Object[] values)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property == null)
+            {
+                Debug.LogWarning($"Property '{propertyName}' was not found on {target.name}.", target);
+                return;
+            }
+
+            property.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++)
+            {
+                property.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+            }
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
+        }
+
+        private static void SetString(Object target, string propertyName, string value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                property.stringValue = value;
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(target);
+            }
+        }
+
+        private static void SetEnum(Object target, string propertyName, int value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                property.enumValueIndex = value;
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(target);
+            }
         }
 
         private static void SetFloat(Object target, string propertyName, float value)

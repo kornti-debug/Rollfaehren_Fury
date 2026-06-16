@@ -38,6 +38,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add weapon cooldown.
 - [x] Add Wwise hook for shooting.
 - [x] Add Wwise hook for hit confirmation.
+- [x] Track A1: extract data-driven `Weapon` + `WeaponDefinition` (ScriptableObject) from the single hitscan weapon.
+- [x] Track A2: add `WeaponSystem` that owns firing input and weapon switching.
+- [x] Track A: add a second weapon (Shotgun, spread fire mode) to prove the abstraction.
+- [ ] Verify Track A in Unity: run `Build Prototype Scene`, no compile errors, both weapons fire and switch via `Player/Next` / `Player/Previous`.
 
 ## Ferry and Cargo
 

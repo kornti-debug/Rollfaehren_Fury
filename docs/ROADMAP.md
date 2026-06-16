@@ -15,7 +15,7 @@ Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
 
 - `GameManager` — game states (Idle / Playing / Shop / GameOver), money, rounds, crossing timer
 - `Health` — reusable health/damage component with events (target-agnostic)
-- `HitscanWeapon` — one weapon: fire, cooldown, damage, aim assist
+- `WeaponSystem` + `Weapon` + `WeaponDefinition` — data-driven weapons (Track A): the active weapon fires, weapons switch, upgrades hit the active weapon
 - `SimpleEnemy` + `EnemySpawner` — one enemy, round-scaled spawning, contact damage
 - `FerryDamageTarget` — the ferry as the protected/damageable object
 - `SimpleHUD` — HUD + shop panel + game over panel
@@ -30,8 +30,7 @@ round, game over on ferry death, Esc back to the menu.
 
 ### Known shortcuts in the current code (these drive the order below)
 
-- Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven.
-- There is **one concrete weapon**; no weapon base class or inventory.
+- Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven (Track B).
 - The **Settings panel exists but has no real options yet**.
 - Wwise **hooks exist but banks/events are not wired up** (banks are gitignored;
   generate them locally — see [WWISE.md](WWISE.md)).
@@ -72,12 +71,15 @@ Track B (shop):      UpgradeSystem (B1) ──▶ ShopManager (B2)
                          once A2 and B1 both exist
 ```
 
-**Track A — weapons**
+**Track A — weapons — implemented (pending Unity verification)**
 
-- **A1. `Weapon` base** — extract the fire / damage / cooldown contract out of `HitscanWeapon` (becomes a subclass). Build on the existing Input System layer rather than re-polling devices.
-  - Depends on: nothing (pure refactor, loop keeps working). Unlocks: every additional weapon type.
-- **A2. `WeaponSystem`** — owns one or more weapons, handles selection/switching, exposes the active weapon to `GameManager`/HUD.
-  - Depends on: A1. Unlocks: multiple weapons, weapon-specific upgrades. (Thin until the second weapon exists — build it right before Tier 2 weapons.)
+Built data-driven (per the chosen design) instead of an inheritance tree:
+
+- **A1. `WeaponDefinition` (ScriptableObject) + data-driven `Weapon`** — replaces the single hitscan weapon. `Weapon` reads a definition and fires by `WeaponFireMode` (hitscan / spread); it keeps runtime copies of the stats so upgrades never mutate the shared asset.
+- **A2. `WeaponSystem`** — owns the firing input (`Player/Attack`), holds the weapon list, switches the active weapon (`Player/Next` / `Player/Previous`), and forwards fire/hit events to HUD + audio.
+- Plus a second weapon (Shotgun, spread) to prove the abstraction end-to-end. New weapons are now just a `WeaponDefinition` asset under `Assets/Weapons/`.
+
+Remaining: verify in Unity — run `Build Prototype Scene`, confirm no compile errors and that both weapons fire and switch.
 
 **Track B — shop & upgrades**
 

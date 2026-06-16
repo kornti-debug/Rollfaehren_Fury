@@ -6,7 +6,7 @@ namespace RollfaehrenFury.Prototype
     public sealed class PrototypeAudioEvents : MonoBehaviour
     {
         [SerializeField] private GameManager gameManager;
-        [SerializeField] private HitscanWeapon weapon;
+        [SerializeField] private WeaponSystem weaponSystem;
         [SerializeField] private bool postEvents;
         [SerializeField] private string weaponShootEvent = "Play_Weapon_Shoot";
         [SerializeField] private string enemyHitEvent = "Play_Enemy_Hit";
@@ -34,18 +34,18 @@ namespace RollfaehrenFury.Prototype
                 gameManager = GameManager.Instance != null ? GameManager.Instance : FindFirstObjectByType<GameManager>();
             }
 
-            if (weapon == null)
+            if (weaponSystem == null)
             {
-                weapon = FindFirstObjectByType<HitscanWeapon>();
+                weaponSystem = FindFirstObjectByType<WeaponSystem>();
             }
         }
 
         private void Subscribe()
         {
-            if (weapon != null)
+            if (weaponSystem != null)
             {
-                weapon.Fired += HandleWeaponFired;
-                weapon.HitHealth += HandleWeaponHitHealth;
+                weaponSystem.Fired += HandleWeaponFired;
+                weaponSystem.HitHealth += HandleWeaponHitHealth;
             }
 
             if (gameManager != null)
@@ -60,10 +60,10 @@ namespace RollfaehrenFury.Prototype
 
         private void Unsubscribe()
         {
-            if (weapon != null)
+            if (weaponSystem != null)
             {
-                weapon.Fired -= HandleWeaponFired;
-                weapon.HitHealth -= HandleWeaponHitHealth;
+                weaponSystem.Fired -= HandleWeaponFired;
+                weaponSystem.HitHealth -= HandleWeaponHitHealth;
             }
 
             if (gameManager != null)
@@ -78,7 +78,7 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleWeaponFired()
         {
-            Post(weaponShootEvent, weapon != null ? weapon.gameObject : gameObject);
+            Post(weaponShootEvent, weaponSystem != null ? weaponSystem.gameObject : gameObject);
         }
 
         private void HandleWeaponHitHealth(Health health)

@@ -16,7 +16,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Health ferryHealth;
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private SimpleFPSController playerController;
-        [SerializeField] private HitscanWeapon playerWeapon;
+        [SerializeField] private WeaponSystem weaponSystem;
         [SerializeField] private SimpleHUD hud;
         [SerializeField] private bool startOnPlay = true;
         [SerializeField] private float crossingDuration = 45f;
@@ -107,7 +107,7 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
-        public void Configure(Health ferry, EnemySpawner spawner, SimpleFPSController controller, HitscanWeapon weapon, SimpleHUD simpleHud)
+        public void Configure(Health ferry, EnemySpawner spawner, SimpleFPSController controller, WeaponSystem weapons, SimpleHUD simpleHud)
         {
             if (ferryHealth != null)
             {
@@ -118,7 +118,7 @@ namespace RollfaehrenFury.Prototype
             ferryHealth = ferry;
             enemySpawner = spawner;
             playerController = controller;
-            playerWeapon = weapon;
+            weaponSystem = weapons;
             hud = simpleHud;
 
             if (ferryHealth != null)
@@ -169,7 +169,7 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            playerWeapon?.AddDamage(weaponDamageUpgradeAmount);
+            weaponSystem?.AddDamageToActive(weaponDamageUpgradeAmount);
             UpgradeBought?.Invoke();
             hud?.ShowMessage($"+{weaponDamageUpgradeAmount:0} weapon damage");
             RefreshHud();
@@ -183,7 +183,7 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            playerWeapon?.MultiplyCooldown(fireRateUpgradeMultiplier);
+            weaponSystem?.MultiplyActiveCooldown(fireRateUpgradeMultiplier);
             UpgradeBought?.Invoke();
             hud?.ShowMessage("Faster fire rate");
             RefreshHud();
@@ -267,15 +267,15 @@ namespace RollfaehrenFury.Prototype
         private void SetGameplayInput(bool isEnabled)
         {
             playerController?.SetInputEnabled(isEnabled);
-            playerWeapon?.SetInputEnabled(isEnabled);
+            weaponSystem?.SetInputEnabled(isEnabled);
         }
 
         private void RefreshHud()
         {
             float current = ferryHealth != null ? ferryHealth.CurrentHealth : 0f;
             float max = ferryHealth != null ? ferryHealth.MaxHealth : 1f;
-            float weaponDamage = playerWeapon != null ? playerWeapon.Damage : 0f;
-            float shotsPerSecond = playerWeapon != null ? playerWeapon.ShotsPerSecond : 0f;
+            float weaponDamage = weaponSystem != null ? weaponSystem.ActiveDamage : 0f;
+            float shotsPerSecond = weaponSystem != null ? weaponSystem.ActiveShotsPerSecond : 0f;
             hud?.SetStats(current, max, money, round, CrossingProgress, weaponDamage, shotsPerSecond);
         }
 
@@ -296,9 +296,9 @@ namespace RollfaehrenFury.Prototype
                 playerController = FindFirstObjectByType<SimpleFPSController>();
             }
 
-            if (playerWeapon == null)
+            if (weaponSystem == null)
             {
-                playerWeapon = FindFirstObjectByType<HitscanWeapon>();
+                weaponSystem = FindFirstObjectByType<WeaponSystem>();
             }
 
             if (hud == null)
