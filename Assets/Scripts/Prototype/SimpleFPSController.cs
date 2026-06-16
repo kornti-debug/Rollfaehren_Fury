@@ -15,10 +15,15 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float jumpHeight = 1.1f;
         [SerializeField] private bool lockCursorOnPlay = true;
 
+        private static readonly int IsRunningId = Animator.StringToHash("IsRunning");
+        private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
+
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
         private Animator animator;
+        private bool animatorHasIsRunning;
+        private bool animatorHasIsIdle;
 
         public bool InputEnabled { get; private set; } = true;
 
@@ -26,6 +31,7 @@ namespace RollfaehrenFury.Prototype
         {
             controller = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
+            CacheAnimatorParameters();
             if (cameraRoot == null)
             {
                 Camera childCamera = GetComponentInChildren<Camera>();
@@ -148,8 +154,40 @@ namespace RollfaehrenFury.Prototype
             }
 
             bool isMoving = moveInput.sqrMagnitude > 0.001f;
-            animator.SetBool("IsRunning", isMoving && isSprinting);
-            animator.SetBool("IsIdle", !isMoving);
+            if (animatorHasIsRunning)
+            {
+                animator.SetBool(IsRunningId, isMoving);
+            }
+
+            if (animatorHasIsIdle)
+            {
+                animator.SetBool(IsIdleId, !isMoving);
+            }
+
+            animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
+        }
+
+        private void CacheAnimatorParameters()
+        {
+            animatorHasIsRunning = false;
+            animatorHasIsIdle = false;
+
+            if (animator == null)
+            {
+                return;
+            }
+
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.nameHash == IsRunningId && parameter.type == AnimatorControllerParameterType.Bool)
+                {
+                    animatorHasIsRunning = true;
+                }
+                else if (parameter.nameHash == IsIdleId && parameter.type == AnimatorControllerParameterType.Bool)
+                {
+                    animatorHasIsIdle = true;
+                }
+            }
         }
 
         private static void SetCursorLocked(bool locked)

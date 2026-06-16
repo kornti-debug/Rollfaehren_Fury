@@ -14,7 +14,17 @@ namespace RollfaehrenFury.Editor
     {
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
+        private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
+        private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
+        private const string PlayerVisualName = "Fraunz Visual";
         private const float EnemySpawnHeight = 1f;
+        private const float PlayerVisualScale = 0.85f;
+
+        private static readonly Vector3 PlayerStartPosition = new Vector3(0f, 7.37f, -1.8f);
+        private static readonly Vector3 FerryAimPointPosition = new Vector3(0f, 4.97f, 0f);
+        private static readonly Vector3 FerryDamageColliderCenter = new Vector3(0f, 7.070751f, 2.7608166f);
+        private static readonly Vector3 FerryDamageColliderSize = new Vector3(20f, 5.4464755f, 45.15598f);
+        private static readonly Vector3 FerryWalkColliderPosition = new Vector3(0f, 10.3f, 0f);
 
         [MenuItem("Rollfaehren Fury/Build Prototype Scene")]
         public static void BuildPrototypeScene()
@@ -60,6 +70,27 @@ namespace RollfaehrenFury.Editor
             BuildPrototypeScene();
         }
 
+        [MenuItem("Rollfaehren Fury/Repair Player Character Visual")]
+        public static void RepairPlayerCharacterVisual()
+        {
+            GameObject player = GameObject.Find("Prototype Player");
+            if (player == null)
+            {
+                Debug.LogWarning("Prototype Player was not found in the open scene.");
+                return;
+            }
+
+            HidePrimitivePlayerShell(player);
+            EnsurePlayerVisual(player.transform);
+
+            Scene scene = SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+
+            Selection.activeGameObject = player;
+            Debug.Log("Fraunz player visual repaired. Press Play to test idle/running animation.");
+        }
+
         private static void EnsureProjectFolders()
         {
             EnsureFolder("Assets", "Scripts");
@@ -99,7 +130,7 @@ namespace RollfaehrenFury.Editor
                 walkColliderObject.transform.SetParent(ferry.transform, false);
             }
 
-            walkColliderObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+            walkColliderObject.transform.localPosition = FerryWalkColliderPosition;
             walkColliderObject.transform.localRotation = Quaternion.identity;
             walkColliderObject.transform.localScale = Vector3.one;
 
@@ -124,15 +155,12 @@ namespace RollfaehrenFury.Editor
                 aimPoint.SetParent(ferry.transform, false);
             }
 
-            aimPoint.localPosition = new Vector3(0f, 3f, 0f);
+            aimPoint.localPosition = FerryAimPointPosition;
 
             BoxCollider collider = EnsureComponent<BoxCollider>(ferry);
             collider.isTrigger = true;
-            if (collider.size.x < 12f || collider.size.z < 20f)
-            {
-                collider.center = new Vector3(0f, 3f, 0f);
-                collider.size = new Vector3(22f, 7f, 48f);
-            }
+            collider.center = FerryDamageColliderCenter;
+            collider.size = FerryDamageColliderSize;
 
             FerryDamageTarget damageTarget = EnsureComponent<FerryDamageTarget>(ferry);
             SetObject(damageTarget, "ferryHealth", ferryHealth);
@@ -149,8 +177,10 @@ namespace RollfaehrenFury.Editor
                 player.name = "Prototype Player";
             }
 
-            player.transform.position = new Vector3(0f, 1.1f, -1.8f);
+            player.transform.position = PlayerStartPosition;
             player.transform.rotation = Quaternion.identity;
+
+            HidePrimitivePlayerShell(player);
 
             CharacterController characterController = EnsureComponent<CharacterController>(player);
             characterController.height = 1.8f;
@@ -175,7 +205,87 @@ namespace RollfaehrenFury.Editor
 
             SimpleFPSController controller = EnsureComponent<SimpleFPSController>(player);
             SetObject(controller, "cameraRoot", cameraRoot);
+            SetFloat(controller, "pitchClamp", 82f);
+            EnsurePlayerVisual(player.transform);
             return controller;
+        }
+
+        private static void HidePrimitivePlayerShell(GameObject player)
+        {
+            MeshRenderer renderer = player.GetComponent<MeshRenderer>();
+            if (renderer != null)
+            {
+                renderer.enabled = false;
+            }
+
+            CapsuleCollider collider = player.GetComponent<CapsuleCollider>();
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+        }
+
+        private static void EnsurePlayerVisual(Transform player)
+        {
+            GameObject visual = FindChild(player, PlayerVisualName);
+            if (visual == null)
+            {
+                GameObject visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerVisualPrefabPath);
+                if (visualPrefab == null)
+                {
+                    Debug.LogWarning($"Player visual prefab was not found at '{PlayerVisualPrefabPath}'.");
+                    return;
+                }
+
+                visual = PrefabUtility.InstantiatePrefab(visualPrefab, player) as GameObject;
+                if (visual == null)
+                {
+                    Debug.LogWarning($"Could not instantiate player visual prefab '{PlayerVisualPrefabPath}'.");
+                    return;
+                }
+
+                visual.name = PlayerVisualName;
+            }
+
+            visual.transform.localPosition = Vector3.zero;
+            visual.transform.localRotation = Quaternion.identity;
+            visual.transform.localScale = Vector3.one * PlayerVisualScale;
+
+            foreach (Collider collider in visual.GetComponentsInChildren<Collider>(true))
+            {
+                collider.enabled = false;
+            }
+
+            foreach (Rigidbody rigidbody in visual.GetComponentsInChildren<Rigidbody>(true))
+            {
+                Object.DestroyImmediate(rigidbody);
+            }
+
+            Animator animator = visual.GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = visual.GetComponentInChildren<Animator>(true);
+            }
+
+            if (animator == null)
+            {
+                animator = visual.AddComponent<Animator>();
+            }
+
+            RuntimeAnimatorController controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerAnimatorControllerPath);
+            if (controller != null)
+            {
+                animator.runtimeAnimatorController = controller;
+            }
+            else
+            {
+                Debug.LogWarning($"Player animator controller was not found at '{PlayerAnimatorControllerPath}'.");
+            }
+
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            EditorUtility.SetDirty(visual);
+            EditorUtility.SetDirty(animator);
         }
 
         private static HitscanWeapon EnsureWeapon(SimpleFPSController playerController)
