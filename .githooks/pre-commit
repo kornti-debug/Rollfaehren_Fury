@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Soft documentation reminder.
+# If gameplay code (Assets/Scripts/) is staged but no docs are, print a nudge.
+# This NEVER blocks the commit -- it only reminds.
+# See the "Agent Workflow" section in AGENTS.md.
+#
+set -euo pipefail
+
+staged="$(git diff --cached --name-only)"
+code="$(printf '%s\n' "$staged" | grep -E '^Assets/Scripts/' || true)"
+docs="$(printf '%s\n' "$staged" | grep -E '^(docs/|README\.md|AGENTS\.md)' || true)"
+
+if [ -n "$code" ] && [ -z "$docs" ]; then
+  echo "--------------------------------------------------------------"
+  echo "[doc reminder] Code under Assets/Scripts/ is staged, but no"
+  echo "docs/, README.md or AGENTS.md changes are. Per AGENTS.md, update"
+  echo "TODO.md (and ARCHITECTURE/GAME_DESIGN if structure/scope changed),"
+  echo "ideally in this same commit. The commit will proceed."
+  echo "--------------------------------------------------------------"
+fi
+
+exit 0
