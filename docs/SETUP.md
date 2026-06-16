@@ -29,20 +29,24 @@ Do not commit `Library/`, `Logs/`, `UserSettings/`, generated `.csproj` files, o
 
 ## Play the Current MVP
 
-1. Pull the `codex/playable-mvp` branch.
-2. Open `Assets/Scenes/Main.unity`.
+1. Pull `main`.
+2. Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity`.
 3. Press Play.
 4. Test the loop:
+   - `New Game` loads `Assets/Scenes/Main.unity`.
    - `WASD` moves.
    - Mouse looks.
    - Left click shoots.
+   - `Esc` / Cancel returns from gameplay to the menu.
    - Enemies approach the ferry.
    - Ferry health drops when enemies touch it.
    - Killing enemies grants money.
    - Crossing completion opens the shop.
    - Ferry health reaching zero opens game over.
 
-If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, and Wwise hook component.
+If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, menu-return input, and Wwise hook component.
+
+If the menu scenes are missing or broken, run `Rollfaehren Fury > Build Bootstrap And Menu Scenes`. This rebuilds `Bootstrap.unity`, `Menu.unity`, the gameplay menu-return input object, and build settings.
 
 When tuning, start with Inspector values on:
 
@@ -51,6 +55,8 @@ When tuning, start with Inspector values on:
 - `PrototypeEnemy` prefab
 - `Prototype Player`
 - `Ferry` / `Ferry Damage Target`
+
+Gameplay and menu inputs use `Assets/InputSystem_Actions.inputactions`. The scripts subscribe to `InputAction` callbacks, so update that asset first if controls change.
 
 ## Wwise First Run
 

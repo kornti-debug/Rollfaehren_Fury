@@ -19,6 +19,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private UnityEvent hitHealth = new UnityEvent();
 
         private float nextFireTime;
+        private InputAction fireAction;
+        private bool fireHeld;
 
         public event Action Fired;
         public event Action<RaycastHit> HitSomething;
@@ -44,14 +46,35 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            if (!InputEnabled || Mouse.current == null)
+            BindInputActions();
+            if (fireAction == null)
             {
                 return;
             }
 
-            if (Mouse.current.leftButton.isPressed)
+            fireAction.performed += HandleFirePerformed;
+            fireAction.canceled += HandleFireCanceled;
+            fireAction.Enable();
+        }
+
+        private void OnDisable()
+        {
+            if (fireAction == null)
+            {
+                return;
+            }
+
+            fireAction.performed -= HandleFirePerformed;
+            fireAction.canceled -= HandleFireCanceled;
+            fireAction.Disable();
+            fireHeld = false;
+        }
+
+        private void Update()
+        {
+            if (InputEnabled && fireHeld)
             {
                 TryFire();
             }
@@ -60,6 +83,10 @@ namespace RollfaehrenFury.Prototype
         public void SetInputEnabled(bool isEnabled)
         {
             InputEnabled = isEnabled;
+            if (!isEnabled)
+            {
+                fireHeld = false;
+            }
         }
 
         public void AddDamage(float amount)
@@ -105,6 +132,25 @@ namespace RollfaehrenFury.Prototype
             return true;
         }
 
+        private void BindInputActions()
+        {
+            fireAction ??= PrototypeInputActions.Find("Player/Attack");
+        }
+
+        private void HandleFirePerformed(InputAction.CallbackContext context)
+        {
+            fireHeld = true;
+            if (InputEnabled)
+            {
+                TryFire();
+            }
+        }
+
+        private void HandleFireCanceled(InputAction.CallbackContext context)
+        {
+            fireHeld = false;
+        }
+
         private bool TryFindHit(Ray ray, out RaycastHit selectedHit)
         {
             RaycastHit[] hits = aimAssistRadius > 0f
@@ -147,5 +193,6 @@ namespace RollfaehrenFury.Prototype
 
             return hitCollider.GetComponentInParent<FerryDamageTarget>() != null;
         }
+
     }
 }

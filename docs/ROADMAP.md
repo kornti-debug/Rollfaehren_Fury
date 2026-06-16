@@ -7,9 +7,11 @@ rework. This file is about *build order*; the live task checklist lives in
 
 ## Where we are now
 
-The single-scene playable vertical slice already exists in
-`Assets/Scenes/Main.unity` (rebuildable via `Rollfaehren Fury > Build Prototype
-Scene`, see `Assets/Scripts/Editor/PrototypeSceneBuilder.cs`):
+The playable vertical slice already exists and now runs through a real scene
+flow — `Assets/Scenes/Bootstrap.unity` → `Assets/Scenes/Menu.unity` →
+`Assets/Scenes/Main.unity` (gameplay; shop and game over are overlays inside the
+gameplay scene). Scenes are rebuildable via `Rollfaehren Fury > Build Prototype
+Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
 
 - `GameManager` — game states (Idle / Playing / Shop / GameOver), money, rounds, crossing timer
 - `Health` — reusable health/damage component with events (target-agnostic)
@@ -17,17 +19,20 @@ Scene`, see `Assets/Scripts/Editor/PrototypeSceneBuilder.cs`):
 - `SimpleEnemy` + `EnemySpawner` — one enemy, round-scaled spawning, contact damage
 - `FerryDamageTarget` — the ferry as the protected/damageable object
 - `SimpleHUD` — HUD + shop panel + game over panel
+- `SceneFlow` / `BootstrapLoader` / `MainMenuController` / `GameplayMenuInput` — bootstrap → menu → main flow, New Game / Settings / Quit, Esc/Cancel returns gameplay to the menu
+- Project-wide **Input System** layer (`PrototypeInputActions` + `Assets/InputSystem_Actions.inputactions`) — gameplay and menu read `InputAction` callbacks instead of polling devices
 - `PrototypeAudioEvents` — Wwise hook points (shoot / hit / enemy death / ferry damage)
 - Fraunz player visual + a vending-machine asset (recently merged)
 
-**The core loop is functionally complete:** move, shoot, kill for money, survive
-the crossing, buy one of three upgrades, face a harder round, game over on ferry
-death.
+**The core loop is functionally complete:** start from the menu, move, shoot,
+kill for money, survive the crossing, buy one of three upgrades, face a harder
+round, game over on ferry death, Esc back to the menu.
 
 ### Known shortcuts in the current code (these drive the order below)
 
 - Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven.
 - There is **one concrete weapon**; no weapon base class or inventory.
+- The **Settings panel exists but has no real options yet**.
 - Wwise **hooks exist but banks/events are not wired up** (banks are gitignored;
   generate them locally — see [WWISE.md](WWISE.md)).
 
@@ -35,15 +40,15 @@ death.
 
 A full ferry-defense vertical slice: multiple weapons, multiple enemy types,
 cargo as a second protected object, a real data-driven shop, working Wwise audio,
-a main menu, low-poly art (ferry / shore / enemy / weapon), and a presentable
-Windows build. Scope and MVP boundaries stay as defined in
-[GAME_DESIGN.md](GAME_DESIGN.md) and [../AGENTS.md](../AGENTS.md).
+low-poly art (ferry / shore / enemy / weapon), and a presentable Windows build.
+Scope and MVP boundaries stay as defined in [GAME_DESIGN.md](GAME_DESIGN.md) and
+[../AGENTS.md](../AGENTS.md).
 
 ## Build order (by dependency)
 
-Because the loop is done, the rule from here is **logic and systems come before
-the content that needs them** — exactly so the shop and weapon code are not
-rebuilt twice.
+Because the loop and the scene/menu flow are done, the rule from here is **logic
+and systems come before the content that needs them** — exactly so the shop and
+weapon code are not rebuilt twice.
 
 ### Tier 0 — Stabilize what exists
 
@@ -52,7 +57,7 @@ Cheap, unblocks honest testing. Depends on: nothing.
 - Generate Wwise SoundBanks and create the events matching the `PrototypeAudioEvents` names → audio actually plays.
 - Visible ferry damage / low-health feedback (uses existing `Health` events).
 - Tuning pass: enemy speed, spawn timing, ferry health, weapon damage, shop prices, crossing duration.
-- Confirm a clean fresh clone + Play Mode on a teammate machine.
+- Confirm a clean fresh clone + Play Mode (through Bootstrap → Menu → Main) on a teammate machine.
 
 ### Tier 1 — System foundations (build the logic before the content)
 
@@ -70,7 +75,7 @@ Track B (shop):      UpgradeSystem (B1) ──▶ ShopManager (B2)
 
 **Track A — weapons**
 
-- **A1. `Weapon` base** — extract the fire / damage / cooldown contract out of `HitscanWeapon` (becomes a subclass).
+- **A1. `Weapon` base** — extract the fire / damage / cooldown contract out of `HitscanWeapon` (becomes a subclass). Build on the existing Input System layer rather than re-polling devices.
   - Depends on: nothing (pure refactor, loop keeps working). Unlocks: every additional weapon type.
 - **A2. `WeaponSystem`** — owns one or more weapons, handles selection/switching, exposes the active weapon to `GameManager`/HUD.
   - Depends on: A1. Unlocks: multiple weapons, weapon-specific upgrades. (Thin until the second weapon exists — build it right before Tier 2 weapons.)
@@ -101,7 +106,7 @@ Each depends on its Tier 1 enabler; otherwise parallelizable.
 
 Mostly independent of Tier 1/2; can run in parallel.
 
-- **Main menu** (separate scene or overlay: New Game / Quit) — depends on the game-state flow (done).
+- **Main menu + scene flow — done** (Bootstrap → Menu → Main, New Game / Settings / Quit, Esc/Cancel back to menu, project-wide Input System). Remaining: real **Settings** options (audio/sensitivity), and pause/resume polish.
 - **Fraunz character** animation states + first-person presence (partially merged).
 - **Vending-machine shop** interaction/flavor (asset merged) — depends on `ShopManager`.
 - HUD/UI styling pass.
@@ -118,14 +123,14 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 ### Tier 5 — Ship
 
 - Balancing pass with real values.
-- Windows build; verify no missing assets or Wwise banks.
+- Windows build from `Bootstrap.unity`; verify no missing assets or Wwise banks.
 - Demo script; update README controls and known issues.
 
 ## Critical path (shortest line to "more than a tech demo")
 
 Tier 0 (audio + damage feedback) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
-→ Tier 2 (a second weapon + one enemy variant) → Tier 3 (main menu) → Tier 4/5
-polish.
+→ Tier 2 (a second weapon + one enemy variant) → Tier 4/5 polish. The main menu
+and scene flow are already in place, so framing is no longer on the critical path.
 
 Track B (B1 `UpgradeSystem` + B2 `ShopManager`) only becomes urgent once you want
 more than the current three upgrades — do it right before expanding the shop, not

@@ -4,6 +4,7 @@ using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,8 +13,11 @@ namespace RollfaehrenFury.Editor
 {
     public static class PrototypeSceneBuilder
     {
+        private const string BootstrapScenePath = "Assets/Scenes/Bootstrap.unity";
+        private const string MenuScenePath = "Assets/Scenes/Menu.unity";
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
+        private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
         private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
         private const string PlayerVisualName = "Fraunz Visual";
@@ -52,6 +56,7 @@ namespace RollfaehrenFury.Editor
             SimpleHUD hud = EnsureHud();
             GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weapon, hud, enemyPrefab, spawnPoints);
             EnsureAudioEvents(gameManager, weapon);
+            EnsureGameplayMenuInputObject();
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
             ConfigureBuildSettings();
@@ -68,6 +73,26 @@ namespace RollfaehrenFury.Editor
         public static void BuildPrototypeSceneFromCommandLine()
         {
             BuildPrototypeScene();
+        }
+
+        [MenuItem("Rollfaehren Fury/Build Bootstrap And Menu Scenes")]
+        public static void BuildBootstrapAndMenuScenes()
+        {
+            EnsureProjectFolders();
+            CreateBootstrapScene();
+            CreateMenuScene();
+            EnsureGameplayMenuReturnInMainScene();
+            ConfigureBuildSettings();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log("Rollfaehren Fury bootstrap/menu scenes built. Start from Bootstrap.unity or Menu.unity to test the menu flow.");
+        }
+
+        public static void BuildBootstrapAndMenuScenesFromCommandLine()
+        {
+            BuildBootstrapAndMenuScenes();
         }
 
         public static void RepairPlayerCharacterVisualFromCommandLine()
@@ -105,6 +130,91 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "Prefabs");
             EnsureFolder("Assets", "Materials");
             EnsureFolder("Assets", "UI");
+        }
+
+        private static void CreateBootstrapScene()
+        {
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            GameObject loaderObject = new GameObject("Bootstrap Loader");
+            EnsureComponent<BootstrapLoader>(loaderObject);
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, BootstrapScenePath);
+        }
+
+        private static void CreateMenuScene()
+        {
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            GameObject cameraObject = new GameObject("Menu Camera");
+            Camera camera = EnsureComponent<Camera>(cameraObject);
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.035f, 0.07f, 0.11f);
+            camera.transform.position = new Vector3(0f, 0f, -10f);
+
+            GameObject canvasObject = new GameObject("Main Menu Canvas");
+            Canvas canvas = EnsureComponent<Canvas>(canvasObject);
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            CanvasScaler scaler = EnsureComponent<CanvasScaler>(canvasObject);
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            EnsureComponent<GraphicRaycaster>(canvasObject);
+
+            GameObject controllerObject = new GameObject("Main Menu Controller");
+            MainMenuController controller = EnsureComponent<MainMenuController>(controllerObject);
+
+            GameObject mainPanel = CreateUiPanel(canvasObject.transform, "Main Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(680f, 500f));
+            Image mainBackground = EnsureComponent<Image>(mainPanel);
+            mainBackground.color = new Color(0.03f, 0.05f, 0.07f, 0.88f);
+            CreateText(mainPanel.transform, "Title", "Rollfaehren Fury", new Vector2(0f, 165f), new Vector2(620f, 64f), 44, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateText(mainPanel.transform, "Subtitle", "Protect the ferry. Survive the crossing.", new Vector2(0f, 105f), new Vector2(620f, 34f), 22, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateButton(mainPanel.transform, "New Game Button", "New Game", new Vector2(0f, 34f), out Button newGameButton);
+            CreateButton(mainPanel.transform, "Settings Button", "Settings", new Vector2(0f, -34f), out Button settingsButton);
+            CreateButton(mainPanel.transform, "Quit Button", "Quit", new Vector2(0f, -102f), out Button quitButton);
+
+            GameObject settingsPanel = CreateUiPanel(canvasObject.transform, "Settings Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(680f, 420f));
+            Image settingsBackground = EnsureComponent<Image>(settingsPanel);
+            settingsBackground.color = new Color(0.03f, 0.05f, 0.07f, 0.9f);
+            CreateText(settingsPanel.transform, "Settings Title", "Settings", new Vector2(0f, 122f), new Vector2(620f, 48f), 36, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateText(settingsPanel.transform, "Settings Text", "Settings placeholder for volume, mouse sensitivity, and graphics options.", new Vector2(0f, 42f), new Vector2(560f, 84f), 20, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateButton(settingsPanel.transform, "Settings Back Button", "Back", new Vector2(0f, -102f), out Button backButton);
+            settingsPanel.SetActive(false);
+
+            UnityEventTools.AddPersistentListener(newGameButton.onClick, controller.NewGame);
+            UnityEventTools.AddPersistentListener(settingsButton.onClick, controller.ShowSettings);
+            UnityEventTools.AddPersistentListener(quitButton.onClick, controller.QuitGame);
+            UnityEventTools.AddPersistentListener(backButton.onClick, controller.ShowMain);
+
+            SetObject(controller, "mainPanel", mainPanel);
+            SetObject(controller, "settingsPanel", settingsPanel);
+            SetObject(controller, "firstSelectedButton", newGameButton.gameObject);
+            SetObject(controller, "settingsFirstSelectedButton", backButton.gameObject);
+
+            EnsureEventSystem();
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, MenuScenePath);
+        }
+
+        private static void EnsureGameplayMenuReturnInMainScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            EnsureGameplayMenuInputObject();
+            EnsureEventSystem();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+        }
+
+        private static void EnsureGameplayMenuInputObject()
+        {
+            GameObject inputObject = GameObject.Find("Gameplay Menu Input");
+            if (inputObject == null)
+            {
+                inputObject = new GameObject("Gameplay Menu Input");
+            }
+
+            EnsureComponent<GameplayMenuInput>(inputObject);
         }
 
         private static GameObject EnsureFerry()
@@ -589,7 +699,18 @@ namespace RollfaehrenFury.Editor
                 Object.DestroyImmediate(oldModule);
             }
 
-            EnsureComponent<InputSystemUIInputModule>(eventSystem.gameObject);
+            InputSystemUIInputModule inputModule = EnsureComponent<InputSystemUIInputModule>(eventSystem.gameObject);
+            InputActionAsset projectActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ProjectInputActionsPath);
+            if (projectActions != null && inputModule.actionsAsset != projectActions)
+            {
+                if (inputModule.actionsAsset == null)
+                {
+                    inputModule.AssignDefaultActions();
+                }
+
+                inputModule.actionsAsset = projectActions;
+                EditorUtility.SetDirty(inputModule);
+            }
         }
 
         private static GameObject CreateUiPanel(Transform parent, string name, TextAnchor anchor, Vector2 anchoredPosition, Vector2 size)
@@ -726,6 +847,8 @@ namespace RollfaehrenFury.Editor
         {
             EditorBuildSettings.scenes = new[]
             {
+                new EditorBuildSettingsScene(BootstrapScenePath, true),
+                new EditorBuildSettingsScene(MenuScenePath, true),
                 new EditorBuildSettingsScene(MainScenePath, true)
             };
         }

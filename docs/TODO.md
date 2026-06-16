@@ -17,9 +17,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 ## Game Flow
 
-- [ ] Create `MainMenu` scene or menu overlay later if time allows.
-- [ ] Add New Game button later if a menu is added.
-- [ ] Add Quit button later if a menu is added.
+- [x] Create bootstrap/menu flow.
+- [x] Add New Game button.
+- [x] Add Settings placeholder.
+- [x] Add Quit button.
+- [x] Add gameplay Cancel/Esc return to menu.
 - [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
 - [x] Add game over state.
 - [x] Add shop/upgrade state.
@@ -28,8 +30,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 ## Player and Weapons
 
 - [x] Add FPS movement and camera look.
+- [x] Refactor player input to subscribed InputAction callbacks.
 - [x] Add basic crosshair.
 - [x] Add first weapon.
+- [x] Refactor shooting input to subscribed InputAction callbacks.
 - [x] Add enemy hit detection.
 - [x] Add weapon cooldown.
 - [x] Add Wwise hook for shooting.

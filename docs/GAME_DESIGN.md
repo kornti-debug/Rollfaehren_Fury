@@ -25,11 +25,12 @@ The first target is a prototype, not a content-heavy finished game. Placeholder 
 Minimum flow:
 
 ```text
-Main Menu -> Game Scene -> Shop/Upgrade -> Game Scene
-                         -> Game Over
+Bootstrap -> Main Menu -> Game Scene -> Shop/Upgrade -> Game Scene
+                                  -> Game Over
+Game Scene -> Main Menu via Cancel/Esc
 ```
 
-The current MVP uses `Assets/Scenes/Main.unity` only. Shop and game over are UI panels. A separate main menu can be added later if the playable loop is stable.
+The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene, `Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and `Assets/Scenes/Main.unity` for gameplay. Shop and game over are UI panels inside the gameplay scene.
 
 ## Player Fantasy
 

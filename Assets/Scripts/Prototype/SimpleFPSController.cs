@@ -27,6 +27,15 @@ namespace RollfaehrenFury.Prototype
         private bool animatorHasIsRunning;
         private bool animatorHasIsIdle;
         private int activeAnimationStateId;
+        private InputAction moveAction;
+        private InputAction lookAction;
+        private InputAction jumpAction;
+        private InputAction sprintAction;
+        private InputAction attackAction;
+        private Vector2 moveInput;
+        private Vector2 pendingLookDelta;
+        private bool jumpQueued;
+        private bool isSprinting;
 
         public bool InputEnabled { get; private set; } = true;
 
@@ -45,6 +54,10 @@ namespace RollfaehrenFury.Prototype
 
         private void OnEnable()
         {
+            BindInputActions();
+            SubscribeInputActions(true);
+            SetInputActionsEnabled(true);
+
             if (lockCursorOnPlay)
             {
                 SetCursorLocked(true);
@@ -53,12 +66,17 @@ namespace RollfaehrenFury.Prototype
             PlayAnimationState(IdleStateId, true);
         }
 
+        private void OnDisable()
+        {
+            SubscribeInputActions(false);
+            SetInputActionsEnabled(false);
+        }
+
         private void Update()
         {
-            HandleCursorToggle();
-
             if (!InputEnabled)
             {
+                pendingLookDelta = Vector2.zero;
                 return;
             }
 
@@ -69,22 +87,137 @@ namespace RollfaehrenFury.Prototype
         public void SetInputEnabled(bool isEnabled)
         {
             InputEnabled = isEnabled;
+            if (!isEnabled)
+            {
+                moveInput = Vector2.zero;
+                pendingLookDelta = Vector2.zero;
+                jumpQueued = false;
+                isSprinting = false;
+                UpdateAnimator(Vector2.zero, false);
+            }
+
             SetCursorLocked(isEnabled && lockCursorOnPlay);
         }
 
-        private void HandleCursorToggle()
+        private void BindInputActions()
         {
-            if (Keyboard.current == null)
+            moveAction ??= PrototypeInputActions.Find("Player/Move");
+            lookAction ??= PrototypeInputActions.Find("Player/Look");
+            jumpAction ??= PrototypeInputActions.Find("Player/Jump");
+            sprintAction ??= PrototypeInputActions.Find("Player/Sprint");
+            attackAction ??= PrototypeInputActions.Find("Player/Attack");
+        }
+
+        private void SubscribeInputActions(bool subscribe)
+        {
+            if (moveAction != null)
             {
+                if (subscribe)
+                {
+                    moveAction.performed += HandleMoveInput;
+                    moveAction.canceled += HandleMoveInput;
+                }
+                else
+                {
+                    moveAction.performed -= HandleMoveInput;
+                    moveAction.canceled -= HandleMoveInput;
+                }
+            }
+
+            if (lookAction != null)
+            {
+                if (subscribe)
+                {
+                    lookAction.performed += HandleLookInput;
+                    lookAction.canceled += HandleLookInput;
+                }
+                else
+                {
+                    lookAction.performed -= HandleLookInput;
+                    lookAction.canceled -= HandleLookInput;
+                }
+            }
+
+            if (jumpAction != null)
+            {
+                if (subscribe)
+                {
+                    jumpAction.performed += HandleJumpInput;
+                }
+                else
+                {
+                    jumpAction.performed -= HandleJumpInput;
+                }
+            }
+
+            if (sprintAction != null)
+            {
+                if (subscribe)
+                {
+                    sprintAction.performed += HandleSprintInput;
+                    sprintAction.canceled += HandleSprintInput;
+                }
+                else
+                {
+                    sprintAction.performed -= HandleSprintInput;
+                    sprintAction.canceled -= HandleSprintInput;
+                }
+            }
+
+            if (attackAction != null)
+            {
+                if (subscribe)
+                {
+                    attackAction.performed += HandleAttackInput;
+                }
+                else
+                {
+                    attackAction.performed -= HandleAttackInput;
+                }
+            }
+        }
+
+        private void SetInputActionsEnabled(bool enabled)
+        {
+            PrototypeInputActions.SetEnabled(moveAction, enabled);
+            PrototypeInputActions.SetEnabled(lookAction, enabled);
+            PrototypeInputActions.SetEnabled(jumpAction, enabled);
+            PrototypeInputActions.SetEnabled(sprintAction, enabled);
+            PrototypeInputActions.SetEnabled(attackAction, enabled);
+        }
+
+        private void HandleMoveInput(InputAction.CallbackContext context)
+        {
+            moveInput = Vector2.ClampMagnitude(context.ReadValue<Vector2>(), 1f);
+        }
+
+        private void HandleLookInput(InputAction.CallbackContext context)
+        {
+            if (context.canceled)
+            {
+                pendingLookDelta = Vector2.zero;
                 return;
             }
 
-            if (Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                SetCursorLocked(false);
-            }
+            pendingLookDelta += context.ReadValue<Vector2>();
+        }
 
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && InputEnabled)
+        private void HandleJumpInput(InputAction.CallbackContext context)
+        {
+            if (InputEnabled)
+            {
+                jumpQueued = true;
+            }
+        }
+
+        private void HandleSprintInput(InputAction.CallbackContext context)
+        {
+            isSprinting = !context.canceled && context.ReadValue<float>() > 0.5f;
+        }
+
+        private void HandleAttackInput(InputAction.CallbackContext context)
+        {
+            if (InputEnabled)
             {
                 SetCursorLocked(true);
             }
@@ -92,12 +225,14 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleLook()
         {
-            if (Mouse.current == null || cameraRoot == null || Cursor.lockState != CursorLockMode.Locked)
+            if (cameraRoot == null || Cursor.lockState != CursorLockMode.Locked)
             {
+                pendingLookDelta = Vector2.zero;
                 return;
             }
 
-            Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity;
+            Vector2 mouseDelta = pendingLookDelta * mouseSensitivity;
+            pendingLookDelta = Vector2.zero;
             transform.Rotate(Vector3.up, mouseDelta.x, Space.World);
 
             pitch = Mathf.Clamp(pitch - mouseDelta.y, -pitchClamp, pitchClamp);
@@ -106,31 +241,6 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleMovement()
         {
-            if (Keyboard.current == null)
-            {
-                return;
-            }
-
-            Vector2 moveInput = Vector2.zero;
-            if (Keyboard.current.wKey.isPressed)
-            {
-                moveInput.y += 1f;
-            }
-            if (Keyboard.current.sKey.isPressed)
-            {
-                moveInput.y -= 1f;
-            }
-            if (Keyboard.current.dKey.isPressed)
-            {
-                moveInput.x += 1f;
-            }
-            if (Keyboard.current.aKey.isPressed)
-            {
-                moveInput.x -= 1f;
-            }
-
-            moveInput = Vector2.ClampMagnitude(moveInput, 1f);
-            bool isSprinting = Keyboard.current.leftShiftKey.isPressed;
             float speed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
             Vector3 movement = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
 
@@ -141,11 +251,12 @@ namespace RollfaehrenFury.Prototype
                 verticalVelocity = -2f;
             }
 
-            if (controller.isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (controller.isGrounded && jumpQueued)
             {
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
 
+            jumpQueued = false;
             verticalVelocity += gravity * Time.deltaTime;
             movement.y = verticalVelocity;
 
@@ -236,5 +347,6 @@ namespace RollfaehrenFury.Prototype
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;
         }
+
     }
 }

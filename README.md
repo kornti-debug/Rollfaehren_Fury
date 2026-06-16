@@ -8,7 +8,7 @@ Project page: https://kornti-debug.github.io/Rollfaehren_Fury/
 
 Build a small but complete ferry-only vertical slice with placeholder low-poly assets first:
 
-- One playable scene: `Assets/Scenes/Main.unity`
+- Bootstrap/menu flow: `Assets/Scenes/Bootstrap.unity` -> `Assets/Scenes/Menu.unity` -> `Assets/Scenes/Main.unity`
 - FPS player on a prototype ferry deck
 - Enemies approaching the ferry
 - Enemies damage only the ferry on contact, then disappear
@@ -71,7 +71,7 @@ For Wwise setup details, see [docs/WWISE.md](docs/WWISE.md).
 
 ## Playable MVP Workflow
 
-On the `codex/playable-mvp` branch, open `Assets/Scenes/Main.unity` and press Play.
+Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity` and press Play. The menu has `New Game`, `Settings`, and `Quit`. `New Game` loads `Assets/Scenes/Main.unity`.
 
 Controls:
 
@@ -80,9 +80,11 @@ Controls:
 - Left click: shoot
 - `Shift`: sprint
 - `Space`: jump
-- `Esc`: unlock mouse cursor
+- `Esc` / Cancel: return from gameplay to the menu
 
-If the scene gets broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` in the Unity menu to regenerate the prototype player, ferry damage target, enemy spawner, HUD, shop, and Wwise hook component.
+Gameplay input uses subscribed callbacks from the project-wide `Assets/InputSystem_Actions.inputactions` asset.
+
+If scenes get broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` to regenerate the prototype gameplay scene, and `Rollfaehren Fury > Build Bootstrap And Menu Scenes` to regenerate the bootstrap/menu flow.
 
 ## Team Workflow
 
@@ -106,4 +108,4 @@ docs/project-structure
 
 ## Next Milestone
 
-The next milestone is testing and tuning the playable loop in Unity: enemy speed, spawn timing, ferry health, weapon damage, shop prices, and whether a simple main menu is worth adding before art polish.
+The next milestone is testing and tuning the playable loop in Unity: enemy speed, spawn timing, ferry health, weapon damage, shop prices, and menu-to-game flow.
