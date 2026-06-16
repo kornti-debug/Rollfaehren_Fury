@@ -10,7 +10,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float sprintMultiplier = 1.35f;
         [SerializeField] private float mouseSensitivity = 0.12f;
-        [SerializeField] private float pitchClamp = 82f;
+        [SerializeField] private float pitchClamp = 60f;
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float jumpHeight = 1.1f;
         [SerializeField] private bool lockCursorOnPlay = true;
@@ -18,12 +18,14 @@ namespace RollfaehrenFury.Prototype
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
+        private Animator animator;
 
         public bool InputEnabled { get; private set; } = true;
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            animator = GetComponentInChildren<Animator>();
             if (cameraRoot == null)
             {
                 Camera childCamera = GetComponentInChildren<Camera>();
@@ -116,8 +118,11 @@ namespace RollfaehrenFury.Prototype
             }
 
             moveInput = Vector2.ClampMagnitude(moveInput, 1f);
-            float speed = Keyboard.current.leftShiftKey.isPressed ? moveSpeed * sprintMultiplier : moveSpeed;
+            bool isSprinting = Keyboard.current.leftShiftKey.isPressed;
+            float speed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
             Vector3 movement = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
+
+            UpdateAnimator(moveInput, isSprinting);
 
             if (controller.isGrounded && verticalVelocity < 0f)
             {
@@ -133,6 +138,18 @@ namespace RollfaehrenFury.Prototype
             movement.y = verticalVelocity;
 
             controller.Move(movement * Time.deltaTime);
+        }
+
+        private void UpdateAnimator(Vector2 moveInput, bool isSprinting)
+        {
+            if (animator == null)
+            {
+                return;
+            }
+
+            bool isMoving = moveInput.sqrMagnitude > 0.001f;
+            animator.SetBool("IsRunning", isMoving && isSprinting);
+            animator.SetBool("IsIdle", !isMoving);
         }
 
         private static void SetCursorLocked(bool locked)
