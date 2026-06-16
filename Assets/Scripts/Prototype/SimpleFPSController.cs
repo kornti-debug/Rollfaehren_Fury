@@ -17,6 +17,8 @@ namespace RollfaehrenFury.Prototype
 
         private static readonly int IsRunningId = Animator.StringToHash("IsRunning");
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
+        private static readonly int RunningStateId = Animator.StringToHash("Base Layer.Running");
+        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Idle");
 
         private CharacterController controller;
         private float pitch;
@@ -24,6 +26,7 @@ namespace RollfaehrenFury.Prototype
         private Animator animator;
         private bool animatorHasIsRunning;
         private bool animatorHasIsIdle;
+        private int activeAnimationStateId;
 
         public bool InputEnabled { get; private set; } = true;
 
@@ -31,6 +34,7 @@ namespace RollfaehrenFury.Prototype
         {
             controller = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
+            ConfigureAnimator();
             CacheAnimatorParameters();
             if (cameraRoot == null)
             {
@@ -45,6 +49,8 @@ namespace RollfaehrenFury.Prototype
             {
                 SetCursorLocked(true);
             }
+
+            PlayAnimationState(IdleStateId, true);
         }
 
         private void Update()
@@ -164,7 +170,26 @@ namespace RollfaehrenFury.Prototype
                 animator.SetBool(IsIdleId, !isMoving);
             }
 
+            int targetStateId = isMoving ? RunningStateId : IdleStateId;
+            PlayAnimationState(targetStateId, !isMoving);
             animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
+        }
+
+        private void ConfigureAnimator()
+        {
+            activeAnimationStateId = 0;
+
+            if (animator == null)
+            {
+                return;
+            }
+
+            animator.enabled = true;
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            animator.updateMode = AnimatorUpdateMode.Normal;
+            animator.Rebind();
+            animator.Update(0f);
         }
 
         private void CacheAnimatorParameters()
@@ -188,6 +213,22 @@ namespace RollfaehrenFury.Prototype
                     animatorHasIsIdle = true;
                 }
             }
+        }
+
+        private void PlayAnimationState(int stateId, bool forceRestart)
+        {
+            if (animator == null)
+            {
+                return;
+            }
+
+            if (!forceRestart && activeAnimationStateId == stateId)
+            {
+                return;
+            }
+
+            animator.CrossFadeInFixedTime(stateId, 0.1f);
+            activeAnimationStateId = stateId;
         }
 
         private static void SetCursorLocked(bool locked)
