@@ -68,6 +68,7 @@ Desktop.ini
 *.apk
 *.aab
 *.unitypackage
+*.unitypackage.meta
 *.app
 *.exe
 *.zip

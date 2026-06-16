@@ -76,6 +76,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 - [ ] Low-poly ferry model.
 - [x] Prototype shore placeholders.
+- [x] Start environment terrain branch.
+- [x] Add URP-safe animated river water material.
 - [ ] Later: cargo crates.
 - [ ] Weapon model.
 - [ ] First enemy model.

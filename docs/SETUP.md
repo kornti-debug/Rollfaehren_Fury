@@ -58,6 +58,14 @@ When tuning, start with Inspector values on:
 
 Gameplay and menu inputs use `Assets/InputSystem_Actions.inputactions`. The scripts subscribe to `InputAction` callbacks, so update that asset first if controls change.
 
+## Environment Work
+
+Terrain and water experiments should happen on an environment branch before merging to `main`.
+
+For the current river setup, use a real water surface object above the sculpted terrain riverbed. Terrain layers are only painted textures; they do not animate like water by themselves. If a water material appears pink, it is probably using a Built-in Render Pipeline shader inside this URP project.
+
+Run `Rollfaehren Fury > Environment > Setup URP River Water` to create/update `River Water Surface` with `Assets/Materials/RiverWater_URP.mat`.
+
 ## Wwise First Run
 
 1. Install Wwise `2025.1.5 Build 9095`.
