@@ -276,7 +276,10 @@ namespace RollfaehrenFury.Prototype
             float max = ferryHealth != null ? ferryHealth.MaxHealth : 1f;
             float weaponDamage = weaponSystem != null ? weaponSystem.ActiveDamage : 0f;
             float shotsPerSecond = weaponSystem != null ? weaponSystem.ActiveShotsPerSecond : 0f;
-            hud?.SetStats(current, max, money, round, CrossingProgress, weaponDamage, shotsPerSecond);
+            string weaponName = weaponSystem != null ? weaponSystem.ActiveWeaponName : "None";
+            int weaponSlot = weaponSystem != null ? weaponSystem.ActiveIndex + 1 : 0;
+            int weaponCount = weaponSystem != null ? weaponSystem.WeaponCount : 0;
+            hud?.SetStats(current, max, money, round, CrossingProgress, weaponName, weaponSlot, weaponCount, weaponDamage, shotsPerSecond);
         }
 
         private void ResolveReferences()

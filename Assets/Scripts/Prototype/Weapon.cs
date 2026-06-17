@@ -12,6 +12,7 @@ namespace RollfaehrenFury.Prototype
     public sealed class Weapon : MonoBehaviour
     {
         [SerializeField] private WeaponDefinition definition;
+        [SerializeField] private WeaponTracer tracer;
         [SerializeField] private UnityEvent fired = new UnityEvent();
         [SerializeField] private UnityEvent hitSomething = new UnityEvent();
         [SerializeField] private UnityEvent hitHealth = new UnityEvent();
@@ -81,19 +82,47 @@ namespace RollfaehrenFury.Prototype
             int pellets = definition.PelletsPerShot;
             for (int i = 0; i < pellets; i++)
             {
-                FireSingleRay(fireCamera, ignoredRoot, hitMask);
+                if (definition.FireMode == WeaponFireMode.Projectile)
+                {
+                    FireProjectile(fireCamera, ignoredRoot, hitMask);
+                }
+                else
+                {
+                    FireSingleRay(fireCamera, ignoredRoot, hitMask);
+                }
             }
 
             return true;
+        }
+
+        private void FireProjectile(Camera fireCamera, Transform ignoredRoot, LayerMask hitMask)
+        {
+            Vector3 direction = GetShotDirection(fireCamera);
+            Vector3 origin = fireCamera.transform.position + direction * 0.5f;
+
+            GameObject projectileObject = new GameObject($"{DisplayName} Projectile");
+            projectileObject.transform.position = origin;
+
+            Projectile projectile = projectileObject.AddComponent<Projectile>();
+            projectile.Initialize(
+                direction * definition.ProjectileSpeed,
+                definition.ProjectileGravity,
+                currentDamage,
+                definition.ProjectileLifetime,
+                ignoredRoot,
+                hitMask);
         }
 
         private void FireSingleRay(Camera fireCamera, Transform ignoredRoot, LayerMask hitMask)
         {
             Vector3 direction = GetShotDirection(fireCamera);
             Ray ray = new Ray(fireCamera.transform.position, direction);
-            Debug.DrawRay(ray.origin, ray.direction * definition.Range, Color.yellow, 0.08f);
 
-            if (!TryFindHit(ray, ignoredRoot, hitMask, out RaycastHit hit))
+            bool didHit = TryFindHit(ray, ignoredRoot, hitMask, out RaycastHit hit);
+            Vector3 endPoint = didHit ? hit.point : ray.origin + direction * definition.Range;
+            ShowTracer(fireCamera, endPoint);
+
+            if (!didHit)
             {
                 return;
             }
@@ -108,6 +137,24 @@ namespace RollfaehrenFury.Prototype
                 hitHealth.Invoke();
                 HitHealth?.Invoke(health);
             }
+        }
+
+        private void ShowTracer(Camera fireCamera, Vector3 endPoint)
+        {
+            if (tracer == null)
+            {
+                return;
+            }
+
+            // A tracer exactly on the view axis is seen edge-on (nearly invisible) and is
+            // clipped by the near plane. Start a touch ahead of and below the eye so it is
+            // visible at every angle, while staying horizontally centered under the crosshair
+            // and converging on the actual aim/hit point.
+            Transform cameraTransform = fireCamera.transform;
+            Vector3 muzzle = cameraTransform.position
+                + cameraTransform.forward * 0.3f
+                - cameraTransform.up * 0.12f;
+            tracer.Show(muzzle, endPoint);
         }
 
         private Vector3 GetShotDirection(Camera fireCamera)

@@ -35,7 +35,7 @@ namespace RollfaehrenFury.Prototype
             gameManager = manager;
         }
 
-        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, float weaponDamage, float shotsPerSecond)
+        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, float weaponDamage, float shotsPerSecond)
         {
             if (ferryHealthText != null)
             {
@@ -70,7 +70,8 @@ namespace RollfaehrenFury.Prototype
 
             if (weaponStatsText != null)
             {
-                weaponStatsText.text = $"Weapon: {weaponDamage:0} dmg | {shotsPerSecond:0.0}/s";
+                string slot = weaponCount > 1 ? $" [{weaponIndex}/{weaponCount}]" : string.Empty;
+                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond:0.0}/s";
             }
         }
 

@@ -63,8 +63,10 @@ Planned systems and responsibilities:
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: implemented (Track A) — owns the player's weapons and the firing input (`Player/Attack`), switches the active weapon (`Player/Next` / `Player/Previous`), and forwards fire/hit events so HUD and audio do not care which weapon is active.
 - `Weapon`: implemented — data-driven runtime weapon. Reads a `WeaponDefinition` and fires by fire mode (hitscan / spread). Keeps runtime copies of the stats, so upgrades never mutate the shared asset.
-- `WeaponDefinition`: implemented — ScriptableObject of weapon stats (fire mode, damage, range, cooldown, aim assist, pellets, spread angle). Assets live in `Assets/Weapons/` (Pistol, Shotgun).
-- `Flamethrower` / projectile weapons: later — add a `WeaponFireMode` value and a new `WeaponDefinition` asset; no new MonoBehaviour needed.
+- `WeaponDefinition`: implemented — ScriptableObject of weapon stats (fire mode, damage, range, cooldown, aim assist, pellets, spread angle). Assets live in `Assets/Weapons/` (Pistol, Shotgun, Harpoon, Flamethrower).
+- `WeaponTracer`: implemented — placeholder shot visual. Pooled `LineRenderer`s draw a brief muzzle→hit line so hitscan/spread shots are visible while there are no weapon/projectile assets. The HUD also shows the active weapon name + slot, updated on switch.
+- `Projectile`: implemented — a thrown projectile that flies a gravity parabola, raycasts its own path to hit `Health`, then despawns (placeholder cube + trail). Spawned by `Weapon` for `WeaponFireMode.Projectile` (the Harpoon).
+- Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
 - `UpgradeSystem`: applies upgrades to player, weapons, ferry, and later cargo rewards. Weapon upgrades currently route through `WeaponSystem` to the active weapon.
 - `FerryController`: ferry movement and crossing progress.
 - `Cargo`: later destructible cargo with reward value.

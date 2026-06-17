@@ -5,7 +5,8 @@ namespace RollfaehrenFury.Prototype
     public enum WeaponFireMode
     {
         Hitscan,
-        Spread
+        Spread,
+        Projectile
     }
 
     /// <summary>
@@ -25,6 +26,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(1)] private int pelletsPerShot = 1;
         [SerializeField] private float spreadAngle = 0f;
 
+        [Header("Projectile (fire mode = Projectile)")]
+        [SerializeField] private float projectileSpeed = 40f;
+        [SerializeField] private float projectileGravity = 18f;
+        [SerializeField] private float projectileLifetime = 4f;
+
         public string DisplayName => displayName;
         public WeaponFireMode FireMode => fireMode;
         public float Damage => damage;
@@ -33,5 +39,8 @@ namespace RollfaehrenFury.Prototype
         public float AimAssistRadius => aimAssistRadius;
         public int PelletsPerShot => Mathf.Max(1, pelletsPerShot);
         public float SpreadAngle => Mathf.Max(0f, spreadAngle);
+        public float ProjectileSpeed => projectileSpeed;
+        public float ProjectileGravity => projectileGravity;
+        public float ProjectileLifetime => projectileLifetime;
     }
 }

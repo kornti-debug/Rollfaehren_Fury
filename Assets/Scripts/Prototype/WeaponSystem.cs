@@ -33,6 +33,7 @@ namespace RollfaehrenFury.Prototype
 
         public bool InputEnabled { get; private set; } = true;
         public int WeaponCount => weapons.Count;
+        public int ActiveIndex => activeIndex;
         public Weapon ActiveWeapon => activeIndex >= 0 && activeIndex < weapons.Count ? weapons[activeIndex] : null;
         public float ActiveDamage => ActiveWeapon != null ? ActiveWeapon.Damage : 0f;
         public float ActiveShotsPerSecond => ActiveWeapon != null ? ActiveWeapon.ShotsPerSecond : 0f;

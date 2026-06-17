@@ -320,11 +320,30 @@ namespace RollfaehrenFury.Editor
             camera.fieldOfView = 72f;
             EnsureComponent<AudioListener>(cameraRoot.gameObject);
 
+            RemoveStrayCameras(player.transform, camera);
+
             SimpleFPSController controller = EnsureComponent<SimpleFPSController>(player);
             SetObject(controller, "cameraRoot", cameraRoot);
             SetFloat(controller, "pitchClamp", 82f);
             EnsurePlayerVisual(player.transform);
             return controller;
+        }
+
+        private static void RemoveStrayCameras(Transform playerRoot, Camera playerCamera)
+        {
+            foreach (Camera sceneCamera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            {
+                if (sceneCamera == null || sceneCamera == playerCamera)
+                {
+                    continue;
+                }
+
+                if (!sceneCamera.transform.IsChildOf(playerRoot))
+                {
+                    Debug.Log($"Removing stray scene camera '{sceneCamera.name}' so only the player camera renders.", sceneCamera);
+                    Object.DestroyImmediate(sceneCamera.gameObject);
+                }
+            }
         }
 
         private static void HidePrimitivePlayerShell(GameObject player)
@@ -414,7 +433,14 @@ namespace RollfaehrenFury.Editor
                 25f, 250f, 0.2f, 0.45f, 1, 0f);
             WeaponDefinition shotgun = EnsureWeaponDefinition(
                 "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
-                12f, 60f, 0.7f, 0f, 6, 6f);
+                11f, 55f, 0.75f, 0f, 8, 12f);
+            WeaponDefinition harpoon = EnsureWeaponDefinition(
+                "Assets/Weapons/Harpoon.asset", "Harpoon", WeaponFireMode.Projectile,
+                120f, 300f, 1.4f, 0f, 1, 0f,
+                45f, 18f, 4f);
+            WeaponDefinition flamethrower = EnsureWeaponDefinition(
+                "Assets/Weapons/Flamethrower.asset", "Flamethrower", WeaponFireMode.Spread,
+                5f, 11f, 0.04f, 0f, 8, 14f);
 
             GameObject weaponsParent = FindChild(camera.transform, "Weapons");
             if (weaponsParent != null)
@@ -427,11 +453,19 @@ namespace RollfaehrenFury.Editor
 
             Weapon pistolWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Pistol", pistol);
             Weapon shotgunWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Shotgun", shotgun);
+            Weapon harpoonWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Harpoon", harpoon);
+            Weapon flamethrowerWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Flamethrower", flamethrower);
+
+            WeaponTracer tracer = EnsureWeaponTracer(camera.transform);
+            SetObject(pistolWeapon, "tracer", tracer);
+            SetObject(shotgunWeapon, "tracer", tracer);
+            SetObject(harpoonWeapon, "tracer", tracer);
+            SetObject(flamethrowerWeapon, "tracer", tracer);
 
             WeaponSystem weaponSystem = EnsureComponent<WeaponSystem>(camera.gameObject);
             SetObject(weaponSystem, "fireCamera", camera);
             SetObject(weaponSystem, "ignoredRoot", playerController.transform);
-            SetObjectList(weaponSystem, "weapons", new Object[] { pistolWeapon, shotgunWeapon });
+            SetObjectList(weaponSystem, "weapons", new Object[] { pistolWeapon, shotgunWeapon, harpoonWeapon, flamethrowerWeapon });
             SetInt(weaponSystem, "startWeaponIndex", 0);
             return weaponSystem;
         }
@@ -445,9 +479,26 @@ namespace RollfaehrenFury.Editor
             return weapon;
         }
 
+        private static WeaponTracer EnsureWeaponTracer(Transform cameraTransform)
+        {
+            GameObject tracerObject = FindChild(cameraTransform, "Weapon Tracer");
+            if (tracerObject == null)
+            {
+                tracerObject = new GameObject("Weapon Tracer");
+                tracerObject.transform.SetParent(cameraTransform, false);
+            }
+
+            WeaponTracer weaponTracer = EnsureComponent<WeaponTracer>(tracerObject);
+            SetInt(weaponTracer, "poolSize", 32);
+            SetFloat(weaponTracer, "width", 0.05f);
+            SetFloat(weaponTracer, "duration", 0.07f);
+            return weaponTracer;
+        }
+
         private static WeaponDefinition EnsureWeaponDefinition(
             string path, string displayName, WeaponFireMode fireMode,
-            float damage, float range, float fireCooldown, float aimAssistRadius, int pelletsPerShot, float spreadAngle)
+            float damage, float range, float fireCooldown, float aimAssistRadius, int pelletsPerShot, float spreadAngle,
+            float projectileSpeed = 40f, float projectileGravity = 18f, float projectileLifetime = 4f)
         {
             WeaponDefinition definition = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(path);
             if (definition == null)
@@ -464,6 +515,9 @@ namespace RollfaehrenFury.Editor
             SetFloat(definition, "aimAssistRadius", aimAssistRadius);
             SetInt(definition, "pelletsPerShot", pelletsPerShot);
             SetFloat(definition, "spreadAngle", spreadAngle);
+            SetFloat(definition, "projectileSpeed", projectileSpeed);
+            SetFloat(definition, "projectileGravity", projectileGravity);
+            SetFloat(definition, "projectileLifetime", projectileLifetime);
             return definition;
         }
 
@@ -666,6 +720,7 @@ namespace RollfaehrenFury.Editor
             RectTransform crosshairRect = crosshair.rectTransform;
             crosshairRect.anchorMin = new Vector2(0.5f, 0.5f);
             crosshairRect.anchorMax = new Vector2(0.5f, 0.5f);
+            crosshairRect.pivot = new Vector2(0.5f, 0.5f);
             crosshairRect.anchoredPosition = Vector2.zero;
 
             GameObject shopPanel = CreateUiPanel(canvasObject.transform, "Shop Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(620f, 430f));
