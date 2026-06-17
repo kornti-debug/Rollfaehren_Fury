@@ -81,12 +81,13 @@ Built data-driven (per the chosen design) instead of an inheritance tree:
 
 Remaining: verify in Unity — run `Build Prototype Scene`, confirm no compile errors and that both weapons fire and switch.
 
-**Track B — shop & upgrades**
+**Track B — shop & upgrades — implemented (pending Unity verification)**
 
-- **B1. `UpgradeSystem`** — data-driven upgrades (ScriptableObject: id, cost, target, effect) applied to player/weapon/ferry. Moves the hardcoded upgrade logic out of `GameManager`.
-  - Depends on: nothing — can target the existing `HitscanWeapon` directly. Unlocks: a flexible shop, the "three choices" design, per-weapon upgrades.
-- **B2. `ShopManager`** — presents upgrades from `UpgradeSystem`, handles purchase and affordability (replaces the fixed buttons wired through `SimpleHUD`).
-  - Depends on: B1.
+- **B1. `UpgradeDefinition` (polymorphic SO) + effects** — abstract `Apply(UpgradeContext)`; `WeaponDamageUpgrade` / `FireRateUpgrade` / `FerryHealthUpgrade` migrate the old hardcoded upgrades to assets. Hardcoded upgrade logic is out of `GameManager`.
+- **B2. `ShopManager`** — catalog of `UpgradeDefinition` assets + UI buttons; purchases go through `GameManager.TryPurchase`; one-off master upgrades tracked per run.
+- Plus the first **master upgrade**: Pistol **Querschläger** (ricochet to the nearest enemy) — proves the polymorphic model carries exotic effects.
+
+Remaining: verify in Unity. Per-weapon base upgrades + more master upgrades need new mechanics (magazine/reload, knockback, fuel).
 
 **Glue (integration, not a prerequisite)**
 

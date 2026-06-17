@@ -46,6 +46,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Verify Track A + HUD + tracer in Unity: scene built, weapons fire/switch, tracers show.
 - [x] Tracer originates from the crosshair; widen Shotgun spread; add Flamethrower (spread).
 - [x] Add `Projectile` fire mode + `Projectile` (gravity parabola, raycast hit, trail); Harpoon throws an arcing projectile.
+- [x] Weapon switching: mouse scroll + keys `1`–`4` (1 Harpoon, 2 Pistol, 3 Shotgun, 4 Flamethrower).
 - [ ] Verify projectiles in Unity: re-run `Build Prototype Scene`, Harpoon arcs and hits.
 
 ## Ferry and Cargo
@@ -79,6 +80,19 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add second upgrade: ferry health.
 - [x] Add third upgrade: fire rate.
 - [x] Add next-round difficulty increase.
+- [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
+- [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
+- [ ] Verify Track B in Unity: re-run `Build Prototype Scene`, shop purchases apply, ricochet works.
+- [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
+- [ ] Rebalance: upgrade costs lowered to 10/10/10/30 + 100 starting gold (testing values, retune later).
+- [x] Track C: vending-machine shop automat (walk up + B opens the shop overlay any time on deck).
+- [ ] Verify automat in Unity: re-run `Build Prototype Scene`, walk to the box, press B, buy, B to close.
+- [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
+- [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
+- [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
+- [ ] Verify augments in Unity: re-run `Build Prototype Scene`, survive a round → 3-augment draft → pick → effect applies.
+- [ ] Later: mechanic-heavy augments (mines, gulls, oil slick, shield...) + the spec's master weapon upgrades.
+- [ ] Track C: round-end augment draft (1 of 3) — replaces the round-end shop popup. (Next.)
 - [ ] Later: add cargo survival reward.
 
 ## Art and Scene Props

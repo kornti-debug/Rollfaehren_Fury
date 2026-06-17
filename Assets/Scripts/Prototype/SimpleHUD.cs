@@ -20,9 +20,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameObject shopPanel;
         [SerializeField] private Text shopTitleText;
         [SerializeField] private Text shopMoneyText;
-        [SerializeField] private Text weaponDamageCostText;
-        [SerializeField] private Text fireRateCostText;
-        [SerializeField] private Text ferryHealthCostText;
+        [SerializeField] private GameObject nextRoundButton;
+        [SerializeField] private GameObject closeShopButton;
+
+        [Header("Augment Draft")]
+        [SerializeField] private GameObject augmentDraftPanel;
 
         [Header("Game Over")]
         [SerializeField] private GameObject gameOverPanel;
@@ -80,18 +82,30 @@ namespace RollfaehrenFury.Prototype
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, false);
             SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, false);
             ShowMessage(string.Empty);
         }
 
-        public void ShowShop(int completedRound, int money, int damageCost, int fireRateCost, int healthCost)
+        public void ShowShop(int completedRound, int money)
+        {
+            ShowShopPanel($"Round {completedRound} survived", money, true);
+        }
+
+        public void ShowShopOverlay(int money)
+        {
+            ShowShopPanel("Shop", money, false);
+        }
+
+        private void ShowShopPanel(string title, int money, bool showNextRound)
         {
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, true);
             SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, false);
 
             if (shopTitleText != null)
             {
-                shopTitleText.text = $"Round {completedRound} survived";
+                shopTitleText.text = title;
             }
 
             if (shopMoneyText != null)
@@ -99,20 +113,16 @@ namespace RollfaehrenFury.Prototype
                 shopMoneyText.text = $"Money: ${money}";
             }
 
-            if (weaponDamageCostText != null)
-            {
-                weaponDamageCostText.text = $"Damage +10 (${damageCost})";
-            }
+            SetActive(nextRoundButton, showNextRound);
+            SetActive(closeShopButton, !showNextRound);
+        }
 
-            if (fireRateCostText != null)
-            {
-                fireRateCostText.text = $"Fire rate +18% (${fireRateCost})";
-            }
-
-            if (ferryHealthCostText != null)
-            {
-                ferryHealthCostText.text = $"Repair + max health (${healthCost})";
-            }
+        public void ShowAugmentDraft(int completedRound)
+        {
+            SetActive(gameplayPanel, true);
+            SetActive(shopPanel, false);
+            SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, true);
         }
 
         public void ShowGameOver(int round, int money)
@@ -120,6 +130,7 @@ namespace RollfaehrenFury.Prototype
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, false);
             SetActive(gameOverPanel, true);
+            SetActive(augmentDraftPanel, false);
 
             if (gameOverText != null)
             {
@@ -133,21 +144,6 @@ namespace RollfaehrenFury.Prototype
             {
                 messageText.text = message;
             }
-        }
-
-        public void BuyDamageUpgrade()
-        {
-            gameManager?.BuyWeaponDamageUpgrade();
-        }
-
-        public void BuyFireRateUpgrade()
-        {
-            gameManager?.BuyFireRateUpgrade();
-        }
-
-        public void BuyFerryHealthUpgrade()
-        {
-            gameManager?.BuyFerryHealthUpgrade();
         }
 
         public void StartNextRound()

@@ -78,6 +78,7 @@ Controls:
 - `WASD`: move
 - Mouse: look
 - Left click: shoot
+- Scroll / `1`–`4`: switch weapon (`1` Harpoon, `2` Pistol, `3` Shotgun, `4` Flamethrower)
 - `Shift`: sprint
 - `Space`: jump
 - `Esc` / Cancel: return from gameplay to the menu

@@ -18,14 +18,10 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private List<Weapon> weapons = new List<Weapon>();
         [SerializeField] private int startWeaponIndex;
         [SerializeField] private string fireActionPath = "Player/Attack";
-        [SerializeField] private string nextWeaponActionPath = "Player/Next";
-        [SerializeField] private string previousWeaponActionPath = "Player/Previous";
 
         private int activeIndex;
         private bool fireHeld;
         private InputAction fireAction;
-        private InputAction nextAction;
-        private InputAction previousAction;
 
         public event Action Fired;
         public event Action<Health> HitHealth;
@@ -63,25 +59,48 @@ namespace RollfaehrenFury.Prototype
                 fireAction.canceled -= HandleFireCanceled;
             }
 
-            if (nextAction != null)
-            {
-                nextAction.performed -= HandleNext;
-            }
-
-            if (previousAction != null)
-            {
-                previousAction.performed -= HandlePrevious;
-            }
-
             UnsubscribeWeapon(ActiveWeapon);
             fireHeld = false;
         }
 
         private void Update()
         {
-            if (InputEnabled && fireHeld)
+            if (!InputEnabled)
+            {
+                return;
+            }
+
+            HandleSwitchInput();
+
+            if (fireHeld)
             {
                 ActiveWeapon?.Fire(fireCamera, ignoredRoot, hitMask);
+            }
+        }
+
+        private void HandleSwitchInput()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                if (keyboard.digit1Key.wasPressedThisFrame) SwitchTo(0);
+                else if (keyboard.digit2Key.wasPressedThisFrame) SwitchTo(1);
+                else if (keyboard.digit3Key.wasPressedThisFrame) SwitchTo(2);
+                else if (keyboard.digit4Key.wasPressedThisFrame) SwitchTo(3);
+            }
+
+            Mouse mouse = Mouse.current;
+            if (mouse != null)
+            {
+                float scroll = mouse.scroll.ReadValue().y;
+                if (scroll > 0.01f)
+                {
+                    SwitchTo(activeIndex + 1);
+                }
+                else if (scroll < -0.01f)
+                {
+                    SwitchTo(activeIndex - 1);
+                }
             }
         }
 
@@ -102,6 +121,11 @@ namespace RollfaehrenFury.Prototype
         public void MultiplyActiveCooldown(float multiplier)
         {
             ActiveWeapon?.MultiplyCooldown(multiplier);
+        }
+
+        public void AddRicochetToActive(int bounces)
+        {
+            ActiveWeapon?.AddRicochet(bounces);
         }
 
         public void SwitchTo(int index)
@@ -132,20 +156,6 @@ namespace RollfaehrenFury.Prototype
                 fireAction.canceled += HandleFireCanceled;
                 fireAction.Enable();
             }
-
-            nextAction ??= PrototypeInputActions.Find(nextWeaponActionPath);
-            if (nextAction != null)
-            {
-                nextAction.performed += HandleNext;
-                nextAction.Enable();
-            }
-
-            previousAction ??= PrototypeInputActions.Find(previousWeaponActionPath);
-            if (previousAction != null)
-            {
-                previousAction.performed += HandlePrevious;
-                previousAction.Enable();
-            }
         }
 
         private void HandleFirePerformed(InputAction.CallbackContext context)
@@ -160,22 +170,6 @@ namespace RollfaehrenFury.Prototype
         private void HandleFireCanceled(InputAction.CallbackContext context)
         {
             fireHeld = false;
-        }
-
-        private void HandleNext(InputAction.CallbackContext context)
-        {
-            if (InputEnabled)
-            {
-                SwitchTo(activeIndex + 1);
-            }
-        }
-
-        private void HandlePrevious(InputAction.CallbackContext context)
-        {
-            if (InputEnabled)
-            {
-                SwitchTo(activeIndex - 1);
-            }
         }
 
         private void SubscribeWeapon(Weapon weapon)
