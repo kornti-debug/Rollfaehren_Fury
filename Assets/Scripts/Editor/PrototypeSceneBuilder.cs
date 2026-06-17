@@ -57,6 +57,7 @@ namespace RollfaehrenFury.Editor
             GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weaponSystem, hud, enemyPrefab, spawnPoints);
             EnsureShopManager(gameManager);
             EnsureVendingMachine(gameManager);
+            EnsureAugmentSystem(gameManager, gameManager.GetComponent<EnemySpawner>());
             EnsureAudioEvents(gameManager, weaponSystem);
             EnsureGameplayMenuInputObject();
             EnsureEventSystem();
@@ -134,6 +135,7 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "UI");
             EnsureFolder("Assets", "Weapons");
             EnsureFolder("Assets", "Upgrades");
+            EnsureFolder("Assets", "Augments");
         }
 
         private static void CreateBootstrapScene()
@@ -790,6 +792,58 @@ namespace RollfaehrenFury.Editor
             return prompt.gameObject;
         }
 
+        private static void EnsureAugmentSystem(GameManager gameManager, EnemySpawner spawner)
+        {
+            AugmentDefinition[] pool =
+            {
+                EnsureAugment<TailwindAugment>("Assets/Augments/Tailwind.asset", "Tailwind", "Ferry crosses 15% faster.",
+                    augment => SetFloat(augment, "crossingFactor", 0.85f)),
+                EnsureAugment<RepairKitAugment>("Assets/Augments/RepairKit.asset", "Repair Kit", "Heal 5% ferry HP each round.",
+                    augment => SetFloat(augment, "healFraction", 0.05f)),
+                EnsureAugment<SwarmAugment>("Assets/Augments/Swarm.asset", "The Swarm", "2x enemies, half HP.",
+                    augment => { SetFloat(augment, "countMultiplier", 2f); SetFloat(augment, "healthMultiplier", 0.5f); }),
+                EnsureAugment<BruisersAugment>("Assets/Augments/Bruisers.asset", "Bruisers", "Half enemies, 2x HP.",
+                    augment => { SetFloat(augment, "countMultiplier", 0.5f); SetFloat(augment, "healthMultiplier", 2f); }),
+            };
+
+            AugmentSystem augmentSystem = EnsureComponent<AugmentSystem>(gameManager.gameObject);
+            SetObject(augmentSystem, "gameManager", gameManager);
+            SetObject(augmentSystem, "spawner", spawner);
+            SetObjectList(augmentSystem, "pool", pool);
+
+            Button[] draftButtons = new Button[3];
+            for (int i = 0; i < draftButtons.Length; i++)
+            {
+                Button button = FindSceneButton($"Augment Draft Button {i}");
+                draftButtons[i] = button;
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+                    UnityEventTools.AddIntPersistentListener(button.onClick, augmentSystem.Pick, i);
+                    EditorUtility.SetDirty(button);
+                }
+            }
+
+            SetObjectList(augmentSystem, "draftButtons", draftButtons);
+            SetObject(gameManager, "augmentSystem", augmentSystem);
+        }
+
+        private static T EnsureAugment<T>(string path, string displayName, string description, System.Action<T> configure)
+            where T : AugmentDefinition
+        {
+            T augment = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (augment == null)
+            {
+                augment = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(augment, path);
+            }
+
+            SetString(augment, "displayName", displayName);
+            SetString(augment, "description", description);
+            configure?.Invoke(augment);
+            return augment;
+        }
+
         private static SimpleHUD EnsureHud()
         {
             GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
@@ -846,6 +900,15 @@ namespace RollfaehrenFury.Editor
             CreateButton(gameOverPanel.transform, "Restart Button", "Restart", new Vector2(0f, -92f), out Button restartButton);
             gameOverPanel.SetActive(false);
 
+            GameObject augmentPanel = CreateUiPanel(canvasObject.transform, "Augment Draft Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(700f, 460f));
+            Image augmentBackground = EnsureComponent<Image>(augmentPanel);
+            augmentBackground.color = new Color(0.04f, 0.06f, 0.09f, 0.92f);
+            CreateText(augmentPanel.transform, "Augment Title", "Choose an Augment", new Vector2(0f, 188f), new Vector2(640f, 44f), 30, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 0", new Vector2(0f, 108f), out _);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 1", new Vector2(0f, -12f), out _);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 2", new Vector2(0f, -132f), out _);
+            augmentPanel.SetActive(false);
+
             SetObject(hud, "gameplayPanel", gameplayPanel);
             SetObject(hud, "ferryHealthText", healthText);
             SetObject(hud, "ferryHealthFill", healthFill);
@@ -862,6 +925,7 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "gameOverText", gameOverText);
             SetObject(hud, "nextRoundButton", nextRoundButton.gameObject);
             SetObject(hud, "closeShopButton", closeShopButton.gameObject);
+            SetObject(hud, "augmentDraftPanel", augmentPanel);
 
             return hud;
         }
@@ -987,6 +1051,26 @@ namespace RollfaehrenFury.Editor
 
             Text buttonText = CreateText(buttonObject.transform, "Label", label, Vector2.zero, new Vector2(400f, 42f), 20, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             buttonText.color = Color.white;
+            return buttonText;
+        }
+
+        // Taller button for the round-end augment draft so a two-line "Name + description"
+        // label fits. The label wraps and overflows vertically instead of being truncated,
+        // and supports rich text so AugmentSystem can render a bold title + smaller description.
+        private static Text CreateAugmentButton(Transform parent, string name, Vector2 anchoredPosition, out Button button)
+        {
+            GameObject buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            Image image = EnsureComponent<Image>(buttonObject);
+            image.color = new Color(0.12f, 0.45f, 0.75f, 1f);
+            button = EnsureComponent<Button>(buttonObject);
+            ConfigureRect(buttonObject.GetComponent<RectTransform>(), TextAnchor.MiddleCenter, anchoredPosition, new Vector2(640f, 108f));
+
+            Text buttonText = CreateText(buttonObject.transform, "Label", "Augment", Vector2.zero, new Vector2(612f, 96f), 22, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            buttonText.color = Color.white;
+            buttonText.supportRichText = true;
+            buttonText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            buttonText.verticalOverflow = VerticalWrapMode.Overflow;
             return buttonText;
         }
 

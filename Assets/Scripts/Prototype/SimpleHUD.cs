@@ -23,6 +23,9 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameObject nextRoundButton;
         [SerializeField] private GameObject closeShopButton;
 
+        [Header("Augment Draft")]
+        [SerializeField] private GameObject augmentDraftPanel;
+
         [Header("Game Over")]
         [SerializeField] private GameObject gameOverPanel;
         [SerializeField] private Text gameOverText;
@@ -79,6 +82,7 @@ namespace RollfaehrenFury.Prototype
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, false);
             SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, false);
             ShowMessage(string.Empty);
         }
 
@@ -97,6 +101,7 @@ namespace RollfaehrenFury.Prototype
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, true);
             SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, false);
 
             if (shopTitleText != null)
             {
@@ -112,11 +117,20 @@ namespace RollfaehrenFury.Prototype
             SetActive(closeShopButton, !showNextRound);
         }
 
+        public void ShowAugmentDraft(int completedRound)
+        {
+            SetActive(gameplayPanel, true);
+            SetActive(shopPanel, false);
+            SetActive(gameOverPanel, false);
+            SetActive(augmentDraftPanel, true);
+        }
+
         public void ShowGameOver(int round, int money)
         {
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, false);
             SetActive(gameOverPanel, true);
+            SetActive(augmentDraftPanel, false);
 
             if (gameOverText != null)
             {

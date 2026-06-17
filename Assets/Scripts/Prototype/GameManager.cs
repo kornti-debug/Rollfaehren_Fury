@@ -8,6 +8,7 @@ namespace RollfaehrenFury.Prototype
         Idle,
         Playing,
         Shop,
+        AugmentDraft,
         GameOver
     }
 
@@ -19,6 +20,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private WeaponSystem weaponSystem;
         [SerializeField] private SimpleHUD hud;
         [SerializeField] private ShopManager shopManager;
+        [SerializeField] private AugmentSystem augmentSystem;
         [SerializeField] private bool startOnPlay = true;
         [SerializeField] private float crossingDuration = 45f;
         [SerializeField] private int startingMoney = 0;
@@ -27,6 +29,8 @@ namespace RollfaehrenFury.Prototype
         private float crossingTimer;
         private int money;
         private int round = 1;
+        private float perRoundHealFraction;
+        private float baseCrossingDuration;
 
         public static GameManager Instance { get; private set; }
 
@@ -51,6 +55,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             Instance = this;
+            baseCrossingDuration = crossingDuration;
             ResolveReferences();
         }
 
@@ -128,8 +133,11 @@ namespace RollfaehrenFury.Prototype
             round = 1;
             money = startingMoney;
             crossingTimer = 0f;
+            crossingDuration = baseCrossingDuration;
+            perRoundHealFraction = 0f;
             ferryHealth?.ResetHealth();
             shopManager?.ResetPurchases();
+            enemySpawner?.ResetAugments();
             StartRound();
         }
 
@@ -205,6 +213,24 @@ namespace RollfaehrenFury.Prototype
             SetGameplayInput(true);
         }
 
+        public void ApplyCrossingSpeedup(float factor)
+        {
+            crossingDuration = Mathf.Max(5f, crossingDuration * Mathf.Clamp(factor, 0.1f, 1f));
+        }
+
+        public void AddPerRoundHeal(float fraction)
+        {
+            perRoundHealFraction += Mathf.Max(0f, fraction);
+        }
+
+        private void ApplyPerRoundHeal()
+        {
+            if (perRoundHealFraction > 0f && ferryHealth != null)
+            {
+                ferryHealth.Heal(perRoundHealFraction * ferryHealth.MaxHealth);
+            }
+        }
+
         private void StartRound()
         {
             State = PrototypeGameState.Playing;
@@ -222,13 +248,15 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            State = PrototypeGameState.Shop;
+            State = PrototypeGameState.AugmentDraft;
             money += roundCompletionReward + round * 5;
+            IsShopOverlayOpen = false;
             SetGameplayInput(false);
             enemySpawner?.StopRound(true);
+            ApplyPerRoundHeal();
             RoundCompleted?.Invoke();
-            hud?.ShowShop(round, money);
-            shopManager?.OpenShop();
+            hud?.ShowAugmentDraft(round);
+            augmentSystem?.OpenDraft();
             RefreshHud();
         }
 
@@ -311,6 +339,11 @@ namespace RollfaehrenFury.Prototype
             if (shopManager == null)
             {
                 shopManager = FindFirstObjectByType<ShopManager>();
+            }
+
+            if (augmentSystem == null)
+            {
+                augmentSystem = FindFirstObjectByType<AugmentSystem>();
             }
         }
     }
