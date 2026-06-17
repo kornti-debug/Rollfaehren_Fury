@@ -59,6 +59,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add contact damage behavior.
 - [x] Add `EnemySpawner`.
 - [x] Add round-based spawn scaling.
+- [x] Align enemy spawn points with the terrain river surface.
 - [ ] Add second enemy variant if time allows.
 
 ## Score, Money, and Upgrades
