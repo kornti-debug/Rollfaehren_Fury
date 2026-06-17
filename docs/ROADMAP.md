@@ -15,7 +15,7 @@ Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
 
 - `GameManager` — game states (Idle / Playing / Shop / GameOver), money, rounds, crossing timer
 - `Health` — reusable health/damage component with events (target-agnostic)
-- `HitscanWeapon` — one weapon: fire, cooldown, damage, aim assist
+- `WeaponSystem` + `Weapon` + `WeaponDefinition` — data-driven weapons (Track A): the active weapon fires, weapons switch, upgrades hit the active weapon
 - `SimpleEnemy` + `EnemySpawner` — one enemy, round-scaled spawning, contact damage
 - `FerryDamageTarget` — the ferry as the protected/damageable object
 - `SimpleHUD` — HUD + shop panel + game over panel
@@ -30,8 +30,7 @@ round, game over on ferry death, Esc back to the menu.
 
 ### Known shortcuts in the current code (these drive the order below)
 
-- Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven.
-- There is **one concrete weapon**; no weapon base class or inventory.
+- Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven (Track B).
 - The **Settings panel exists but has no real options yet**.
 - Wwise **hooks exist but banks/events are not wired up** (banks are gitignored;
   generate them locally — see [WWISE.md](WWISE.md)).
@@ -54,7 +53,6 @@ weapon code are not rebuilt twice.
 
 Cheap, unblocks honest testing. Depends on: nothing.
 
-- Generate Wwise SoundBanks and create the events matching the `PrototypeAudioEvents` names → audio actually plays.
 - Visible ferry damage / low-health feedback (uses existing `Health` events).
 - Tuning pass: enemy speed, spawn timing, ferry health, weapon damage, shop prices, crossing duration.
 - Confirm a clean fresh clone + Play Mode (through Bootstrap → Menu → Main) on a teammate machine.
@@ -73,12 +71,15 @@ Track B (shop):      UpgradeSystem (B1) ──▶ ShopManager (B2)
                          once A2 and B1 both exist
 ```
 
-**Track A — weapons**
+**Track A — weapons — implemented (pending Unity verification)**
 
-- **A1. `Weapon` base** — extract the fire / damage / cooldown contract out of `HitscanWeapon` (becomes a subclass). Build on the existing Input System layer rather than re-polling devices.
-  - Depends on: nothing (pure refactor, loop keeps working). Unlocks: every additional weapon type.
-- **A2. `WeaponSystem`** — owns one or more weapons, handles selection/switching, exposes the active weapon to `GameManager`/HUD.
-  - Depends on: A1. Unlocks: multiple weapons, weapon-specific upgrades. (Thin until the second weapon exists — build it right before Tier 2 weapons.)
+Built data-driven (per the chosen design) instead of an inheritance tree:
+
+- **A1. `WeaponDefinition` (ScriptableObject) + data-driven `Weapon`** — replaces the single hitscan weapon. `Weapon` reads a definition and fires by `WeaponFireMode` (hitscan / spread); it keeps runtime copies of the stats so upgrades never mutate the shared asset.
+- **A2. `WeaponSystem`** — owns the firing input (`Player/Attack`), holds the weapon list, switches the active weapon (`Player/Next` / `Player/Previous`), and forwards fire/hit events to HUD + audio.
+- Plus a second weapon (Shotgun, spread) to prove the abstraction end-to-end. New weapons are now just a `WeaponDefinition` asset under `Assets/Weapons/`.
+
+Remaining: verify in Unity — run `Build Prototype Scene`, confirm no compile errors and that both weapons fire and switch.
 
 **Track B — shop & upgrades**
 
@@ -117,7 +118,7 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 
 - Low-poly ferry, shore, weapon, and enemy models replacing the primitives.
 - Water, lighting, and low-poly art direction.
-- Wwise mix + river/ferry ambience + music.
+- Wwise audio (deferred from Tier 0 — nothing depends on it): generate SoundBanks, wire the events matching `PrototypeAudioEvents`, then mix + river/ferry ambience + music. Until then the `Init.bnk not found` Console errors are expected noise.
 - Animations where they clarify behaviour.
 
 ### Tier 5 — Ship
@@ -128,7 +129,7 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 
 ## Critical path (shortest line to "more than a tech demo")
 
-Tier 0 (audio + damage feedback) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
+Tier 0 (damage feedback + tuning) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
 → Tier 2 (a second weapon + one enemy variant) → Tier 4/5 polish. The main menu
 and scene flow are already in place, so framing is no longer on the critical path.
 
