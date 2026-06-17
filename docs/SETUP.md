@@ -67,9 +67,15 @@ Gameplay and menu inputs use `Assets/InputSystem_Actions.inputactions`. The scri
 
 Terrain and water experiments should happen on an environment branch before merging to `main`.
 
-For the current river setup, use a real water surface object above the sculpted terrain riverbed. Terrain layers are only painted textures; they do not animate like water by themselves. If a water material appears pink, it is probably using a Built-in Render Pipeline shader inside this URP project.
+For the current river setup, use the terrain for land and riverbed only, then place one visual water plane above the sculpted riverbed. Terrain layers are only painted textures; they do not animate like water by themselves. If a water material appears pink, it is probably using a Built-in Render Pipeline shader inside this URP project.
 
-Run `Rollfaehren Fury > Environment > Setup URP River Water` to create/update `River Water Surface` with `Assets/Materials/RiverWater_URP.mat`.
+Current manual setup:
+
+1. Keep the object named `River Water Surface` above the riverbed.
+2. Remove colliders from the water plane; the player should stand on the ferry, not on water.
+3. Use `Assets/Materials/RiverWater_URP.mat` only as a temporary URP-safe transparent material.
+4. For animated water, create a URP Unlit Shader Graph in the Unity Editor, set it to Transparent, scroll a wave/noise texture with Time, then assign that material to `River Water Surface`.
+5. Use the imported Basic Toon Water textures as wave/noise inputs if they look good, but do not assign the imported Basic Toon Water shaders directly because they are Built-in Pipeline shaders.
 
 ## Wwise First Run
 

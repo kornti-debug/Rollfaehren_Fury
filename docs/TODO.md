@@ -78,7 +78,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Low-poly ferry model.
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
-- [x] Add URP-safe animated river water material.
+- [x] Add URP-safe temporary river water material.
+- [ ] Create final animated river water Shader Graph in Unity Editor.
 - [ ] Later: cargo crates.
 - [ ] Weapon model.
 - [ ] First enemy model.
