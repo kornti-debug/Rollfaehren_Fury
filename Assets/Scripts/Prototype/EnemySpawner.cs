@@ -19,7 +19,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float spawnDelayReductionPerRound = 0.18f;
         [SerializeField] private float fallbackSpawnRadius = 65f;
         [SerializeField] private bool useFixedSpawnHeight = true;
-        [SerializeField] private float spawnHeight = 1f;
+        [SerializeField] private float spawnHeight = 7f;
 
         private readonly List<SimpleEnemy> aliveEnemies = new List<SimpleEnemy>();
         private Coroutine spawnRoutine;
