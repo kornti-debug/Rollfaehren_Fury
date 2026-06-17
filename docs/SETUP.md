@@ -17,6 +17,11 @@ cd Rollfaehren_Fury
 git lfs pull
 ```
 
+TerrainData files are binary Unity assets and must come down through Git LFS. If
+the terrain or Terrain Collider data is missing after cloning, run
+`git lfs pull`, close Unity, delete the clone's generated `Library/` folder, and
+reopen the project so Unity imports the restored binary asset.
+
 ## Open in Unity
 
 1. Open Unity Hub.

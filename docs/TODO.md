@@ -10,6 +10,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Integrate Wwise.
 - [x] Add project docs.
 - [x] Add first playable MVP branch: `codex/playable-mvp`.
+- [x] Track the binary TerrainData asset through Git LFS for fresh clones.
 - [ ] Verify a fresh clone on another machine.
 - [x] Confirm Unity batchmode compiles the prototype scene builder.
 - [ ] Confirm Unity Play Mode has no Console errors on a teammate machine.
