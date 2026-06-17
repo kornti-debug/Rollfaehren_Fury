@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,6 +14,7 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private WeaponDefinition definition;
         [SerializeField] private WeaponTracer tracer;
+        [SerializeField] private float ricochetRange = 25f;
         [SerializeField] private UnityEvent fired = new UnityEvent();
         [SerializeField] private UnityEvent hitSomething = new UnityEvent();
         [SerializeField] private UnityEvent hitHealth = new UnityEvent();
@@ -20,6 +22,7 @@ namespace RollfaehrenFury.Prototype
         private float currentDamage;
         private float currentCooldown;
         private float nextFireTime;
+        private int ricochetBounces;
         private bool statsInitialized;
 
         public event Action Fired;
@@ -60,6 +63,11 @@ namespace RollfaehrenFury.Prototype
         {
             EnsureStats();
             currentCooldown = Mathf.Max(0.05f, currentCooldown * multiplier);
+        }
+
+        public void AddRicochet(int bounces)
+        {
+            ricochetBounces += Mathf.Max(0, bounces);
         }
 
         public bool CanFire()
@@ -136,7 +144,66 @@ namespace RollfaehrenFury.Prototype
                 health.Damage(currentDamage);
                 hitHealth.Invoke();
                 HitHealth?.Invoke(health);
+
+                if (ricochetBounces > 0)
+                {
+                    Ricochet(hit.point, health.GetComponentInParent<SimpleEnemy>());
+                }
             }
+        }
+
+        private void Ricochet(Vector3 fromPoint, SimpleEnemy firstHit)
+        {
+            HashSet<SimpleEnemy> alreadyHit = new HashSet<SimpleEnemy>();
+            if (firstHit != null)
+            {
+                alreadyHit.Add(firstHit);
+            }
+
+            Vector3 from = fromPoint;
+            for (int i = 0; i < ricochetBounces; i++)
+            {
+                SimpleEnemy next = FindNearestEnemy(from, alreadyHit);
+                if (next == null)
+                {
+                    break;
+                }
+
+                Health nextHealth = next.GetComponent<Health>();
+                if (nextHealth != null)
+                {
+                    nextHealth.Damage(currentDamage);
+                    HitHealth?.Invoke(nextHealth);
+                }
+
+                Vector3 to = next.transform.position;
+                tracer?.Show(from, to);
+                alreadyHit.Add(next);
+                from = to;
+            }
+        }
+
+        private SimpleEnemy FindNearestEnemy(Vector3 point, HashSet<SimpleEnemy> exclude)
+        {
+            SimpleEnemy nearest = null;
+            float nearestSqr = ricochetRange * ricochetRange;
+
+            foreach (SimpleEnemy enemy in FindObjectsByType<SimpleEnemy>(FindObjectsSortMode.None))
+            {
+                if (enemy == null || exclude.Contains(enemy))
+                {
+                    continue;
+                }
+
+                float sqr = (enemy.transform.position - point).sqrMagnitude;
+                if (sqr <= nearestSqr)
+                {
+                    nearestSqr = sqr;
+                    nearest = enemy;
+                }
+            }
+
+            return nearest;
         }
 
         private void ShowTracer(Camera fireCamera, Vector3 endPoint)

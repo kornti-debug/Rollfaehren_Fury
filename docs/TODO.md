@@ -79,6 +79,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add second upgrade: ferry health.
 - [x] Add third upgrade: fire rate.
 - [x] Add next-round difficulty increase.
+- [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
+- [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
+- [ ] Verify Track B in Unity: re-run `Build Prototype Scene`, shop purchases apply, ricochet works.
+- [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
 - [ ] Later: add cargo survival reward.
 
 ## Art and Scene Props

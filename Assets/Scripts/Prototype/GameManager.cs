@@ -18,16 +18,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private SimpleFPSController playerController;
         [SerializeField] private WeaponSystem weaponSystem;
         [SerializeField] private SimpleHUD hud;
+        [SerializeField] private ShopManager shopManager;
         [SerializeField] private bool startOnPlay = true;
         [SerializeField] private float crossingDuration = 45f;
         [SerializeField] private int startingMoney = 0;
         [SerializeField] private int roundCompletionReward = 25;
-        [SerializeField] private int weaponDamageUpgradeCost = 50;
-        [SerializeField] private int fireRateUpgradeCost = 45;
-        [SerializeField] private int ferryHealthUpgradeCost = 60;
-        [SerializeField] private float weaponDamageUpgradeAmount = 10f;
-        [SerializeField] private float fireRateUpgradeMultiplier = 0.82f;
-        [SerializeField] private float ferryHealthUpgradeAmount = 25f;
 
         private float crossingTimer;
         private int money;
@@ -134,6 +129,7 @@ namespace RollfaehrenFury.Prototype
             money = startingMoney;
             crossingTimer = 0f;
             ferryHealth?.ResetHealth();
+            shopManager?.ResetPurchases();
             StartRound();
         }
 
@@ -161,50 +157,24 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
-        public void BuyWeaponDamageUpgrade()
+        public bool TryPurchase(UpgradeDefinition upgrade)
         {
-            if (!TrySpend(weaponDamageUpgradeCost))
+            if (upgrade == null)
+            {
+                return false;
+            }
+
+            if (!TrySpend(upgrade.Cost))
             {
                 hud?.ShowMessage("Not enough money");
-                return;
+                return false;
             }
 
-            weaponSystem?.AddDamageToActive(weaponDamageUpgradeAmount);
+            upgrade.Apply(new UpgradeContext(weaponSystem, ferryHealth));
             UpgradeBought?.Invoke();
-            hud?.ShowMessage($"+{weaponDamageUpgradeAmount:0} weapon damage");
+            hud?.ShowMessage($"Bought {upgrade.DisplayName}");
             RefreshHud();
-        }
-
-        public void BuyFireRateUpgrade()
-        {
-            if (!TrySpend(fireRateUpgradeCost))
-            {
-                hud?.ShowMessage("Not enough money");
-                return;
-            }
-
-            weaponSystem?.MultiplyActiveCooldown(fireRateUpgradeMultiplier);
-            UpgradeBought?.Invoke();
-            hud?.ShowMessage("Faster fire rate");
-            RefreshHud();
-        }
-
-        public void BuyFerryHealthUpgrade()
-        {
-            if (!TrySpend(ferryHealthUpgradeCost))
-            {
-                hud?.ShowMessage("Not enough money");
-                return;
-            }
-
-            if (ferryHealth != null)
-            {
-                ferryHealth.SetMaxHealth(ferryHealth.MaxHealth + ferryHealthUpgradeAmount, true);
-            }
-
-            UpgradeBought?.Invoke();
-            hud?.ShowMessage($"+{ferryHealthUpgradeAmount:0} ferry health");
-            RefreshHud();
+            return true;
         }
 
         private void StartRound()
@@ -229,7 +199,8 @@ namespace RollfaehrenFury.Prototype
             SetGameplayInput(false);
             enemySpawner?.StopRound(true);
             RoundCompleted?.Invoke();
-            hud?.ShowShop(round, money, weaponDamageUpgradeCost, fireRateUpgradeCost, ferryHealthUpgradeCost);
+            hud?.ShowShop(round, money);
+            shopManager?.OpenShop();
             RefreshHud();
         }
 
@@ -307,6 +278,11 @@ namespace RollfaehrenFury.Prototype
             if (hud == null)
             {
                 hud = FindFirstObjectByType<SimpleHUD>();
+            }
+
+            if (shopManager == null)
+            {
+                shopManager = FindFirstObjectByType<ShopManager>();
             }
         }
     }

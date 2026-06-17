@@ -67,7 +67,8 @@ Planned systems and responsibilities:
 - `WeaponTracer`: implemented — placeholder shot visual. Pooled `LineRenderer`s draw a brief muzzle→hit line so hitscan/spread shots are visible while there are no weapon/projectile assets. The HUD also shows the active weapon name + slot, updated on switch.
 - `Projectile`: implemented — a thrown projectile that flies a gravity parabola, raycasts its own path to hit `Health`, then despawns (placeholder cube + trail). Spawned by `Weapon` for `WeaponFireMode.Projectile` (the Harpoon).
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
-- `UpgradeSystem`: applies upgrades to player, weapons, ferry, and later cargo rewards. Weapon upgrades currently route through `WeaponSystem` to the active weapon.
+- `UpgradeDefinition` (Track B): implemented — polymorphic ScriptableObject upgrade; subclasses define the effect via `Apply(UpgradeContext)`: `WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, and the master `RicochetUpgrade`. Weapon upgrades route through `WeaponSystem` to the active weapon.
+- `ShopManager` (Track B): implemented — holds a catalog of `UpgradeDefinition` assets + parallel UI buttons; purchases go through `GameManager.TryPurchase`. One-off "master" upgrades (non-repeatable) are tracked per run.
 - `FerryController`: ferry movement and crossing progress.
 - `Cargo`: later destructible cargo with reward value.
 

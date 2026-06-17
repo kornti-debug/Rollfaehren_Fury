@@ -20,9 +20,6 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameObject shopPanel;
         [SerializeField] private Text shopTitleText;
         [SerializeField] private Text shopMoneyText;
-        [SerializeField] private Text weaponDamageCostText;
-        [SerializeField] private Text fireRateCostText;
-        [SerializeField] private Text ferryHealthCostText;
 
         [Header("Game Over")]
         [SerializeField] private GameObject gameOverPanel;
@@ -83,7 +80,7 @@ namespace RollfaehrenFury.Prototype
             ShowMessage(string.Empty);
         }
 
-        public void ShowShop(int completedRound, int money, int damageCost, int fireRateCost, int healthCost)
+        public void ShowShop(int completedRound, int money)
         {
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, true);
@@ -97,21 +94,6 @@ namespace RollfaehrenFury.Prototype
             if (shopMoneyText != null)
             {
                 shopMoneyText.text = $"Money: ${money}";
-            }
-
-            if (weaponDamageCostText != null)
-            {
-                weaponDamageCostText.text = $"Damage +10 (${damageCost})";
-            }
-
-            if (fireRateCostText != null)
-            {
-                fireRateCostText.text = $"Fire rate +18% (${fireRateCost})";
-            }
-
-            if (ferryHealthCostText != null)
-            {
-                ferryHealthCostText.text = $"Repair + max health (${healthCost})";
             }
         }
 
@@ -133,21 +115,6 @@ namespace RollfaehrenFury.Prototype
             {
                 messageText.text = message;
             }
-        }
-
-        public void BuyDamageUpgrade()
-        {
-            gameManager?.BuyWeaponDamageUpgrade();
-        }
-
-        public void BuyFireRateUpgrade()
-        {
-            gameManager?.BuyFireRateUpgrade();
-        }
-
-        public void BuyFerryHealthUpgrade()
-        {
-            gameManager?.BuyFerryHealthUpgrade();
         }
 
         public void StartNextRound()

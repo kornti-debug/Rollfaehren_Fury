@@ -104,6 +104,11 @@ namespace RollfaehrenFury.Prototype
             ActiveWeapon?.MultiplyCooldown(multiplier);
         }
 
+        public void AddRicochetToActive(int bounces)
+        {
+            ActiveWeapon?.AddRicochet(bounces);
+        }
+
         public void SwitchTo(int index)
         {
             if (weapons.Count == 0)

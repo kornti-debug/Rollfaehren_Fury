@@ -55,6 +55,7 @@ namespace RollfaehrenFury.Editor
 
             SimpleHUD hud = EnsureHud();
             GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weaponSystem, hud, enemyPrefab, spawnPoints);
+            EnsureShopManager(gameManager);
             EnsureAudioEvents(gameManager, weaponSystem);
             EnsureGameplayMenuInputObject();
             EnsureEventSystem();
@@ -131,6 +132,7 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "Materials");
             EnsureFolder("Assets", "UI");
             EnsureFolder("Assets", "Weapons");
+            EnsureFolder("Assets", "Upgrades");
         }
 
         private static void CreateBootstrapScene()
@@ -688,6 +690,60 @@ namespace RollfaehrenFury.Editor
             SetBool(audioEvents, "postEvents", false);
         }
 
+        private static ShopManager EnsureShopManager(GameManager gameManager)
+        {
+            UpgradeDefinition[] catalog =
+            {
+                EnsureUpgrade<WeaponDamageUpgrade>("Assets/Upgrades/WeaponDamage.asset", "Damage +10", "More weapon damage.", 50, true,
+                    upgrade => SetFloat(upgrade, "amount", 10f)),
+                EnsureUpgrade<FireRateUpgrade>("Assets/Upgrades/FireRate.asset", "Fire Rate +18%", "Faster fire rate.", 45, true,
+                    upgrade => SetFloat(upgrade, "cooldownMultiplier", 0.82f)),
+                EnsureUpgrade<FerryHealthUpgrade>("Assets/Upgrades/FerryHealth.asset", "Repair + Max HP", "Heal and raise ferry max health.", 60, true,
+                    upgrade => SetFloat(upgrade, "amount", 25f)),
+                EnsureUpgrade<RicochetUpgrade>("Assets/Upgrades/Ricochet.asset", "Querschlaeger (Master)", "Shots ricochet to the nearest enemy.", 150, false,
+                    upgrade => SetInt(upgrade, "bounces", 1)),
+            };
+
+            ShopManager shopManager = EnsureComponent<ShopManager>(gameManager.gameObject);
+            SetObject(shopManager, "gameManager", gameManager);
+            SetObjectList(shopManager, "catalog", catalog);
+
+            Button[] shopButtons = new Button[catalog.Length];
+            for (int i = 0; i < shopButtons.Length; i++)
+            {
+                Button button = FindSceneButton($"Shop Upgrade Button {i}");
+                shopButtons[i] = button;
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+                    UnityEventTools.AddIntPersistentListener(button.onClick, shopManager.Buy, i);
+                    EditorUtility.SetDirty(button);
+                }
+            }
+
+            SetObjectList(shopManager, "buttons", shopButtons);
+            SetObject(gameManager, "shopManager", shopManager);
+            return shopManager;
+        }
+
+        private static T EnsureUpgrade<T>(string path, string displayName, string description, int cost, bool repeatable, System.Action<T> configure)
+            where T : UpgradeDefinition
+        {
+            T upgrade = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (upgrade == null)
+            {
+                upgrade = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(upgrade, path);
+            }
+
+            SetString(upgrade, "displayName", displayName);
+            SetString(upgrade, "description", description);
+            SetInt(upgrade, "cost", cost);
+            SetBool(upgrade, "repeatable", repeatable);
+            configure?.Invoke(upgrade);
+            return upgrade;
+        }
+
         private static SimpleHUD EnsureHud()
         {
             GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
@@ -728,10 +784,12 @@ namespace RollfaehrenFury.Editor
             shopBackground.color = new Color(0.04f, 0.06f, 0.08f, 0.88f);
             Text shopTitle = CreateText(shopPanel.transform, "Shop Title", "Round survived", new Vector2(0f, 160f), new Vector2(560f, 40f), 30, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             Text shopMoney = CreateText(shopPanel.transform, "Shop Money", "Money: $0", new Vector2(0f, 112f), new Vector2(560f, 32f), 22, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
-            Text damageCost = CreateButton(shopPanel.transform, "Damage Upgrade Button", "Damage Upgrade ($50)", new Vector2(0f, 48f), out Button damageButton);
-            Text fireRateCost = CreateButton(shopPanel.transform, "Fire Rate Upgrade Button", "Fire Rate Upgrade ($45)", new Vector2(0f, -16f), out Button fireRateButton);
-            Text ferryHealthCost = CreateButton(shopPanel.transform, "Ferry Health Upgrade Button", "Ferry Health ($60)", new Vector2(0f, -80f), out Button healthButton);
-            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -158f), out Button nextRoundButton);
+            float[] shopButtonY = { 78f, 26f, -26f, -78f };
+            for (int i = 0; i < shopButtonY.Length; i++)
+            {
+                CreateButton(shopPanel.transform, $"Shop Upgrade Button {i}", "Upgrade", new Vector2(0f, shopButtonY[i]), out _);
+            }
+            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -150f), out _);
             shopPanel.SetActive(false);
 
             GameObject gameOverPanel = CreateUiPanel(canvasObject.transform, "Game Over Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(620f, 330f));
@@ -753,26 +811,14 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "shopPanel", shopPanel);
             SetObject(hud, "shopTitleText", shopTitle);
             SetObject(hud, "shopMoneyText", shopMoney);
-            SetObject(hud, "weaponDamageCostText", damageCost);
-            SetObject(hud, "fireRateCostText", fireRateCost);
-            SetObject(hud, "ferryHealthCostText", ferryHealthCost);
             SetObject(hud, "gameOverPanel", gameOverPanel);
             SetObject(hud, "gameOverText", gameOverText);
-
-            damageButton.name = "Damage Upgrade Button";
-            fireRateButton.name = "Fire Rate Upgrade Button";
-            healthButton.name = "Ferry Health Upgrade Button";
-            nextRoundButton.name = "Next Round Button";
-            restartButton.name = "Restart Button";
 
             return hud;
         }
 
         private static void ConfigureHudButtons(GameManager gameManager)
         {
-            AddButtonListener("Damage Upgrade Button", gameManager.BuyWeaponDamageUpgrade);
-            AddButtonListener("Fire Rate Upgrade Button", gameManager.BuyFireRateUpgrade);
-            AddButtonListener("Ferry Health Upgrade Button", gameManager.BuyFerryHealthUpgrade);
             AddButtonListener("Next Round Button", gameManager.StartNextRound);
             AddButtonListener("Restart Button", gameManager.RestartGame);
         }
