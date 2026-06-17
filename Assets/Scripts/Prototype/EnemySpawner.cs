@@ -26,6 +26,8 @@ namespace RollfaehrenFury.Prototype
         private GameManager gameManager;
         private int activeRound = 1;
         private bool isSpawning;
+        private float augmentCountMultiplier = 1f;
+        private float augmentHealthMultiplier = 1f;
 
         public int AliveCount => aliveEnemies.Count;
 
@@ -76,9 +78,25 @@ namespace RollfaehrenFury.Prototype
             aliveEnemies.Clear();
         }
 
+        public void AddCountMultiplier(float multiplier)
+        {
+            augmentCountMultiplier = Mathf.Max(0.1f, augmentCountMultiplier * multiplier);
+        }
+
+        public void AddHealthMultiplier(float multiplier)
+        {
+            augmentHealthMultiplier = Mathf.Max(0.1f, augmentHealthMultiplier * multiplier);
+        }
+
+        public void ResetAugments()
+        {
+            augmentCountMultiplier = 1f;
+            augmentHealthMultiplier = 1f;
+        }
+
         private IEnumerator SpawnRound()
         {
-            int targetCount = baseEnemiesPerRound + (activeRound - 1) * extraEnemiesPerRound;
+            int targetCount = Mathf.Max(1, Mathf.RoundToInt((baseEnemiesPerRound + (activeRound - 1) * extraEnemiesPerRound) * augmentCountMultiplier));
             int spawned = 0;
 
             while (isSpawning && spawned < targetCount)
@@ -108,7 +126,7 @@ namespace RollfaehrenFury.Prototype
             aliveEnemies.Add(enemy);
 
             float speedMultiplier = 1f + (activeRound - 1) * speedScalePerRound;
-            float healthMultiplier = 1f + (activeRound - 1) * healthScalePerRound;
+            float healthMultiplier = (1f + (activeRound - 1) * healthScalePerRound) * augmentHealthMultiplier;
             int reward = baseKillReward + (activeRound - 1) * 2;
             enemy.Initialize(ferryTarget, gameManager, reward, speedMultiplier, healthMultiplier);
         }

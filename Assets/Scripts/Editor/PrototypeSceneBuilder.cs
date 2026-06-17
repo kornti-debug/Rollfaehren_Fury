@@ -17,14 +17,18 @@ namespace RollfaehrenFury.Editor
         private const string MenuScenePath = "Assets/Scenes/Menu.unity";
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
+        private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
         private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
         private const string PlayerVisualName = "Fraunz Visual";
-        private const float EnemySpawnHeight = 1f;
+        private const float EnemySpawnHeight = 7f;
         private const float PlayerVisualScale = 0.85f;
 
-        private static readonly Vector3 PlayerStartPosition = new Vector3(0f, 7.37f, -1.8f);
+        private static readonly Vector3 FerryStartPosition = new Vector3(276.8f, 1.85f, 481.1f);
+        private static readonly Vector3 PlayerStartPosition = new Vector3(279.7f, 12.25f, 479.2f);
+        private static readonly Vector3 VendingMachinePosition = new Vector3(283.2f, 12.25f, 479.2f);
+        private static readonly Vector3 EnemySpawnParentPosition = new Vector3(292f, 0f, 487f);
         private static readonly Vector3 FerryAimPointPosition = new Vector3(0f, 4.97f, 0f);
         private static readonly Vector3 FerryDamageColliderCenter = new Vector3(0f, 7.070751f, 2.7608166f);
         private static readonly Vector3 FerryDamageColliderSize = new Vector3(20f, 5.4464755f, 45.15598f);
@@ -47,15 +51,18 @@ namespace RollfaehrenFury.Editor
             FerryDamageTarget ferryTarget = EnsureFerryDamageTarget(ferry, ferryHealth);
 
             SimpleFPSController playerController = EnsurePlayer();
-            HitscanWeapon weapon = EnsureWeapon(playerController);
-            Transform[] spawnPoints = EnsureSpawnPoints(ferryTarget.transform);
+            WeaponSystem weaponSystem = EnsureWeapon(playerController);
+            Transform[] spawnPoints = EnsureSpawnPoints();
             SimpleEnemy enemyPrefab = EnsureEnemyPrefab(enemyMaterial);
 
             CreatePrototypeEnvironment(waterMaterial, shoreMaterial);
 
             SimpleHUD hud = EnsureHud();
-            GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weapon, hud, enemyPrefab, spawnPoints);
-            EnsureAudioEvents(gameManager, weapon);
+            GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weaponSystem, hud, enemyPrefab, spawnPoints);
+            EnsureShopManager(gameManager);
+            EnsureVendingMachine(gameManager);
+            EnsureAugmentSystem(gameManager, gameManager.GetComponent<EnemySpawner>());
+            EnsureAudioEvents(gameManager, weaponSystem);
             EnsureGameplayMenuInputObject();
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
@@ -130,6 +137,9 @@ namespace RollfaehrenFury.Editor
             EnsureFolder("Assets", "Prefabs");
             EnsureFolder("Assets", "Materials");
             EnsureFolder("Assets", "UI");
+            EnsureFolder("Assets", "Weapons");
+            EnsureFolder("Assets", "Upgrades");
+            EnsureFolder("Assets", "Augments");
         }
 
         private static void CreateBootstrapScene()
@@ -223,8 +233,9 @@ namespace RollfaehrenFury.Editor
             if (ferry == null)
             {
                 ferry = new GameObject("Ferry");
-                ferry.transform.position = Vector3.zero;
             }
+
+            ferry.transform.position = FerryStartPosition;
 
             GameObject deck = FindChild(ferry.transform, "Prototype Ferry Deck");
             if (deck != null)
@@ -319,11 +330,30 @@ namespace RollfaehrenFury.Editor
             camera.fieldOfView = 72f;
             EnsureComponent<AudioListener>(cameraRoot.gameObject);
 
+            RemoveStrayCameras(player.transform, camera);
+
             SimpleFPSController controller = EnsureComponent<SimpleFPSController>(player);
             SetObject(controller, "cameraRoot", cameraRoot);
             SetFloat(controller, "pitchClamp", 82f);
             EnsurePlayerVisual(player.transform);
             return controller;
+        }
+
+        private static void RemoveStrayCameras(Transform playerRoot, Camera playerCamera)
+        {
+            foreach (Camera sceneCamera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            {
+                if (sceneCamera == null || sceneCamera == playerCamera)
+                {
+                    continue;
+                }
+
+                if (!sceneCamera.transform.IsChildOf(playerRoot))
+                {
+                    Debug.Log($"Removing stray scene camera '{sceneCamera.name}' so only the player camera renders.", sceneCamera);
+                    Object.DestroyImmediate(sceneCamera.gameObject);
+                }
+            }
         }
 
         private static void HidePrimitivePlayerShell(GameObject player)
@@ -404,20 +434,104 @@ namespace RollfaehrenFury.Editor
             EditorUtility.SetDirty(animator);
         }
 
-        private static HitscanWeapon EnsureWeapon(SimpleFPSController playerController)
+        private static WeaponSystem EnsureWeapon(SimpleFPSController playerController)
         {
             Camera camera = playerController.GetComponentInChildren<Camera>();
-            HitscanWeapon weapon = EnsureComponent<HitscanWeapon>(camera.gameObject);
-            SetObject(weapon, "fireCamera", camera);
-            SetFloat(weapon, "damage", 25f);
-            SetFloat(weapon, "range", 250f);
-            SetFloat(weapon, "aimAssistRadius", 0.45f);
-            SetFloat(weapon, "fireCooldown", 0.2f);
-            SetObject(weapon, "ignoredRoot", playerController.transform);
+
+            WeaponDefinition pistol = EnsureWeaponDefinition(
+                "Assets/Weapons/Pistol.asset", "Pistol", WeaponFireMode.Hitscan,
+                25f, 250f, 0.2f, 0.45f, 1, 0f);
+            WeaponDefinition shotgun = EnsureWeaponDefinition(
+                "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
+                11f, 55f, 0.75f, 0f, 8, 12f);
+            WeaponDefinition harpoon = EnsureWeaponDefinition(
+                "Assets/Weapons/Harpoon.asset", "Harpoon", WeaponFireMode.Projectile,
+                120f, 300f, 1.4f, 0f, 1, 0f,
+                45f, 18f, 4f);
+            WeaponDefinition flamethrower = EnsureWeaponDefinition(
+                "Assets/Weapons/Flamethrower.asset", "Flamethrower", WeaponFireMode.Spread,
+                5f, 11f, 0.04f, 0f, 8, 14f);
+
+            GameObject weaponsParent = FindChild(camera.transform, "Weapons");
+            if (weaponsParent != null)
+            {
+                Object.DestroyImmediate(weaponsParent);
+            }
+
+            weaponsParent = new GameObject("Weapons");
+            weaponsParent.transform.SetParent(camera.transform, false);
+
+            Weapon pistolWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Pistol", pistol);
+            Weapon shotgunWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Shotgun", shotgun);
+            Weapon harpoonWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Harpoon", harpoon);
+            Weapon flamethrowerWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Flamethrower", flamethrower);
+
+            WeaponTracer tracer = EnsureWeaponTracer(camera.transform);
+            SetObject(pistolWeapon, "tracer", tracer);
+            SetObject(shotgunWeapon, "tracer", tracer);
+            SetObject(harpoonWeapon, "tracer", tracer);
+            SetObject(flamethrowerWeapon, "tracer", tracer);
+
+            WeaponSystem weaponSystem = EnsureComponent<WeaponSystem>(camera.gameObject);
+            SetObject(weaponSystem, "fireCamera", camera);
+            SetObject(weaponSystem, "ignoredRoot", playerController.transform);
+            SetObjectList(weaponSystem, "weapons", new Object[] { harpoonWeapon, pistolWeapon, shotgunWeapon, flamethrowerWeapon });
+            SetInt(weaponSystem, "startWeaponIndex", 1);
+            return weaponSystem;
+        }
+
+        private static Weapon CreateWeaponObject(Transform parent, string objectName, WeaponDefinition definition)
+        {
+            GameObject weaponObject = new GameObject(objectName);
+            weaponObject.transform.SetParent(parent, false);
+            Weapon weapon = EnsureComponent<Weapon>(weaponObject);
+            SetObject(weapon, "definition", definition);
             return weapon;
         }
 
-        private static Transform[] EnsureSpawnPoints(Transform center)
+        private static WeaponTracer EnsureWeaponTracer(Transform cameraTransform)
+        {
+            GameObject tracerObject = FindChild(cameraTransform, "Weapon Tracer");
+            if (tracerObject == null)
+            {
+                tracerObject = new GameObject("Weapon Tracer");
+                tracerObject.transform.SetParent(cameraTransform, false);
+            }
+
+            WeaponTracer weaponTracer = EnsureComponent<WeaponTracer>(tracerObject);
+            SetInt(weaponTracer, "poolSize", 32);
+            SetFloat(weaponTracer, "width", 0.05f);
+            SetFloat(weaponTracer, "duration", 0.07f);
+            return weaponTracer;
+        }
+
+        private static WeaponDefinition EnsureWeaponDefinition(
+            string path, string displayName, WeaponFireMode fireMode,
+            float damage, float range, float fireCooldown, float aimAssistRadius, int pelletsPerShot, float spreadAngle,
+            float projectileSpeed = 40f, float projectileGravity = 18f, float projectileLifetime = 4f)
+        {
+            WeaponDefinition definition = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(path);
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<WeaponDefinition>();
+                AssetDatabase.CreateAsset(definition, path);
+            }
+
+            SetString(definition, "displayName", displayName);
+            SetEnum(definition, "fireMode", (int)fireMode);
+            SetFloat(definition, "damage", damage);
+            SetFloat(definition, "range", range);
+            SetFloat(definition, "fireCooldown", fireCooldown);
+            SetFloat(definition, "aimAssistRadius", aimAssistRadius);
+            SetInt(definition, "pelletsPerShot", pelletsPerShot);
+            SetFloat(definition, "spreadAngle", spreadAngle);
+            SetFloat(definition, "projectileSpeed", projectileSpeed);
+            SetFloat(definition, "projectileGravity", projectileGravity);
+            SetFloat(definition, "projectileLifetime", projectileLifetime);
+            return definition;
+        }
+
+        private static Transform[] EnsureSpawnPoints()
         {
             GameObject parent = GameObject.Find("Enemy Spawn Points");
             if (parent != null)
@@ -426,14 +540,15 @@ namespace RollfaehrenFury.Editor
             }
 
             parent = new GameObject("Enemy Spawn Points");
+            parent.transform.position = EnemySpawnParentPosition;
             Vector3[] positions =
             {
-                new Vector3(-58f, 0f, -34f),
-                new Vector3(58f, 0f, -34f),
-                new Vector3(-65f, 0f, 0f),
-                new Vector3(65f, 0f, 0f),
-                new Vector3(-58f, 0f, 34f),
-                new Vector3(58f, 0f, 34f)
+                new Vector3(-58.7f, EnemySpawnHeight, -39.1f),
+                new Vector3(57.3f, EnemySpawnHeight, -39.1f),
+                new Vector3(-65.7f, EnemySpawnHeight, -5.1f),
+                new Vector3(64.3f, EnemySpawnHeight, -5.1f),
+                new Vector3(-58.7f, EnemySpawnHeight, 28.9f),
+                new Vector3(57.3f, EnemySpawnHeight, 28.9f)
             };
 
             Transform[] points = new Transform[positions.Length];
@@ -441,10 +556,7 @@ namespace RollfaehrenFury.Editor
             {
                 GameObject point = new GameObject($"Enemy Spawn {i + 1}");
                 point.transform.SetParent(parent.transform, false);
-                point.transform.position = new Vector3(
-                    center.position.x + positions[i].x,
-                    EnemySpawnHeight,
-                    center.position.z + positions[i].z);
+                point.transform.localPosition = positions[i];
                 points[i] = point.transform;
             }
 
@@ -453,6 +565,13 @@ namespace RollfaehrenFury.Editor
 
         private static SimpleEnemy EnsureEnemyPrefab(Material enemyMaterial)
         {
+            GameObject animatedEnemyPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AnimatedEnemyPrefabPath);
+            SimpleEnemy animatedEnemy = animatedEnemyPrefab != null ? animatedEnemyPrefab.GetComponent<SimpleEnemy>() : null;
+            if (animatedEnemy != null)
+            {
+                return animatedEnemy;
+            }
+
             GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath);
             if (existingPrefab != null)
             {
@@ -503,6 +622,14 @@ namespace RollfaehrenFury.Editor
                 parent = new GameObject("Prototype Environment");
             }
 
+            if (GameObject.Find("Terrain") != null || GameObject.Find("River Water Surface") != null)
+            {
+                SetEnvironmentBlockActive(parent.transform, "River Placeholder", false);
+                SetEnvironmentBlockActive(parent.transform, "Shore A Placeholder", false);
+                SetEnvironmentBlockActive(parent.transform, "Shore B Placeholder", false);
+                return;
+            }
+
             GameObject river = EnsureEnvironmentBlock(parent.transform, "River Placeholder");
             river.transform.position = new Vector3(0f, -0.25f, 0f);
             river.transform.localScale = new Vector3(358.71f, 0.1f, 600f);
@@ -517,6 +644,15 @@ namespace RollfaehrenFury.Editor
             shoreB.transform.position = new Vector3(197.8f, -0.15f, 0f);
             shoreB.transform.localScale = new Vector3(22f, 0.25f, 600f);
             shoreB.GetComponent<Renderer>().sharedMaterial = shoreMaterial;
+        }
+
+        private static void SetEnvironmentBlockActive(Transform parent, string blockName, bool active)
+        {
+            GameObject block = FindChild(parent, blockName);
+            if (block != null)
+            {
+                block.SetActive(active);
+            }
         }
 
         private static GameObject EnsureEnvironmentBlock(Transform parent, string blockName)
@@ -537,7 +673,7 @@ namespace RollfaehrenFury.Editor
             Health ferryHealth,
             FerryDamageTarget ferryTarget,
             SimpleFPSController playerController,
-            HitscanWeapon weapon,
+            WeaponSystem weaponSystem,
             SimpleHUD hud,
             SimpleEnemy enemyPrefab,
             Transform[] spawnPoints)
@@ -554,10 +690,11 @@ namespace RollfaehrenFury.Editor
             SetObject(gameManager, "ferryHealth", ferryHealth);
             SetObject(gameManager, "enemySpawner", spawner);
             SetObject(gameManager, "playerController", playerController);
-            SetObject(gameManager, "playerWeapon", weapon);
+            SetObject(gameManager, "weaponSystem", weaponSystem);
             SetObject(gameManager, "hud", hud);
             SetBool(gameManager, "startOnPlay", true);
             SetFloat(gameManager, "crossingDuration", 45f);
+            SetInt(gameManager, "startingMoney", 100);
 
             SetObject(spawner, "enemyPrefab", enemyPrefab);
             SetObject(spawner, "ferryTarget", ferryTarget);
@@ -576,12 +713,162 @@ namespace RollfaehrenFury.Editor
             return gameManager;
         }
 
-        private static void EnsureAudioEvents(GameManager gameManager, HitscanWeapon weapon)
+        private static void EnsureAudioEvents(GameManager gameManager, WeaponSystem weaponSystem)
         {
             PrototypeAudioEvents audioEvents = EnsureComponent<PrototypeAudioEvents>(gameManager.gameObject);
             SetObject(audioEvents, "gameManager", gameManager);
-            SetObject(audioEvents, "weapon", weapon);
+            SetObject(audioEvents, "weaponSystem", weaponSystem);
             SetBool(audioEvents, "postEvents", false);
+        }
+
+        private static ShopManager EnsureShopManager(GameManager gameManager)
+        {
+            UpgradeDefinition[] catalog =
+            {
+                EnsureUpgrade<WeaponDamageUpgrade>("Assets/Upgrades/WeaponDamage.asset", "Damage +10", "More weapon damage.", 10, 3,
+                    upgrade => SetFloat(upgrade, "amount", 10f)),
+                EnsureUpgrade<FireRateUpgrade>("Assets/Upgrades/FireRate.asset", "Fire Rate +18%", "Faster fire rate.", 10, 3,
+                    upgrade => SetFloat(upgrade, "cooldownMultiplier", 0.82f)),
+                EnsureUpgrade<FerryHealthUpgrade>("Assets/Upgrades/FerryHealth.asset", "Repair + Max HP", "Heal and raise ferry max health.", 10, 3,
+                    upgrade => SetFloat(upgrade, "amount", 25f)),
+                EnsureUpgrade<RicochetUpgrade>("Assets/Upgrades/Ricochet.asset", "Querschlaeger (Master)", "Shots ricochet to the nearest enemy.", 30, 1,
+                    upgrade => SetInt(upgrade, "bounces", 1)),
+            };
+
+            ShopManager shopManager = EnsureComponent<ShopManager>(gameManager.gameObject);
+            SetObject(shopManager, "gameManager", gameManager);
+            SetObjectList(shopManager, "catalog", catalog);
+
+            Button[] shopButtons = new Button[catalog.Length];
+            for (int i = 0; i < shopButtons.Length; i++)
+            {
+                Button button = FindSceneButton($"Shop Upgrade Button {i}");
+                shopButtons[i] = button;
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+                    UnityEventTools.AddIntPersistentListener(button.onClick, shopManager.Buy, i);
+                    EditorUtility.SetDirty(button);
+                }
+            }
+
+            SetObjectList(shopManager, "buttons", shopButtons);
+            SetObject(gameManager, "shopManager", shopManager);
+            return shopManager;
+        }
+
+        private static T EnsureUpgrade<T>(string path, string displayName, string description, int cost, int maxPurchases, System.Action<T> configure)
+            where T : UpgradeDefinition
+        {
+            T upgrade = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (upgrade == null)
+            {
+                upgrade = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(upgrade, path);
+            }
+
+            SetString(upgrade, "displayName", displayName);
+            SetString(upgrade, "description", description);
+            SetInt(upgrade, "cost", cost);
+            SetInt(upgrade, "maxPurchases", maxPurchases);
+            configure?.Invoke(upgrade);
+            return upgrade;
+        }
+
+        private static void EnsureVendingMachine(GameManager gameManager)
+        {
+            GameObject machine = GameObject.Find("Vending Machine");
+            if (machine == null)
+            {
+                machine = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                machine.name = "Vending Machine";
+            }
+
+            machine.transform.position = VendingMachinePosition;
+            machine.transform.rotation = Quaternion.identity;
+            machine.transform.localScale = new Vector3(1f, 2f, 1f);
+
+            Renderer renderer = machine.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = EnsureMaterial("Assets/Materials/PrototypeVendingMachine.mat", new Color(0.85f, 0.45f, 0.1f));
+            }
+
+            GameObject prompt = EnsureShopPrompt();
+            ShopInteractable interactable = EnsureComponent<ShopInteractable>(machine);
+            SetObject(interactable, "gameManager", gameManager);
+            SetObject(interactable, "promptObject", prompt);
+        }
+
+        private static GameObject EnsureShopPrompt()
+        {
+            GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
+            if (canvasObject == null)
+            {
+                return null;
+            }
+
+            Transform existing = canvasObject.transform.Find("Shop Prompt");
+            if (existing != null)
+            {
+                return existing.gameObject;
+            }
+
+            Text prompt = CreateText(canvasObject.transform, "Shop Prompt", "Press B  -  Shop", new Vector2(0f, 140f), new Vector2(360f, 40f), 24, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            prompt.gameObject.SetActive(false);
+            return prompt.gameObject;
+        }
+
+        private static void EnsureAugmentSystem(GameManager gameManager, EnemySpawner spawner)
+        {
+            AugmentDefinition[] pool =
+            {
+                EnsureAugment<TailwindAugment>("Assets/Augments/Tailwind.asset", "Tailwind", "Ferry crosses 15% faster.",
+                    augment => SetFloat(augment, "crossingFactor", 0.85f)),
+                EnsureAugment<RepairKitAugment>("Assets/Augments/RepairKit.asset", "Repair Kit", "Heal 5% ferry HP each round.",
+                    augment => SetFloat(augment, "healFraction", 0.05f)),
+                EnsureAugment<SwarmAugment>("Assets/Augments/Swarm.asset", "The Swarm", "2x enemies, half HP.",
+                    augment => { SetFloat(augment, "countMultiplier", 2f); SetFloat(augment, "healthMultiplier", 0.5f); }),
+                EnsureAugment<BruisersAugment>("Assets/Augments/Bruisers.asset", "Bruisers", "Half enemies, 2x HP.",
+                    augment => { SetFloat(augment, "countMultiplier", 0.5f); SetFloat(augment, "healthMultiplier", 2f); }),
+            };
+
+            AugmentSystem augmentSystem = EnsureComponent<AugmentSystem>(gameManager.gameObject);
+            SetObject(augmentSystem, "gameManager", gameManager);
+            SetObject(augmentSystem, "spawner", spawner);
+            SetObjectList(augmentSystem, "pool", pool);
+
+            Button[] draftButtons = new Button[3];
+            for (int i = 0; i < draftButtons.Length; i++)
+            {
+                Button button = FindSceneButton($"Augment Draft Button {i}");
+                draftButtons[i] = button;
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+                    UnityEventTools.AddIntPersistentListener(button.onClick, augmentSystem.Pick, i);
+                    EditorUtility.SetDirty(button);
+                }
+            }
+
+            SetObjectList(augmentSystem, "draftButtons", draftButtons);
+            SetObject(gameManager, "augmentSystem", augmentSystem);
+        }
+
+        private static T EnsureAugment<T>(string path, string displayName, string description, System.Action<T> configure)
+            where T : AugmentDefinition
+        {
+            T augment = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (augment == null)
+            {
+                augment = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(augment, path);
+            }
+
+            SetString(augment, "displayName", displayName);
+            SetString(augment, "description", description);
+            configure?.Invoke(augment);
+            return augment;
         }
 
         private static SimpleHUD EnsureHud()
@@ -616,6 +903,7 @@ namespace RollfaehrenFury.Editor
             RectTransform crosshairRect = crosshair.rectTransform;
             crosshairRect.anchorMin = new Vector2(0.5f, 0.5f);
             crosshairRect.anchorMax = new Vector2(0.5f, 0.5f);
+            crosshairRect.pivot = new Vector2(0.5f, 0.5f);
             crosshairRect.anchoredPosition = Vector2.zero;
 
             GameObject shopPanel = CreateUiPanel(canvasObject.transform, "Shop Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(620f, 430f));
@@ -623,10 +911,13 @@ namespace RollfaehrenFury.Editor
             shopBackground.color = new Color(0.04f, 0.06f, 0.08f, 0.88f);
             Text shopTitle = CreateText(shopPanel.transform, "Shop Title", "Round survived", new Vector2(0f, 160f), new Vector2(560f, 40f), 30, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             Text shopMoney = CreateText(shopPanel.transform, "Shop Money", "Money: $0", new Vector2(0f, 112f), new Vector2(560f, 32f), 22, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
-            Text damageCost = CreateButton(shopPanel.transform, "Damage Upgrade Button", "Damage Upgrade ($50)", new Vector2(0f, 48f), out Button damageButton);
-            Text fireRateCost = CreateButton(shopPanel.transform, "Fire Rate Upgrade Button", "Fire Rate Upgrade ($45)", new Vector2(0f, -16f), out Button fireRateButton);
-            Text ferryHealthCost = CreateButton(shopPanel.transform, "Ferry Health Upgrade Button", "Ferry Health ($60)", new Vector2(0f, -80f), out Button healthButton);
-            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -158f), out Button nextRoundButton);
+            float[] shopButtonY = { 78f, 26f, -26f, -78f };
+            for (int i = 0; i < shopButtonY.Length; i++)
+            {
+                CreateButton(shopPanel.transform, $"Shop Upgrade Button {i}", "Upgrade", new Vector2(0f, shopButtonY[i]), out _);
+            }
+            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -150f), out Button nextRoundButton);
+            CreateButton(shopPanel.transform, "Close Shop Button", "Close", new Vector2(0f, -150f), out Button closeShopButton);
             shopPanel.SetActive(false);
 
             GameObject gameOverPanel = CreateUiPanel(canvasObject.transform, "Game Over Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(620f, 330f));
@@ -635,6 +926,15 @@ namespace RollfaehrenFury.Editor
             Text gameOverText = CreateText(gameOverPanel.transform, "Game Over Text", "Ferry destroyed", new Vector2(0f, 58f), new Vector2(560f, 120f), 30, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             CreateButton(gameOverPanel.transform, "Restart Button", "Restart", new Vector2(0f, -92f), out Button restartButton);
             gameOverPanel.SetActive(false);
+
+            GameObject augmentPanel = CreateUiPanel(canvasObject.transform, "Augment Draft Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(700f, 460f));
+            Image augmentBackground = EnsureComponent<Image>(augmentPanel);
+            augmentBackground.color = new Color(0.04f, 0.06f, 0.09f, 0.92f);
+            CreateText(augmentPanel.transform, "Augment Title", "Choose an Augment", new Vector2(0f, 188f), new Vector2(640f, 44f), 30, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 0", new Vector2(0f, 108f), out _);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 1", new Vector2(0f, -12f), out _);
+            CreateAugmentButton(augmentPanel.transform, "Augment Draft Button 2", new Vector2(0f, -132f), out _);
+            augmentPanel.SetActive(false);
 
             SetObject(hud, "gameplayPanel", gameplayPanel);
             SetObject(hud, "ferryHealthText", healthText);
@@ -648,27 +948,19 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "shopPanel", shopPanel);
             SetObject(hud, "shopTitleText", shopTitle);
             SetObject(hud, "shopMoneyText", shopMoney);
-            SetObject(hud, "weaponDamageCostText", damageCost);
-            SetObject(hud, "fireRateCostText", fireRateCost);
-            SetObject(hud, "ferryHealthCostText", ferryHealthCost);
             SetObject(hud, "gameOverPanel", gameOverPanel);
             SetObject(hud, "gameOverText", gameOverText);
-
-            damageButton.name = "Damage Upgrade Button";
-            fireRateButton.name = "Fire Rate Upgrade Button";
-            healthButton.name = "Ferry Health Upgrade Button";
-            nextRoundButton.name = "Next Round Button";
-            restartButton.name = "Restart Button";
+            SetObject(hud, "nextRoundButton", nextRoundButton.gameObject);
+            SetObject(hud, "closeShopButton", closeShopButton.gameObject);
+            SetObject(hud, "augmentDraftPanel", augmentPanel);
 
             return hud;
         }
 
         private static void ConfigureHudButtons(GameManager gameManager)
         {
-            AddButtonListener("Damage Upgrade Button", gameManager.BuyWeaponDamageUpgrade);
-            AddButtonListener("Fire Rate Upgrade Button", gameManager.BuyFireRateUpgrade);
-            AddButtonListener("Ferry Health Upgrade Button", gameManager.BuyFerryHealthUpgrade);
             AddButtonListener("Next Round Button", gameManager.StartNextRound);
+            AddButtonListener("Close Shop Button", gameManager.CloseShopOverlay);
             AddButtonListener("Restart Button", gameManager.RestartGame);
         }
 
@@ -786,6 +1078,26 @@ namespace RollfaehrenFury.Editor
 
             Text buttonText = CreateText(buttonObject.transform, "Label", label, Vector2.zero, new Vector2(400f, 42f), 20, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             buttonText.color = Color.white;
+            return buttonText;
+        }
+
+        // Taller button for the round-end augment draft so a two-line "Name + description"
+        // label fits. The label wraps and overflows vertically instead of being truncated,
+        // and supports rich text so AugmentSystem can render a bold title + smaller description.
+        private static Text CreateAugmentButton(Transform parent, string name, Vector2 anchoredPosition, out Button button)
+        {
+            GameObject buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            Image image = EnsureComponent<Image>(buttonObject);
+            image.color = new Color(0.12f, 0.45f, 0.75f, 1f);
+            button = EnsureComponent<Button>(buttonObject);
+            ConfigureRect(buttonObject.GetComponent<RectTransform>(), TextAnchor.MiddleCenter, anchoredPosition, new Vector2(640f, 108f));
+
+            Text buttonText = CreateText(buttonObject.transform, "Label", "Augment", Vector2.zero, new Vector2(612f, 96f), 22, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            buttonText.color = Color.white;
+            buttonText.supportRichText = true;
+            buttonText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            buttonText.verticalOverflow = VerticalWrapMode.Overflow;
             return buttonText;
         }
 
@@ -907,6 +1219,50 @@ namespace RollfaehrenFury.Editor
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
+        }
+
+        private static void SetObjectList(Object target, string propertyName, Object[] values)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property == null)
+            {
+                Debug.LogWarning($"Property '{propertyName}' was not found on {target.name}.", target);
+                return;
+            }
+
+            property.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++)
+            {
+                property.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+            }
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
+        }
+
+        private static void SetString(Object target, string propertyName, string value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                property.stringValue = value;
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(target);
+            }
+        }
+
+        private static void SetEnum(Object target, string propertyName, int value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                property.enumValueIndex = value;
+                serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(target);
+            }
         }
 
         private static void SetFloat(Object target, string propertyName, float value)

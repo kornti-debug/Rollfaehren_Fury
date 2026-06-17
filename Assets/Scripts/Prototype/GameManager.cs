@@ -8,6 +8,7 @@ namespace RollfaehrenFury.Prototype
         Idle,
         Playing,
         Shop,
+        AugmentDraft,
         GameOver
     }
 
@@ -16,22 +17,20 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Health ferryHealth;
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private SimpleFPSController playerController;
-        [SerializeField] private HitscanWeapon playerWeapon;
+        [SerializeField] private WeaponSystem weaponSystem;
         [SerializeField] private SimpleHUD hud;
+        [SerializeField] private ShopManager shopManager;
+        [SerializeField] private AugmentSystem augmentSystem;
         [SerializeField] private bool startOnPlay = true;
         [SerializeField] private float crossingDuration = 45f;
         [SerializeField] private int startingMoney = 0;
         [SerializeField] private int roundCompletionReward = 25;
-        [SerializeField] private int weaponDamageUpgradeCost = 50;
-        [SerializeField] private int fireRateUpgradeCost = 45;
-        [SerializeField] private int ferryHealthUpgradeCost = 60;
-        [SerializeField] private float weaponDamageUpgradeAmount = 10f;
-        [SerializeField] private float fireRateUpgradeMultiplier = 0.82f;
-        [SerializeField] private float ferryHealthUpgradeAmount = 25f;
 
         private float crossingTimer;
         private int money;
         private int round = 1;
+        private float perRoundHealFraction;
+        private float baseCrossingDuration;
 
         public static GameManager Instance { get; private set; }
 
@@ -56,6 +55,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             Instance = this;
+            baseCrossingDuration = crossingDuration;
             ResolveReferences();
         }
 
@@ -107,7 +107,7 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
-        public void Configure(Health ferry, EnemySpawner spawner, SimpleFPSController controller, HitscanWeapon weapon, SimpleHUD simpleHud)
+        public void Configure(Health ferry, EnemySpawner spawner, SimpleFPSController controller, WeaponSystem weapons, SimpleHUD simpleHud)
         {
             if (ferryHealth != null)
             {
@@ -118,7 +118,7 @@ namespace RollfaehrenFury.Prototype
             ferryHealth = ferry;
             enemySpawner = spawner;
             playerController = controller;
-            playerWeapon = weapon;
+            weaponSystem = weapons;
             hud = simpleHud;
 
             if (ferryHealth != null)
@@ -133,7 +133,11 @@ namespace RollfaehrenFury.Prototype
             round = 1;
             money = startingMoney;
             crossingTimer = 0f;
+            crossingDuration = baseCrossingDuration;
+            perRoundHealFraction = 0f;
             ferryHealth?.ResetHealth();
+            shopManager?.ResetPurchases();
+            enemySpawner?.ResetAugments();
             StartRound();
         }
 
@@ -161,50 +165,70 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
-        public void BuyWeaponDamageUpgrade()
+        public bool TryPurchase(UpgradeDefinition upgrade)
         {
-            if (!TrySpend(weaponDamageUpgradeCost))
+            if (upgrade == null)
             {
-                hud?.ShowMessage("Not enough money");
-                return;
+                return false;
             }
 
-            playerWeapon?.AddDamage(weaponDamageUpgradeAmount);
+            if (!TrySpend(upgrade.Cost))
+            {
+                hud?.ShowMessage("Not enough money");
+                return false;
+            }
+
+            upgrade.Apply(new UpgradeContext(weaponSystem, ferryHealth));
             UpgradeBought?.Invoke();
-            hud?.ShowMessage($"+{weaponDamageUpgradeAmount:0} weapon damage");
+            hud?.ShowMessage($"Bought {upgrade.DisplayName}");
             RefreshHud();
+            return true;
         }
 
-        public void BuyFireRateUpgrade()
+        public bool IsShopOverlayOpen { get; private set; }
+
+        public bool OpenShopOverlay()
         {
-            if (!TrySpend(fireRateUpgradeCost))
+            if (State != PrototypeGameState.Playing)
             {
-                hud?.ShowMessage("Not enough money");
-                return;
+                return false;
             }
 
-            playerWeapon?.MultiplyCooldown(fireRateUpgradeMultiplier);
-            UpgradeBought?.Invoke();
-            hud?.ShowMessage("Faster fire rate");
-            RefreshHud();
+            IsShopOverlayOpen = true;
+            SetGameplayInput(false);
+            hud?.ShowShopOverlay(money);
+            shopManager?.OpenShop();
+            return true;
         }
 
-        public void BuyFerryHealthUpgrade()
+        public void CloseShopOverlay()
         {
-            if (!TrySpend(ferryHealthUpgradeCost))
+            if (!IsShopOverlayOpen)
             {
-                hud?.ShowMessage("Not enough money");
                 return;
             }
 
-            if (ferryHealth != null)
-            {
-                ferryHealth.SetMaxHealth(ferryHealth.MaxHealth + ferryHealthUpgradeAmount, true);
-            }
+            IsShopOverlayOpen = false;
+            hud?.ShowGameplay();
+            SetGameplayInput(true);
+        }
 
-            UpgradeBought?.Invoke();
-            hud?.ShowMessage($"+{ferryHealthUpgradeAmount:0} ferry health");
-            RefreshHud();
+        public void ApplyCrossingSpeedup(float factor)
+        {
+            crossingDuration = Mathf.Max(5f, crossingDuration * Mathf.Clamp(factor, 0.1f, 1f));
+        }
+
+        public void AddPerRoundHeal(float fraction)
+        {
+            perRoundHealFraction += Mathf.Max(0f, fraction);
+        }
+
+        private void ApplyPerRoundHeal()
+        {
+            if (perRoundHealFraction > 0f && ferryHealth != null)
+            {
+                ferryHealth.Heal(perRoundHealFraction * ferryHealth.MaxHealth);
+            }
         }
 
         private void StartRound()
@@ -224,12 +248,15 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            State = PrototypeGameState.Shop;
+            State = PrototypeGameState.AugmentDraft;
             money += roundCompletionReward + round * 5;
+            IsShopOverlayOpen = false;
             SetGameplayInput(false);
             enemySpawner?.StopRound(true);
+            ApplyPerRoundHeal();
             RoundCompleted?.Invoke();
-            hud?.ShowShop(round, money, weaponDamageUpgradeCost, fireRateUpgradeCost, ferryHealthUpgradeCost);
+            hud?.ShowAugmentDraft(round);
+            augmentSystem?.OpenDraft();
             RefreshHud();
         }
 
@@ -267,16 +294,19 @@ namespace RollfaehrenFury.Prototype
         private void SetGameplayInput(bool isEnabled)
         {
             playerController?.SetInputEnabled(isEnabled);
-            playerWeapon?.SetInputEnabled(isEnabled);
+            weaponSystem?.SetInputEnabled(isEnabled);
         }
 
         private void RefreshHud()
         {
             float current = ferryHealth != null ? ferryHealth.CurrentHealth : 0f;
             float max = ferryHealth != null ? ferryHealth.MaxHealth : 1f;
-            float weaponDamage = playerWeapon != null ? playerWeapon.Damage : 0f;
-            float shotsPerSecond = playerWeapon != null ? playerWeapon.ShotsPerSecond : 0f;
-            hud?.SetStats(current, max, money, round, CrossingProgress, weaponDamage, shotsPerSecond);
+            float weaponDamage = weaponSystem != null ? weaponSystem.ActiveDamage : 0f;
+            float shotsPerSecond = weaponSystem != null ? weaponSystem.ActiveShotsPerSecond : 0f;
+            string weaponName = weaponSystem != null ? weaponSystem.ActiveWeaponName : "None";
+            int weaponSlot = weaponSystem != null ? weaponSystem.ActiveIndex + 1 : 0;
+            int weaponCount = weaponSystem != null ? weaponSystem.WeaponCount : 0;
+            hud?.SetStats(current, max, money, round, CrossingProgress, weaponName, weaponSlot, weaponCount, weaponDamage, shotsPerSecond);
         }
 
         private void ResolveReferences()
@@ -296,14 +326,24 @@ namespace RollfaehrenFury.Prototype
                 playerController = FindFirstObjectByType<SimpleFPSController>();
             }
 
-            if (playerWeapon == null)
+            if (weaponSystem == null)
             {
-                playerWeapon = FindFirstObjectByType<HitscanWeapon>();
+                weaponSystem = FindFirstObjectByType<WeaponSystem>();
             }
 
             if (hud == null)
             {
                 hud = FindFirstObjectByType<SimpleHUD>();
+            }
+
+            if (shopManager == null)
+            {
+                shopManager = FindFirstObjectByType<ShopManager>();
+            }
+
+            if (augmentSystem == null)
+            {
+                augmentSystem = FindFirstObjectByType<AugmentSystem>();
             }
         }
     }
