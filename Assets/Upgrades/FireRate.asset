@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.FireRateUpgrade
   displayName: Fire Rate +18%
   description: Faster fire rate.
-  cost: 45
-  repeatable: 1
+  cost: 10
+  maxPurchases: 3
   cooldownMultiplier: 0.82

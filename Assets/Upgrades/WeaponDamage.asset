@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDamageUpgrade
   displayName: Damage +10
   description: More weapon damage.
-  cost: 50
-  repeatable: 1
+  cost: 10
+  maxPurchases: 3
   amount: 10

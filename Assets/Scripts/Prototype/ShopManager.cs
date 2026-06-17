@@ -5,9 +5,10 @@ using UnityEngine.UI;
 namespace RollfaehrenFury.Prototype
 {
     /// <summary>
-    /// Drives the between-round shop. Holds a catalog of <see cref="UpgradeDefinition"/>
-    /// assets and a parallel list of UI buttons; labels/affordability are refreshed from
-    /// the catalog, and purchases go through <see cref="GameManager.TryPurchase"/>.
+    /// Drives the shop. Holds a catalog of <see cref="UpgradeDefinition"/> assets and a
+    /// parallel list of UI buttons; labels/affordability refresh from the catalog, and
+    /// purchases go through <see cref="GameManager.TryPurchase"/>. Each upgrade can be
+    /// bought up to <see cref="UpgradeDefinition.MaxPurchases"/> times per run.
     /// </summary>
     public sealed class ShopManager : MonoBehaviour
     {
@@ -15,7 +16,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private List<UpgradeDefinition> catalog = new List<UpgradeDefinition>();
         [SerializeField] private List<Button> buttons = new List<Button>();
 
-        private readonly HashSet<UpgradeDefinition> purchasedOneOffs = new HashSet<UpgradeDefinition>();
+        private readonly Dictionary<UpgradeDefinition, int> purchaseCounts = new Dictionary<UpgradeDefinition, int>();
 
         private void Awake()
         {
@@ -25,13 +26,11 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        /// <summary>Called by GameManager when the shop opens (round complete).</summary>
         public void OpenShop()
         {
             RefreshButtons();
         }
 
-        /// <summary>Bound to shop button i (UnityEvent int listener) by the scene builder.</summary>
         public void Buy(int index)
         {
             if (index < 0 || index >= catalog.Count)
@@ -40,31 +39,26 @@ namespace RollfaehrenFury.Prototype
             }
 
             UpgradeDefinition definition = catalog[index];
-            if (definition == null)
-            {
-                return;
-            }
-
-            if (!definition.Repeatable && purchasedOneOffs.Contains(definition))
+            if (definition == null || GetCount(definition) >= definition.MaxPurchases)
             {
                 return;
             }
 
             if (gameManager != null && gameManager.TryPurchase(definition))
             {
-                if (!definition.Repeatable)
-                {
-                    purchasedOneOffs.Add(definition);
-                }
-
+                purchaseCounts[definition] = GetCount(definition) + 1;
                 RefreshButtons();
             }
         }
 
-        /// <summary>Reset one-off purchases for a fresh run.</summary>
         public void ResetPurchases()
         {
-            purchasedOneOffs.Clear();
+            purchaseCounts.Clear();
+        }
+
+        private int GetCount(UpgradeDefinition definition)
+        {
+            return purchaseCounts.TryGetValue(definition, out int count) ? count : 0;
         }
 
         private void RefreshButtons()
@@ -88,15 +82,16 @@ namespace RollfaehrenFury.Prototype
                 UpgradeDefinition definition = catalog[i];
                 button.gameObject.SetActive(true);
 
-                bool soldOut = !definition.Repeatable && purchasedOneOffs.Contains(definition);
+                int count = GetCount(definition);
+                bool soldOut = count >= definition.MaxPurchases;
                 button.interactable = !soldOut && money >= definition.Cost;
 
                 Text label = button.GetComponentInChildren<Text>();
                 if (label != null)
                 {
                     label.text = soldOut
-                        ? $"{definition.DisplayName} — owned"
-                        : $"{definition.DisplayName} (${definition.Cost})";
+                        ? $"{definition.DisplayName} — maxed ({count}/{definition.MaxPurchases})"
+                        : $"{definition.DisplayName} (${definition.Cost})  {count}/{definition.MaxPurchases}";
                 }
             }
         }

@@ -20,6 +20,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameObject shopPanel;
         [SerializeField] private Text shopTitleText;
         [SerializeField] private Text shopMoneyText;
+        [SerializeField] private GameObject nextRoundButton;
+        [SerializeField] private GameObject closeShopButton;
 
         [Header("Game Over")]
         [SerializeField] private GameObject gameOverPanel;
@@ -82,19 +84,32 @@ namespace RollfaehrenFury.Prototype
 
         public void ShowShop(int completedRound, int money)
         {
+            ShowShopPanel($"Round {completedRound} survived", money, true);
+        }
+
+        public void ShowShopOverlay(int money)
+        {
+            ShowShopPanel("Shop", money, false);
+        }
+
+        private void ShowShopPanel(string title, int money, bool showNextRound)
+        {
             SetActive(gameplayPanel, true);
             SetActive(shopPanel, true);
             SetActive(gameOverPanel, false);
 
             if (shopTitleText != null)
             {
-                shopTitleText.text = $"Round {completedRound} survived";
+                shopTitleText.text = title;
             }
 
             if (shopMoneyText != null)
             {
                 shopMoneyText.text = $"Money: ${money}";
             }
+
+            SetActive(nextRoundButton, showNextRound);
+            SetActive(closeShopButton, !showNextRound);
         }
 
         public void ShowGameOver(int round, int money)

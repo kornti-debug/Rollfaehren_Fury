@@ -56,6 +56,7 @@ namespace RollfaehrenFury.Editor
             SimpleHUD hud = EnsureHud();
             GameManager gameManager = EnsureGameManager(ferryHealth, ferryTarget, playerController, weaponSystem, hud, enemyPrefab, spawnPoints);
             EnsureShopManager(gameManager);
+            EnsureVendingMachine(gameManager);
             EnsureAudioEvents(gameManager, weaponSystem);
             EnsureGameplayMenuInputObject();
             EnsureEventSystem();
@@ -467,8 +468,8 @@ namespace RollfaehrenFury.Editor
             WeaponSystem weaponSystem = EnsureComponent<WeaponSystem>(camera.gameObject);
             SetObject(weaponSystem, "fireCamera", camera);
             SetObject(weaponSystem, "ignoredRoot", playerController.transform);
-            SetObjectList(weaponSystem, "weapons", new Object[] { pistolWeapon, shotgunWeapon, harpoonWeapon, flamethrowerWeapon });
-            SetInt(weaponSystem, "startWeaponIndex", 0);
+            SetObjectList(weaponSystem, "weapons", new Object[] { harpoonWeapon, pistolWeapon, shotgunWeapon, flamethrowerWeapon });
+            SetInt(weaponSystem, "startWeaponIndex", 1);
             return weaponSystem;
         }
 
@@ -664,6 +665,7 @@ namespace RollfaehrenFury.Editor
             SetObject(gameManager, "hud", hud);
             SetBool(gameManager, "startOnPlay", true);
             SetFloat(gameManager, "crossingDuration", 45f);
+            SetInt(gameManager, "startingMoney", 100);
 
             SetObject(spawner, "enemyPrefab", enemyPrefab);
             SetObject(spawner, "ferryTarget", ferryTarget);
@@ -694,13 +696,13 @@ namespace RollfaehrenFury.Editor
         {
             UpgradeDefinition[] catalog =
             {
-                EnsureUpgrade<WeaponDamageUpgrade>("Assets/Upgrades/WeaponDamage.asset", "Damage +10", "More weapon damage.", 50, true,
+                EnsureUpgrade<WeaponDamageUpgrade>("Assets/Upgrades/WeaponDamage.asset", "Damage +10", "More weapon damage.", 10, 3,
                     upgrade => SetFloat(upgrade, "amount", 10f)),
-                EnsureUpgrade<FireRateUpgrade>("Assets/Upgrades/FireRate.asset", "Fire Rate +18%", "Faster fire rate.", 45, true,
+                EnsureUpgrade<FireRateUpgrade>("Assets/Upgrades/FireRate.asset", "Fire Rate +18%", "Faster fire rate.", 10, 3,
                     upgrade => SetFloat(upgrade, "cooldownMultiplier", 0.82f)),
-                EnsureUpgrade<FerryHealthUpgrade>("Assets/Upgrades/FerryHealth.asset", "Repair + Max HP", "Heal and raise ferry max health.", 60, true,
+                EnsureUpgrade<FerryHealthUpgrade>("Assets/Upgrades/FerryHealth.asset", "Repair + Max HP", "Heal and raise ferry max health.", 10, 3,
                     upgrade => SetFloat(upgrade, "amount", 25f)),
-                EnsureUpgrade<RicochetUpgrade>("Assets/Upgrades/Ricochet.asset", "Querschlaeger (Master)", "Shots ricochet to the nearest enemy.", 150, false,
+                EnsureUpgrade<RicochetUpgrade>("Assets/Upgrades/Ricochet.asset", "Querschlaeger (Master)", "Shots ricochet to the nearest enemy.", 30, 1,
                     upgrade => SetInt(upgrade, "bounces", 1)),
             };
 
@@ -726,7 +728,7 @@ namespace RollfaehrenFury.Editor
             return shopManager;
         }
 
-        private static T EnsureUpgrade<T>(string path, string displayName, string description, int cost, bool repeatable, System.Action<T> configure)
+        private static T EnsureUpgrade<T>(string path, string displayName, string description, int cost, int maxPurchases, System.Action<T> configure)
             where T : UpgradeDefinition
         {
             T upgrade = AssetDatabase.LoadAssetAtPath<T>(path);
@@ -739,9 +741,53 @@ namespace RollfaehrenFury.Editor
             SetString(upgrade, "displayName", displayName);
             SetString(upgrade, "description", description);
             SetInt(upgrade, "cost", cost);
-            SetBool(upgrade, "repeatable", repeatable);
+            SetInt(upgrade, "maxPurchases", maxPurchases);
             configure?.Invoke(upgrade);
             return upgrade;
+        }
+
+        private static void EnsureVendingMachine(GameManager gameManager)
+        {
+            GameObject machine = GameObject.Find("Vending Machine");
+            if (machine == null)
+            {
+                machine = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                machine.name = "Vending Machine";
+            }
+
+            machine.transform.position = new Vector3(3.5f, 7.37f, -1.8f);
+            machine.transform.rotation = Quaternion.identity;
+            machine.transform.localScale = new Vector3(1f, 2f, 1f);
+
+            Renderer renderer = machine.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = EnsureMaterial("Assets/Materials/PrototypeVendingMachine.mat", new Color(0.85f, 0.45f, 0.1f));
+            }
+
+            GameObject prompt = EnsureShopPrompt();
+            ShopInteractable interactable = EnsureComponent<ShopInteractable>(machine);
+            SetObject(interactable, "gameManager", gameManager);
+            SetObject(interactable, "promptObject", prompt);
+        }
+
+        private static GameObject EnsureShopPrompt()
+        {
+            GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
+            if (canvasObject == null)
+            {
+                return null;
+            }
+
+            Transform existing = canvasObject.transform.Find("Shop Prompt");
+            if (existing != null)
+            {
+                return existing.gameObject;
+            }
+
+            Text prompt = CreateText(canvasObject.transform, "Shop Prompt", "Press B  -  Shop", new Vector2(0f, 140f), new Vector2(360f, 40f), 24, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            prompt.gameObject.SetActive(false);
+            return prompt.gameObject;
         }
 
         private static SimpleHUD EnsureHud()
@@ -789,7 +835,8 @@ namespace RollfaehrenFury.Editor
             {
                 CreateButton(shopPanel.transform, $"Shop Upgrade Button {i}", "Upgrade", new Vector2(0f, shopButtonY[i]), out _);
             }
-            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -150f), out _);
+            CreateButton(shopPanel.transform, "Next Round Button", "Next Round", new Vector2(0f, -150f), out Button nextRoundButton);
+            CreateButton(shopPanel.transform, "Close Shop Button", "Close", new Vector2(0f, -150f), out Button closeShopButton);
             shopPanel.SetActive(false);
 
             GameObject gameOverPanel = CreateUiPanel(canvasObject.transform, "Game Over Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(620f, 330f));
@@ -813,6 +860,8 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "shopMoneyText", shopMoney);
             SetObject(hud, "gameOverPanel", gameOverPanel);
             SetObject(hud, "gameOverText", gameOverText);
+            SetObject(hud, "nextRoundButton", nextRoundButton.gameObject);
+            SetObject(hud, "closeShopButton", closeShopButton.gameObject);
 
             return hud;
         }
@@ -820,6 +869,7 @@ namespace RollfaehrenFury.Editor
         private static void ConfigureHudButtons(GameManager gameManager)
         {
             AddButtonListener("Next Round Button", gameManager.StartNextRound);
+            AddButtonListener("Close Shop Button", gameManager.CloseShopOverlay);
             AddButtonListener("Restart Button", gameManager.RestartGame);
         }
 

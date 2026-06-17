@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.RicochetUpgrade
   displayName: Querschlaeger (Master)
   description: Shots ricochet to the nearest enemy.
-  cost: 150
-  repeatable: 0
+  cost: 30
+  maxPurchases: 1
   bounces: 1

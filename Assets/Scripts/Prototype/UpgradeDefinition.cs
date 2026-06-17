@@ -12,13 +12,13 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private string displayName = "Upgrade";
         [SerializeField, TextArea] private string description = string.Empty;
         [SerializeField] private int cost = 50;
-        [Tooltip("Repeatable base upgrades can be bought every round; one-off 'master' upgrades cannot.")]
-        [SerializeField] private bool repeatable = true;
+        [Tooltip("How many times this upgrade can be bought per run (base upgrades 3, master 1).")]
+        [SerializeField, Min(1)] private int maxPurchases = 3;
 
         public string DisplayName => displayName;
         public string Description => description;
         public int Cost => cost;
-        public bool Repeatable => repeatable;
+        public int MaxPurchases => Mathf.Max(1, maxPurchases);
 
         public abstract void Apply(UpgradeContext context);
     }

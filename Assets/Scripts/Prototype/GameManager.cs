@@ -177,6 +177,34 @@ namespace RollfaehrenFury.Prototype
             return true;
         }
 
+        public bool IsShopOverlayOpen { get; private set; }
+
+        public bool OpenShopOverlay()
+        {
+            if (State != PrototypeGameState.Playing)
+            {
+                return false;
+            }
+
+            IsShopOverlayOpen = true;
+            SetGameplayInput(false);
+            hud?.ShowShopOverlay(money);
+            shopManager?.OpenShop();
+            return true;
+        }
+
+        public void CloseShopOverlay()
+        {
+            if (!IsShopOverlayOpen)
+            {
+                return;
+            }
+
+            IsShopOverlayOpen = false;
+            hud?.ShowGameplay();
+            SetGameplayInput(true);
+        }
+
         private void StartRound()
         {
             State = PrototypeGameState.Playing;

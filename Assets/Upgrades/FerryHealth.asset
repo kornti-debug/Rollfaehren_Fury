@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.FerryHealthUpgrade
   displayName: Repair + Max HP
   description: Heal and raise ferry max health.
-  cost: 60
-  repeatable: 1
+  cost: 10
+  maxPurchases: 3
   amount: 25
