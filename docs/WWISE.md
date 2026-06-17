@@ -65,14 +65,18 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 
 ## Soundbank Workflow
 
-Suggested first workflow:
+Generated soundbanks are ignored by Git for now, so a fresh clone should be playable without Wwise banks. `WwiseGlobal` is disabled in `Main.unity` by default and `PrototypeAudioEvents.postEvents` stays disabled until the team has real events and generated banks.
+
+Suggested first workflow for audio work:
 
 1. Create a test event in Wwise, for example `Play_Test_Click`.
 2. Assign a simple test sound.
 3. Generate soundbanks.
-4. In Unity, add a temporary object with an `AkEvent` or call the event from a test script.
-5. Confirm the sound plays in Play Mode.
-6. Commit Wwise project changes and any required generated soundbank files.
+4. In Unity, enable `WwiseGlobal` in the scene or create it from the Wwise integration if needed.
+5. Enable `PrototypeAudioEvents.postEvents` only after matching events exist.
+6. Add a temporary object with an `AkEvent` or call the event from a test script.
+7. Confirm the sound plays in Play Mode.
+8. Commit Wwise project changes. Commit generated soundbanks only if the team changes the current ignore policy.
 
 Do not build gameplay around audio before the gameplay event exists. First create the gameplay action, then connect the Wwise event.
 
@@ -88,6 +92,6 @@ Do not build gameplay around audio before the gameplay event exists. First creat
 - `Play_UI_Select`
 - `Play_UI_Confirm`
 
-The playable MVP branch has a `PrototypeAudioEvents` component that already posts the first seven event names above. Missing events should not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.
+The playable MVP branch has a `PrototypeAudioEvents` component that can post the first seven event names above. Missing events and missing banks must not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.
 
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by default so missing Wwise events do not spam the Unity Console. Enable it in the Inspector after the matching Wwise events exist and the soundbanks have been regenerated.

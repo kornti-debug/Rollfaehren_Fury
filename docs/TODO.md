@@ -92,6 +92,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Confirm Wwise project opens.
 - [ ] Create first test event.
 - [ ] Generate initial soundbanks.
+- [x] Keep Wwise runtime disabled by default for fresh clones without soundbanks.
 - [x] Hook shooting event in Unity.
 - [x] Hook enemy death event.
 - [x] Hook ferry damage event.

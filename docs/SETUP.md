@@ -86,6 +86,8 @@ Current manual setup:
 4. If Unity reports missing soundbanks, generate them from Wwise.
 5. See [WWISE.md](WWISE.md) for details.
 
+The gameplay prototype is intentionally configured so Wwise is optional in fresh clones: `WwiseGlobal` is disabled in `Main.unity`, generated soundbanks are ignored, and audio event posting is off by default. Enable Wwise only after generating soundbanks locally.
+
 ## Git Hooks (one-time)
 
 The repo ships a soft documentation reminder in `.githooks/`. Enable it once per
