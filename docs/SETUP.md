@@ -73,9 +73,10 @@ Current manual setup:
 
 1. Keep the object named `River Water Surface` above the riverbed.
 2. Remove colliders from the water plane; the player should stand on the ferry, not on water.
-3. Use `Assets/Materials/RiverWater_URP.mat` only as a temporary URP-safe transparent material.
-4. For animated water, create a URP Unlit Shader Graph in the Unity Editor, set it to Transparent, scroll a wave/noise texture with Time, then assign that material to `River Water Surface`.
-5. Use the imported Basic Toon Water textures as wave/noise inputs if they look good, but do not assign the imported Basic Toon Water shaders directly because they are Built-in Pipeline shaders.
+3. Use `Assets/Materials/RiverWater_URP.mat` as the URP-safe transparent material.
+4. Keep `RiverWaterScroller` on `River Water Surface` to animate the material UVs in Play Mode.
+5. Tune `Texture Tiling` and `Scroll Speed` in the Inspector until the movement feels like slow river flow.
+6. Use the imported Basic Toon Water textures as wave/noise inputs if they look good, but do not assign the imported Basic Toon Water shaders directly because they are Built-in Pipeline shaders.
 
 ## Wwise First Run
 

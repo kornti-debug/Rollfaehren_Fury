@@ -79,7 +79,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
-- [ ] Create final animated river water Shader Graph in Unity Editor.
+- [x] Add simple animated river water scrolling.
+- [ ] Later: replace temporary water with a tuned Shader Graph if needed.
 - [ ] Later: cargo crates.
 - [ ] Weapon model.
 - [ ] First enemy model.
