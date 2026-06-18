@@ -19,6 +19,9 @@ namespace RollfaehrenFury.Editor
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
         private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
+        private const string FishAnimatorControllerPath = "Assets/Animations/CarpGameplay.controller";
+        private const string FishSwimAnimationPath = "Assets/Models/CHAR_Fish.fbx";
+        private const string FishExplosionAnimationPath = "Assets/Models/Fish_Explode_Anim.fbx";
         private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
         private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
@@ -65,6 +68,7 @@ namespace RollfaehrenFury.Editor
             WeaponSystem weaponSystem = EnsureWeapon(playerController);
             Transform[] spawnPoints = EnsureSpawnPoints(ferry.transform);
             SimpleEnemy enemyPrefab = EnsureEnemyPrefab(enemyMaterial);
+            EnsureFishContactAnimation();
 
             CreatePrototypeEnvironment(waterMaterial, shoreMaterial);
 
@@ -111,6 +115,7 @@ namespace RollfaehrenFury.Editor
             }
 
             EnsurePigeonAnimator();
+            EnsureFishContactAnimation();
             EnsureWwiseFootsteps(player);
             EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
             EnsureEventSystem();
@@ -148,6 +153,20 @@ namespace RollfaehrenFury.Editor
         public static void IntegrateWwiseFootstepsFromCommandLine()
         {
             IntegrateWwiseFootsteps();
+        }
+
+        [MenuItem("Rollfaehren Fury/Integrate Fish Contact Explosion")]
+        public static void IntegrateFishContactExplosion()
+        {
+            EnsureFishContactAnimation();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Fish contact explosion integrated into CHAR_Fish.prefab.");
+        }
+
+        public static void IntegrateFishContactExplosionFromCommandLine()
+        {
+            IntegrateFishContactExplosion();
         }
 
         [MenuItem("Rollfaehren Fury/Build Bootstrap And Menu Scenes")]
@@ -559,6 +578,62 @@ namespace RollfaehrenFury.Editor
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
             return controller;
+        }
+
+        private static void EnsureFishContactAnimation()
+        {
+            AnimationClip swimClip = LoadAnimationClip(FishSwimAnimationPath, "Armature|SwimCycle");
+            AnimationClip explosionClip = LoadAnimationClip(FishExplosionAnimationPath, "Armature|Explode");
+            if (swimClip == null || explosionClip == null)
+            {
+                Debug.LogWarning("Fish swim or explosion animation clip could not be loaded.");
+                return;
+            }
+
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(FishAnimatorControllerPath);
+            if (controller == null)
+            {
+                controller = AnimatorController.CreateAnimatorControllerAtPath(FishAnimatorControllerPath);
+            }
+
+            controller.parameters = System.Array.Empty<AnimatorControllerParameter>();
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+            foreach (ChildAnimatorState childState in stateMachine.states)
+            {
+                stateMachine.RemoveState(childState.state);
+            }
+
+            AnimatorState swimState = stateMachine.AddState("Swim", new Vector3(220f, 100f));
+            swimState.motion = swimClip;
+            swimState.speed = 2f;
+            AnimatorState explosionState = stateMachine.AddState("ContactExplosion", new Vector3(220f, 220f));
+            explosionState.motion = explosionClip;
+            stateMachine.defaultState = swimState;
+            EditorUtility.SetDirty(controller);
+            AssetDatabase.SaveAssets();
+
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(AnimatedEnemyPrefabPath);
+            try
+            {
+                Animator animator = prefabRoot.GetComponentInChildren<Animator>(true);
+                SimpleEnemy enemy = prefabRoot.GetComponentInChildren<SimpleEnemy>(true);
+                if (animator == null || enemy == null)
+                {
+                    Debug.LogWarning("CHAR_Fish.prefab is missing its Animator or SimpleEnemy component.");
+                    return;
+                }
+
+                animator.runtimeAnimatorController = controller;
+                animator.applyRootMotion = false;
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                SetString(enemy, "contactAnimationStateName", "ContactExplosion");
+                SetFloat(enemy, "contactAnimationDuration", Mathf.Max(0.1f, explosionClip.length + 0.05f));
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, AnimatedEnemyPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
         }
 
         private static AnimationClip LoadAnimationClip(string assetPath, string preferredName)
