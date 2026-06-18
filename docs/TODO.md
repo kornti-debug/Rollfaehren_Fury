@@ -85,6 +85,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Replace full spawn rings with ferry-relative forward attack arcs.
 - [x] Pace enemy spawns across 5%-90% of ferry crossing progress.
 - [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
+- [x] Attach the looping flight Animator to the pigeon prefab.
 - [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
 - [ ] Later: add boss fish or boss pigeon variants.
 

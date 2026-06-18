@@ -90,6 +90,8 @@ height. `SimpleEnemy` remains shared and selects either planar `Surface`
 movement or full 3D `Flying` movement from the prefab. Spawn points are
 ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
+The pigeon prefab owns an `AlwaysAnimate` Animator using
+`PigeonAnimator.controller`; movement remains script-driven with root motion off.
 
 ## Key Relationships
 

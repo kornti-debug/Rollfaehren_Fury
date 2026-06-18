@@ -19,6 +19,7 @@ namespace RollfaehrenFury.Editor
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
         private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
         private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
+        private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
         private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
@@ -103,6 +104,7 @@ namespace RollfaehrenFury.Editor
                 return;
             }
 
+            EnsurePigeonAnimator();
             EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
             EnsureEventSystem();
             EditorSceneManager.MarkSceneDirty(scene);
@@ -946,6 +948,33 @@ namespace RollfaehrenFury.Editor
             EnsureVendingMachine(gameManager);
             EnsureRoundStartConsole(ferry.transform, gameManager, hud);
             EnsureGameplayPauseUi(gameManager, hud);
+        }
+
+        private static void EnsurePigeonAnimator()
+        {
+            RuntimeAnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PigeonAnimatorControllerPath);
+            if (controller == null)
+            {
+                Debug.LogWarning($"Pigeon animator controller was not found at {PigeonAnimatorControllerPath}.");
+                return;
+            }
+
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PigeonEnemyPrefabPath);
+            if (prefabRoot == null)
+            {
+                Debug.LogWarning($"Pigeon prefab was not found at {PigeonEnemyPrefabPath}.");
+                return;
+            }
+
+            Animator animator = EnsureComponent<Animator>(prefabRoot);
+            animator.runtimeAnimatorController = controller;
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            animator.updateMode = AnimatorUpdateMode.Normal;
+
+            PrefabUtility.SaveAsPrefabAsset(prefabRoot, PigeonEnemyPrefabPath);
+            PrefabUtility.UnloadPrefabContents(prefabRoot);
         }
 
         private static void RemovePlacedPigeon()
