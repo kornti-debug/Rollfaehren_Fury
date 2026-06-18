@@ -38,6 +38,9 @@ namespace RollfaehrenFury.Prototype
         private bool isSprinting;
 
         public bool InputEnabled { get; private set; } = true;
+        public bool IsSprinting => isSprinting;
+        public bool IsGrounded => controller != null && controller.isGrounded;
+        public Vector2 MoveInput => moveInput;
 
         private void Awake()
         {

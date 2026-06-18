@@ -4,12 +4,19 @@
 		<WorkUnit Name="Default Work Unit" ID="{E956995F-0D45-451F-B194-075DF45E94ED}" PersistMode="Standalone">
 			<ChildrenList>
 				<RandomSequenceContainer Name="Steps" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}" ShortID="373998439">
+					<PropertyList>
+						<Property Name="Lowpass" Type="int16">
+							<ValueList>
+								<Value>8</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
-							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
@@ -77,6 +84,155 @@
 							</ChildrenList>
 							<ActiveSourceList>
 								<ActiveSource Name="Wood_Step_4" ID="{7A4FC0E1-9245-44D0-821F-DE0BDC619DE7}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="HaraldKrullSpeaking" ID="{536AE88E-1119-42CD-AC36-FE768F44849B}" ShortID="140904570">
+					<PropertyList>
+						<Property Name="InitialDelay" Type="Real64">
+							<ValueList>
+								<Value>5</Value>
+							</ValueList>
+						</Property>
+						<Property Name="NormalOrShuffle" Type="int16" Value="0"/>
+						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="1"/>
+						<Property Name="PlayMechanismSpecialTransitionsValue" Type="Real64" Value="10"/>
+						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Dialogue" ID="{3F8B2263-9632-4C24-B808-DE5A22BDE598}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="KRULL_frauen_sind_mir_heilig" ID="{44A81C43-1F0D-4961-84EF-11AEE3D7529F}" ShortID="685906049">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="KRULL_frauen_sind_mir_heilig" ID="{51534F50-0583-45AC-8F51-550689025467}">
+									<Language>SFX</Language>
+									<AudioFile>KRULL_frauen_sind_mir_heilig.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="429250410"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="KRULL_frauen_sind_mir_heilig" ID="{51534F50-0583-45AC-8F51-550689025467}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="KRULL_ich_fahr_pölle" ID="{6B9D65AD-E1A1-4346-B4C2-731B77107808}" ShortID="375851917">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="KRULL_ich_fahr_pölle" ID="{8A98A725-369E-4709-897B-421E00267E21}">
+									<Language>SFX</Language>
+									<AudioFile>KRULL_ich_fahr_pölle.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="828682680"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="KRULL_ich_fahr_pölle" ID="{8A98A725-369E-4709-897B-421E00267E21}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="KRULL_jung_sind_heilig" ID="{B01C4232-5F4D-4B6B-B991-5F94EE0D772F}" ShortID="528371237">
+							<PropertyList>
+								<Property Name="Weight" Type="Real64">
+									<ValueList>
+										<Value>30</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="KRULL_jung_sind_heilig" ID="{2B65E633-3DFE-4306-A0C3-205A9DACCFCE}">
+									<Language>SFX</Language>
+									<AudioFile>KRULL_jung_sind_heilig.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="476749650"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="KRULL_jung_sind_heilig" ID="{2B65E633-3DFE-4306-A0C3-205A9DACCFCE}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="KRULL_patent_ABC6" ID="{935F4631-F40B-44B3-A3DD-B3107444FEFB}" ShortID="683276041">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="KRULL_patent_ABC6" ID="{3C366379-B5CF-46C9-B2EB-907456517677}">
+									<Language>SFX</Language>
+									<AudioFile>KRULL_patent_ABC6.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="183859689"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="KRULL_patent_ABC6" ID="{3C366379-B5CF-46C9-B2EB-907456517677}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="KRULL_sangria_kommt_aus_spanien" ID="{EAA85FAA-E947-4BBA-92A8-A8778E09E28D}" ShortID="831693188">
+							<PropertyList>
+								<Property Name="Weight" Type="Real64">
+									<ValueList>
+										<Value>30</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="KRULL_sangria_kommt_aus_spanien" ID="{07AA1756-9B32-47F1-97B8-15207F0018E7}">
+									<Language>SFX</Language>
+									<AudioFile>KRULL_sangria_kommt_aus_spanien.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="1044468961"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="KRULL_sangria_kommt_aus_spanien" ID="{07AA1756-9B32-47F1-97B8-15207F0018E7}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>

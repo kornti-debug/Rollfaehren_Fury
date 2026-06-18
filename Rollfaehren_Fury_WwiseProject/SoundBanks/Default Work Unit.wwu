@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{67987605-87D2-4203-8125-A6E86C24BA5C}" SchemaVersion="133">
 	<SoundBanks>
-		<WorkUnit Name="Default Work Unit" ID="{67987605-87D2-4203-8125-A6E86C24BA5C}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{67987605-87D2-4203-8125-A6E86C24BA5C}" PersistMode="Standalone">
+			<ChildrenList>
+				<SoundBank Name="MainSoundBank" ID="{216757D1-222F-4AA5-8C50-BBE647F38374}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Play_Steps" ID="{FD99B580-42F1-422A-9C48-DE59AC07F1D6}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_HaraldKrullSpeaking" ID="{A0D38CC8-CA2E-47D3-B0E1-3EDCCAB2533C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+			</ChildrenList>
+		</WorkUnit>
 	</SoundBanks>
 </WwiseDocument>
