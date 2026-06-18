@@ -17,11 +17,17 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Armature|WalkCycle' has import animation warnings
+    animationImportWarnings: "\nClip 'Armature|Idle' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
       to improve retargeting quality.\n\t'Shoulder.R' is inbetween humanoid transforms
       and has rotation animation that will be discarded.\n\t'Shoulder.L' is inbetween
       humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.R'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
+      'Armature|WalkCycle' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Shoulder.R'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Shoulder.L'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.R'
       is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.R'
       is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
       is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.L'
@@ -39,15 +45,15 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature|WalkCycle
-      takeName: Armature|WalkCycle
+      name: Armature|Idle
+      takeName: Armature|Idle
       internalID: 2517152770028793317
       firstFrame: 0
-      lastFrame: 15
+      lastFrame: 198
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
-      cycleOffset: 0
+      cycleOffset: 20
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
