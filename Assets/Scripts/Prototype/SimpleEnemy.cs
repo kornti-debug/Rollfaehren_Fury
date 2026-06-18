@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,8 +19,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;
-        [SerializeField] private string contactAnimationStateName;
-        [SerializeField] private float contactAnimationDuration;
+        [SerializeField] private GameObject contactEffectPrefab;
+        [SerializeField] private float contactEffectDuration = 1.25f;
         [SerializeField] private UnityEvent reachedFerry = new UnityEvent();
         [SerializeField] private UnityEvent diedFromDamage = new UnityEvent();
 
@@ -134,40 +133,12 @@ namespace RollfaehrenFury.Prototype
             gameManager?.RegisterEnemyReachedFerry(this, contactDamage);
             reachedFerry.Invoke();
 
-            if (!TryPlayContactAnimation())
+            if (contactEffectPrefab != null)
             {
-                Destroy(gameObject);
-            }
-        }
-
-        private bool TryPlayContactAnimation()
-        {
-            if (string.IsNullOrWhiteSpace(contactAnimationStateName) || contactAnimationDuration <= 0f)
-            {
-                return false;
+                GameObject effect = Instantiate(contactEffectPrefab, transform.position, transform.rotation);
+                Destroy(effect, Mathf.Max(0.1f, contactEffectDuration));
             }
 
-            Animator animator = GetComponentInChildren<Animator>(true);
-            int stateId = Animator.StringToHash($"Base Layer.{contactAnimationStateName}");
-            if (animator == null || animator.runtimeAnimatorController == null || !animator.HasState(0, stateId))
-            {
-                return false;
-            }
-
-            foreach (Collider enemyCollider in GetComponentsInChildren<Collider>(true))
-            {
-                enemyCollider.enabled = false;
-            }
-
-            animator.speed = 1f;
-            animator.CrossFadeInFixedTime(stateId, 0.05f);
-            StartCoroutine(DestroyAfterContactAnimation());
-            return true;
-        }
-
-        private IEnumerator DestroyAfterContactAnimation()
-        {
-            yield return new WaitForSeconds(contactAnimationDuration);
             Destroy(gameObject);
         }
 

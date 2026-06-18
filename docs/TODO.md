@@ -131,7 +131,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] First enemy model: animated carp prefab.
 - [x] Import the fish explosion animation asset.
 - [x] Play the fish explosion animation when it reaches and damages the ferry.
-- [ ] Verify the fish contact explosion timing in Play Mode.
+- [ ] Verify fish still approach the ferry and the contact explosion timing in Play Mode.
 - [x] Vending-machine shop prop.
 - [ ] Optional civilian NPCs.
 

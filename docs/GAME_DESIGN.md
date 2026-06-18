@@ -85,8 +85,8 @@ Enemy behavior should be simple:
 - Die and reward money.
 
 Fish contact has a short visual payoff: the fish damages the ferry, plays its
-explosion animation, then disappears. The animation does not delay or repeat
-the damage.
+explosion effect, then disappears. The effect does not delay or repeat the
+damage.
 
 ## Weapons
 

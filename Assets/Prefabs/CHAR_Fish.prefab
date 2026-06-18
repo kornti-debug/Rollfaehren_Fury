@@ -166,8 +166,8 @@ MonoBehaviour:
   contactDamage: 10
   killReward: 10
   faceTarget: 1
-  contactAnimationStateName: ContactExplosion
-  contactAnimationDuration: 1.2583333
+  contactEffectPrefab: {fileID: 1526100735404244297, guid: 57c2861ca1a64c5409ab415d8564f3b0, type: 3}
+  contactEffectDuration: 1.2583333
   reachedFerry:
     m_PersistentCalls:
       m_Calls: []
@@ -184,7 +184,7 @@ Animator:
   m_GameObject: {fileID: 4274781286499194740}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: a4310322659e3b94f9077123eb381690, type: 2}
+  m_Controller: {fileID: 9100000, guid: dbbdb453ce94d244ea3356ffe3796d17, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

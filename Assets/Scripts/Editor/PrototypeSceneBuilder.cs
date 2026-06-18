@@ -19,8 +19,9 @@ namespace RollfaehrenFury.Editor
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
         private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
-        private const string FishAnimatorControllerPath = "Assets/Animations/CarpGameplay.controller";
-        private const string FishSwimAnimationPath = "Assets/Models/CHAR_Fish.fbx";
+        private const string FishAnimatorControllerPath = "Assets/Animations/CarpAnimator.controller";
+        private const string FishExplosionControllerPath = "Assets/Animations/FishExplosion.controller";
+        private const string FishExplosionPrefabPath = "Assets/Prefabs/FishContactExplosion.prefab";
         private const string FishExplosionAnimationPath = "Assets/Models/Fish_Explode_Anim.fbx";
         private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
         private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
@@ -582,36 +583,37 @@ namespace RollfaehrenFury.Editor
 
         private static void EnsureFishContactAnimation()
         {
-            AnimationClip swimClip = LoadAnimationClip(FishSwimAnimationPath, "Armature|SwimCycle");
             AnimationClip explosionClip = LoadAnimationClip(FishExplosionAnimationPath, "Armature|Explode");
-            if (swimClip == null || explosionClip == null)
+            if (explosionClip == null)
             {
-                Debug.LogWarning("Fish swim or explosion animation clip could not be loaded.");
+                Debug.LogWarning("Fish explosion animation clip could not be loaded.");
                 return;
             }
 
-            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(FishAnimatorControllerPath);
-            if (controller == null)
+            AnimatorController explosionController =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(FishExplosionControllerPath);
+            if (explosionController == null)
             {
-                controller = AnimatorController.CreateAnimatorControllerAtPath(FishAnimatorControllerPath);
+                explosionController =
+                    AnimatorController.CreateAnimatorControllerAtPath(FishExplosionControllerPath);
             }
 
-            controller.parameters = System.Array.Empty<AnimatorControllerParameter>();
-            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+            explosionController.parameters = System.Array.Empty<AnimatorControllerParameter>();
+            AnimatorStateMachine stateMachine = explosionController.layers[0].stateMachine;
             foreach (ChildAnimatorState childState in stateMachine.states)
             {
                 stateMachine.RemoveState(childState.state);
             }
 
-            AnimatorState swimState = stateMachine.AddState("Swim", new Vector3(220f, 100f));
-            swimState.motion = swimClip;
-            swimState.speed = 2f;
-            AnimatorState explosionState = stateMachine.AddState("ContactExplosion", new Vector3(220f, 220f));
+            AnimatorState explosionState = stateMachine.AddState("Explode", new Vector3(220f, 100f));
             explosionState.motion = explosionClip;
-            stateMachine.defaultState = swimState;
-            EditorUtility.SetDirty(controller);
+            stateMachine.defaultState = explosionState;
+            EditorUtility.SetDirty(explosionController);
             AssetDatabase.SaveAssets();
 
+            GameObject explosionPrefab = BuildFishExplosionEffect(explosionController);
+            RuntimeAnimatorController swimController =
+                AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(FishAnimatorControllerPath);
             GameObject prefabRoot = PrefabUtility.LoadPrefabContents(AnimatedEnemyPrefabPath);
             try
             {
@@ -623,16 +625,61 @@ namespace RollfaehrenFury.Editor
                     return;
                 }
 
-                animator.runtimeAnimatorController = controller;
+                animator.runtimeAnimatorController = swimController;
                 animator.applyRootMotion = false;
                 animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                SetString(enemy, "contactAnimationStateName", "ContactExplosion");
-                SetFloat(enemy, "contactAnimationDuration", Mathf.Max(0.1f, explosionClip.length + 0.05f));
+                SetObject(enemy, "contactEffectPrefab", explosionPrefab);
+                SetFloat(enemy, "contactEffectDuration", Mathf.Max(0.1f, explosionClip.length + 0.05f));
                 PrefabUtility.SaveAsPrefabAsset(prefabRoot, AnimatedEnemyPrefabPath);
             }
             finally
             {
                 PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
+        }
+
+        private static GameObject BuildFishExplosionEffect(RuntimeAnimatorController controller)
+        {
+            GameObject explosionModel = AssetDatabase.LoadAssetAtPath<GameObject>(FishExplosionAnimationPath);
+            if (explosionModel == null)
+            {
+                Debug.LogWarning("Fish explosion model could not be loaded.");
+                return null;
+            }
+
+            GameObject effectRoot = new GameObject("Fish Contact Explosion");
+            try
+            {
+                GameObject visual = PrefabUtility.InstantiatePrefab(explosionModel) as GameObject;
+                visual.transform.SetParent(effectRoot.transform, false);
+                visual.transform.localPosition = Vector3.zero;
+                visual.transform.localRotation = Quaternion.identity;
+
+                Animator animator = visual.GetComponentInChildren<Animator>(true);
+                if (animator == null)
+                {
+                    animator = visual.AddComponent<Animator>();
+                }
+
+                animator.runtimeAnimatorController = controller;
+                animator.applyRootMotion = false;
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+
+                foreach (Collider effectCollider in effectRoot.GetComponentsInChildren<Collider>(true))
+                {
+                    Object.DestroyImmediate(effectCollider);
+                }
+
+                foreach (Rigidbody effectBody in effectRoot.GetComponentsInChildren<Rigidbody>(true))
+                {
+                    Object.DestroyImmediate(effectBody);
+                }
+
+                return PrefabUtility.SaveAsPrefabAsset(effectRoot, FishExplosionPrefabPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(effectRoot);
             }
         }
 
