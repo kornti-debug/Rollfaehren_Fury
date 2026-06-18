@@ -6,6 +6,7 @@ namespace RollfaehrenFury.Prototype
     public enum PrototypeGameState
     {
         Idle,
+        Preparation,
         Playing,
         Shop,
         AugmentDraft,
@@ -15,6 +16,7 @@ namespace RollfaehrenFury.Prototype
     public sealed class GameManager : MonoBehaviour
     {
         [SerializeField] private Health ferryHealth;
+        [SerializeField] private FerryController ferryController;
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private SimpleFPSController playerController;
         [SerializeField] private WeaponSystem weaponSystem;
@@ -22,15 +24,12 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private ShopManager shopManager;
         [SerializeField] private AugmentSystem augmentSystem;
         [SerializeField] private bool startOnPlay = true;
-        [SerializeField] private float crossingDuration = 45f;
         [SerializeField] private int startingMoney = 0;
         [SerializeField] private int roundCompletionReward = 25;
 
-        private float crossingTimer;
         private int money;
         private int round = 1;
         private float perRoundHealFraction;
-        private float baseCrossingDuration;
 
         public static GameManager Instance { get; private set; }
 
@@ -41,10 +40,13 @@ namespace RollfaehrenFury.Prototype
         public event Action UpgradeBought;
 
         public PrototypeGameState State { get; private set; } = PrototypeGameState.Idle;
-        public bool AllowsGameplayInput => State == PrototypeGameState.Playing;
+        public bool AllowsGameplayInput => !IsPaused
+            && (State == PrototypeGameState.Playing || State == PrototypeGameState.Preparation);
+        public bool AllowsShopInteraction => !IsPaused && State == PrototypeGameState.Preparation;
+        public bool IsPaused { get; private set; }
         public int Money => money;
         public int Round => round;
-        public float CrossingProgress => crossingDuration <= 0f ? 1f : Mathf.Clamp01(crossingTimer / crossingDuration);
+        public float CrossingProgress => ferryController != null ? ferryController.Progress : 0f;
 
         private void Awake()
         {
@@ -55,7 +57,6 @@ namespace RollfaehrenFury.Prototype
             }
 
             Instance = this;
-            baseCrossingDuration = crossingDuration;
             ResolveReferences();
         }
 
@@ -65,6 +66,11 @@ namespace RollfaehrenFury.Prototype
             {
                 ferryHealth.Died += HandleFerryDestroyed;
                 ferryHealth.HealthChanged += HandleFerryHealthChanged;
+            }
+
+            if (ferryController != null)
+            {
+                ferryController.Arrived += HandleFerryArrived;
             }
         }
 
@@ -89,21 +95,15 @@ namespace RollfaehrenFury.Prototype
                 ferryHealth.Died -= HandleFerryDestroyed;
                 ferryHealth.HealthChanged -= HandleFerryHealthChanged;
             }
+
+            if (ferryController != null)
+            {
+                ferryController.Arrived -= HandleFerryArrived;
+            }
         }
 
         private void Update()
         {
-            if (State != PrototypeGameState.Playing)
-            {
-                return;
-            }
-
-            crossingTimer += Time.deltaTime;
-            if (crossingTimer >= crossingDuration)
-            {
-                CompleteRound();
-            }
-
             RefreshHud();
         }
 
@@ -132,24 +132,37 @@ namespace RollfaehrenFury.Prototype
         {
             round = 1;
             money = startingMoney;
-            crossingTimer = 0f;
-            crossingDuration = baseCrossingDuration;
+            IsPaused = false;
             perRoundHealFraction = 0f;
             ferryHealth?.ResetHealth();
             shopManager?.ResetPurchases();
             enemySpawner?.ResetAugments();
-            StartRound();
+            enemySpawner?.StopRound(true);
+            ferryController?.ResetToDockA();
+            EnterPreparation();
         }
 
         public void StartNextRound()
         {
             round++;
-            StartRound();
+            EnterPreparation();
         }
 
         public void RestartGame()
         {
             StartNewGame();
+        }
+
+        public void SetPaused(bool paused)
+        {
+            IsPaused = paused;
+            if (paused)
+            {
+                SetPlayerInput(false, false);
+                return;
+            }
+
+            RestoreInputForCurrentState();
         }
 
         public void RegisterEnemyKilled(int reward)
@@ -189,13 +202,13 @@ namespace RollfaehrenFury.Prototype
 
         public bool OpenShopOverlay()
         {
-            if (State != PrototypeGameState.Playing)
+            if (!AllowsShopInteraction)
             {
                 return false;
             }
 
             IsShopOverlayOpen = true;
-            SetGameplayInput(false);
+            SetPlayerInput(false, false);
             hud?.ShowShopOverlay(money);
             shopManager?.OpenShop();
             return true;
@@ -210,12 +223,13 @@ namespace RollfaehrenFury.Prototype
 
             IsShopOverlayOpen = false;
             hud?.ShowGameplay();
-            SetGameplayInput(true);
+            SetPlayerInput(true, false);
         }
 
         public void ApplyCrossingSpeedup(float factor)
         {
-            crossingDuration = Mathf.Max(5f, crossingDuration * Mathf.Clamp(factor, 0.1f, 1f));
+            float durationFactor = Mathf.Clamp(factor, 0.1f, 1f);
+            ferryController?.MultiplySpeed(1f / durationFactor);
         }
 
         public void AddPerRoundHeal(float fraction)
@@ -231,13 +245,35 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private void StartRound()
+        public bool BeginCrossing()
         {
+            if (State != PrototypeGameState.Preparation || ferryController == null)
+            {
+                return false;
+            }
+
+            if (!ferryController.BeginCrossing())
+            {
+                return false;
+            }
+
             State = PrototypeGameState.Playing;
-            crossingTimer = 0f;
-            SetGameplayInput(true);
+            IsShopOverlayOpen = false;
+            SetPlayerInput(true, true);
             hud?.ShowGameplay();
             enemySpawner?.BeginRound(round, this);
+            RefreshHud();
+            return true;
+        }
+
+        private void EnterPreparation()
+        {
+            State = PrototypeGameState.Preparation;
+            IsShopOverlayOpen = false;
+            enemySpawner?.StopRound(true);
+            SetPlayerInput(true, false);
+            hud?.ShowGameplay();
+            hud?.ShowMessage("Use the console in the ferry house to start");
             RefreshHud();
         }
 
@@ -251,7 +287,8 @@ namespace RollfaehrenFury.Prototype
             State = PrototypeGameState.AugmentDraft;
             money += roundCompletionReward + round * 5;
             IsShopOverlayOpen = false;
-            SetGameplayInput(false);
+            ferryController?.Stop();
+            SetPlayerInput(false, false);
             enemySpawner?.StopRound(true);
             ApplyPerRoundHeal();
             RoundCompleted?.Invoke();
@@ -268,7 +305,8 @@ namespace RollfaehrenFury.Prototype
             }
 
             State = PrototypeGameState.GameOver;
-            SetGameplayInput(false);
+            ferryController?.Stop();
+            SetPlayerInput(false, false);
             enemySpawner?.StopRound(true);
             GameOverReached?.Invoke();
             hud?.ShowGameOver(round, money);
@@ -291,10 +329,31 @@ namespace RollfaehrenFury.Prototype
             return true;
         }
 
-        private void SetGameplayInput(bool isEnabled)
+        private void SetPlayerInput(bool movementEnabled, bool weaponsEnabled)
         {
-            playerController?.SetInputEnabled(isEnabled);
-            weaponSystem?.SetInputEnabled(isEnabled);
+            playerController?.SetInputEnabled(movementEnabled);
+            weaponSystem?.SetInputEnabled(weaponsEnabled);
+        }
+
+        private void RestoreInputForCurrentState()
+        {
+            switch (State)
+            {
+                case PrototypeGameState.Preparation:
+                    SetPlayerInput(true, false);
+                    break;
+                case PrototypeGameState.Playing:
+                    SetPlayerInput(true, true);
+                    break;
+                default:
+                    SetPlayerInput(false, false);
+                    break;
+            }
+        }
+
+        private void HandleFerryArrived()
+        {
+            CompleteRound();
         }
 
         private void RefreshHud()
@@ -319,6 +378,11 @@ namespace RollfaehrenFury.Prototype
             if (enemySpawner == null)
             {
                 enemySpawner = FindFirstObjectByType<EnemySpawner>();
+            }
+
+            if (ferryController == null)
+            {
+                ferryController = FindFirstObjectByType<FerryController>();
             }
 
             if (playerController == null)

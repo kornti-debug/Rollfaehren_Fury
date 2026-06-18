@@ -99,6 +99,16 @@ namespace RollfaehrenFury.Prototype
             SetCursorLocked(isEnabled && lockCursorOnPlay);
         }
 
+        public void MoveWithPlatform(Vector3 displacement)
+        {
+            if (controller == null || displacement.sqrMagnitude <= 0f)
+            {
+                return;
+            }
+
+            controller.Move(displacement);
+        }
+
         private void BindInputActions()
         {
             moveAction ??= PrototypeInputActions.Find("Player/Move");
