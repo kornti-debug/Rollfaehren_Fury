@@ -86,6 +86,10 @@ Planned systems and responsibilities:
   state and posts the authored Wwise `Play_Steps` event at walk/sprint
   intervals. It posts only while the Wwise engine is initialized, so missing
   local SoundBanks do not block gameplay.
+- The player's hidden controller capsule owns the camera, movement, weapons,
+  and collisions. Its child `Fraunz Visual` uses the revised `CHAR_Fraunz`
+  prefab and `FraunzGameplay.controller`: the existing idle clip is the
+  `Idle` state and the revised `Armature|WalkCycle` is the `Running` state.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its

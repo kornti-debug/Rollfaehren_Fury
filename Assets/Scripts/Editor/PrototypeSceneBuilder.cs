@@ -1,5 +1,6 @@
 using RollfaehrenFury.Prototype;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -21,13 +22,15 @@ namespace RollfaehrenFury.Editor
         private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
         private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
-        private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
-        private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
+        private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
+        private const string PlayerAnimatorControllerPath = "Assets/Animations/FraunzGameplay.controller";
+        private const string PlayerIdleAnimationPath = "Assets/Prefabs/Character/Fraunz/Idle.fbx";
+        private const string PlayerWalkAnimationPath = "Assets/Models/CHAR_Fraunz.fbx";
         private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
         private const string MainSoundBankReferencePath = "Assets/Wwise/ScriptableObjects/Soundbank/216757D1-222F-4AA5-8C50-BBE647F38374.asset";
         private const string PlayerVisualName = "Fraunz Visual";
         private const float EnemySpawnHeight = 7f;
-        private const float PlayerVisualScale = 0.85f;
+        private const float PlayerVisualScale = 1f;
 
         private static readonly Vector3 FerryStartPosition = new Vector3(261.30118f, 1.85f, 483.7371f);
         private static readonly Vector3 FerryDockBPosition = new Vector3(733.9988f, 1.85f, 493.8429f);
@@ -176,22 +179,24 @@ namespace RollfaehrenFury.Editor
         [MenuItem("Rollfaehren Fury/Repair Player Character Visual")]
         public static void RepairPlayerCharacterVisual()
         {
-            GameObject player = GameObject.Find("Prototype Player");
+            GameObject player = GameObject.Find("Player") ?? GameObject.Find("Prototype Player");
             if (player == null)
             {
-                Debug.LogWarning("Prototype Player was not found in the open scene.");
+                Debug.LogWarning("Player was not found in the open scene.");
                 return;
             }
 
             HidePrimitivePlayerShell(player);
+            EnsureFraunzGameplayController();
             EnsurePlayerVisual(player.transform);
+            RemoveStandaloneFraunzPreview(player.transform);
 
             Scene scene = SceneManager.GetActiveScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
 
             Selection.activeGameObject = player;
-            Debug.Log("Fraunz player visual repaired. Press Play to test idle/running animation.");
+            Debug.Log("Fraunz player visual integrated. Press Play to test idle/walking animation.");
         }
 
         private static void EnsureProjectFolders()
@@ -439,7 +444,15 @@ namespace RollfaehrenFury.Editor
 
         private static void EnsurePlayerVisual(Transform player)
         {
+            EnsureFraunzGameplayController();
+
             GameObject visual = FindChild(player, PlayerVisualName);
+            if (visual != null && !IsPrefabInstanceFromPath(visual, PlayerVisualPrefabPath))
+            {
+                Object.DestroyImmediate(visual);
+                visual = null;
+            }
+
             if (visual == null)
             {
                 GameObject visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerVisualPrefabPath);
@@ -498,6 +511,102 @@ namespace RollfaehrenFury.Editor
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             EditorUtility.SetDirty(visual);
             EditorUtility.SetDirty(animator);
+        }
+
+        private static AnimatorController EnsureFraunzGameplayController()
+        {
+            AnimationClip idleClip = LoadAnimationClip(PlayerIdleAnimationPath, "mixamo.com");
+            AnimationClip walkClip = LoadAnimationClip(PlayerWalkAnimationPath, "Armature|WalkCycle");
+            if (idleClip == null || walkClip == null)
+            {
+                Debug.LogWarning("Fraunz idle or walk animation clip could not be loaded.");
+                return AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerAnimatorControllerPath);
+            }
+
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerAnimatorControllerPath);
+            if (controller == null)
+            {
+                controller = AnimatorController.CreateAnimatorControllerAtPath(PlayerAnimatorControllerPath);
+            }
+
+            controller.parameters = new[]
+            {
+                new AnimatorControllerParameter
+                {
+                    name = "IsRunning",
+                    type = AnimatorControllerParameterType.Bool
+                },
+                new AnimatorControllerParameter
+                {
+                    name = "IsIdle",
+                    type = AnimatorControllerParameterType.Bool,
+                    defaultBool = true
+                }
+            };
+
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+            foreach (ChildAnimatorState childState in stateMachine.states)
+            {
+                stateMachine.RemoveState(childState.state);
+            }
+
+            AnimatorState idleState = stateMachine.AddState("Idle", new Vector3(220f, 100f));
+            idleState.motion = idleClip;
+            AnimatorState runningState = stateMachine.AddState("Running", new Vector3(220f, 220f));
+            runningState.motion = walkClip;
+            stateMachine.defaultState = idleState;
+
+            EditorUtility.SetDirty(controller);
+            AssetDatabase.SaveAssets();
+            return controller;
+        }
+
+        private static AnimationClip LoadAnimationClip(string assetPath, string preferredName)
+        {
+            AnimationClip fallback = null;
+            foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(assetPath))
+            {
+                if (asset is not AnimationClip clip || clip.name.StartsWith("__preview__", System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (clip.name == preferredName)
+                {
+                    return clip;
+                }
+
+                fallback ??= clip;
+            }
+
+            return fallback;
+        }
+
+        private static bool IsPrefabInstanceFromPath(GameObject instance, string assetPath)
+        {
+            GameObject source = PrefabUtility.GetCorrespondingObjectFromSource(instance);
+            return source != null && AssetDatabase.GetAssetPath(source) == assetPath;
+        }
+
+        private static void RemoveStandaloneFraunzPreview(Transform player)
+        {
+            System.Collections.Generic.List<GameObject> previews = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform transform in Object.FindObjectsByType<Transform>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                if (transform.parent == null
+                    && transform != player
+                    && transform.name == "CHAR_Fraunz")
+                {
+                    previews.Add(transform.gameObject);
+                }
+            }
+
+            foreach (GameObject preview in previews)
+            {
+                Object.DestroyImmediate(preview);
+            }
         }
 
         private static WeaponSystem EnsureWeapon(SimpleFPSController playerController)
