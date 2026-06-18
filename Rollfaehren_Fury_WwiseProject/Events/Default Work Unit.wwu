@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" SchemaVersion="133">
 	<Events>
-		<WorkUnit Name="Default Work Unit" ID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_Steps" ID="{FD99B580-42F1-422A-9C48-DE59AC07F1D6}">
+					<ChildrenList>
+						<Action Name="" ID="{6D23690B-7E31-4808-B82E-8D150F6DB5DC}" ShortID="843488586">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="Steps" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_HaraldKrullSpeaking" ID="{A0D38CC8-CA2E-47D3-B0E1-3EDCCAB2533C}">
+					<ChildrenList>
+						<Action Name="" ID="{4AB52A50-36AE-4D21-A8CC-297CB208DC49}" ShortID="922670715">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="HaraldKrullSpeaking" ID="{536AE88E-1119-42CD-AC36-FE768F44849B}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
 	</Events>
 </WwiseDocument>

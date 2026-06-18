@@ -87,7 +87,7 @@ Current must-have:
 - Shop or upgrade panel between rounds
 - First-person player controller
 - One weapon with hit/damage behavior
-- Simulated ferry crossing timer
+- Physical ferry crossing between two dock transforms
 - Ferry health
 - At least one enemy type
 - Enemy spawning and contact damage behavior
@@ -146,8 +146,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before adding new manager-like 
 
 1. Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity` and press Play.
 2. Use `New Game` to enter `Assets/Scenes/Main.unity`.
-3. Test `WASD`, mouse look, left-click shooting, `Esc`/Cancel return to menu, shop, and game over.
+3. Test `WASD`, mouse look, shooting, `E` interactions, the pause menu, shop, and game over.
 4. If needed, run `Rollfaehren Fury > Build Prototype Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
-5. Tune enemy speed, spawn timing, ferry health, weapon damage, shop prices, and crossing duration.
+5. Tune fish/pigeon weights, enemy speed, ferry speed, ferry health, weapon damage, and shop prices.
 6. Create Wwise events matching the hook names in `PrototypeAudioEvents`.
 7. Replace placeholders with team assets after the loop is playable.

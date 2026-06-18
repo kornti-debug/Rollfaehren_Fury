@@ -13,7 +13,7 @@ Build a small but complete ferry-only vertical slice with placeholder low-poly a
 - Enemies approaching the ferry
 - Enemies damage only the ferry on contact, then disappear
 - Weapon/shooting loop with enemy kill rewards
-- Timed crossing progress
+- Physical ferry crossings between two jetties
 - Simple shop/upgrades between rounds
 - Next round with higher difficulty
 - Game over when the ferry is destroyed
@@ -81,7 +81,8 @@ Controls:
 - Scroll / `1`–`4`: switch weapon (`1` Harpoon, `2` Pistol, `3` Shotgun, `4` Flamethrower)
 - `Shift`: sprint
 - `Space`: jump
-- `Esc` / Cancel: return from gameplay to the menu
+- `E`: use the vending machine or start the ferry from the house console
+- `Esc` / Cancel: open or close the gameplay pause menu
 
 Gameplay input uses subscribed callbacks from the project-wide `Assets/InputSystem_Actions.inputactions` asset.
 

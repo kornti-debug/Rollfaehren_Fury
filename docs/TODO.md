@@ -22,11 +22,15 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add New Game button.
 - [x] Add Settings placeholder.
 - [x] Add Quit button.
-- [x] Add gameplay Cancel/Esc return to menu.
+- [x] Add initial gameplay Cancel/Esc navigation.
+- [x] Replace direct gameplay Esc return with a pause-controller flow.
+- [ ] Verify Resume, New Game, Settings, Main Menu, and Quit pause buttons.
 - [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
 - [x] Add game over state.
 - [x] Add shop/upgrade state.
 - [x] Add round restart/next round behavior.
+- [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
+- [ ] Verify the ferry house console prompt and manual round start in Unity.
 
 ## Player and Weapons
 
@@ -55,6 +59,12 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Create placeholder ferry deck.
 - [x] Create river/shore placeholder layout.
 - [x] Implement ferry crossing progress.
+- [x] Add physical dock-to-dock ferry controller and arrival-driven round completion.
+- [x] Add alternating Dock A/Dock B route support.
+- [x] Replace sideways linear travel with a curved bow-first route and dock turns.
+- [x] Correct Dock B to remain on the river side of the opposite jetty.
+- [ ] Verify ferry/player motion is visually stable without shaking.
+- [ ] Verify the player remains aboard during a full crossing.
 - [x] Add ferry health.
 - [ ] Add visible damage or warning feedback.
 - [ ] Later: add cargo prefab.
@@ -70,7 +80,14 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add `EnemySpawner`.
 - [x] Add round-based spawn scaling.
 - [x] Align enemy spawn points with the terrain river surface.
-- [ ] Add second enemy variant if time allows.
+- [x] Add separate fish and pigeon enemy profiles with surface/flying movement.
+- [x] Add weighted round unlocks: fish from round 1, pigeons from round 2.
+- [x] Replace full spawn rings with ferry-relative forward attack arcs.
+- [x] Pace enemy spawns across 5%-90% of ferry crossing progress.
+- [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
+- [x] Attach the looping flight Animator to the pigeon prefab.
+- [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
+- [ ] Later: add boss fish or boss pigeon variants.
 
 ## Score, Money, and Upgrades
 
@@ -88,7 +105,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
 - [ ] Rebalance: upgrade costs lowered to 10/10/10/30 + 100 starting gold (testing values, retune later).
 - [x] Track C: vending-machine shop automat (walk up + B opens the shop overlay any time on deck).
-- [ ] Verify automat in Unity: re-run `Build Prototype Scene`, walk to the box, press B, buy, B to close.
+- [ ] Verify automat in Unity: walk to the machine, press `E`, buy, then close it.
 - [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
@@ -100,6 +117,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 ## Art and Scene Props
 
 - [x] Low-poly ferry model.
+- [x] Import the revised Fraunz rig, walk-cycle controller, and character prefab.
+- [ ] Replace the current player visual with the revised Fraunz prefab after animation testing.
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
@@ -109,15 +128,19 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Later: cargo crates.
 - [ ] Weapon model.
 - [x] First enemy model: animated carp prefab.
+- [x] Import the fish explosion animation asset.
+- [ ] Trigger the fish explosion animation from enemy death.
 - [x] Vending-machine shop prop.
 - [ ] Optional civilian NPCs.
 
 ## Audio and Wwise
 
-- [ ] Confirm Wwise project opens.
-- [ ] Create first test event.
-- [ ] Generate initial soundbanks.
-- [x] Keep Wwise runtime disabled by default for fresh clones without soundbanks.
+- [x] Confirm Wwise project opens.
+- [x] Import the authored Wwise containers, events, SoundBank definition, and source audio.
+- [x] Add guarded `Play_Steps` footsteps to the current player.
+- [x] Generate and test the initial Windows SoundBanks locally.
+- [x] Enable `WwiseGlobal` in the shared gameplay scene.
+- [x] Keep ferry/round-flow changes independent from local generated SoundBanks.
 - [x] Hook shooting event in Unity.
 - [x] Hook enemy death event.
 - [x] Hook ferry damage event.

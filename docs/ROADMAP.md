@@ -13,13 +13,14 @@ flow — `Assets/Scenes/Bootstrap.unity` → `Assets/Scenes/Menu.unity` →
 gameplay scene). Scenes are rebuildable via `Rollfaehren Fury > Build Prototype
 Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
 
-- `GameManager` — game states (Idle / Playing / Shop / GameOver), money, rounds, crossing timer
+- `GameManager` — docked preparation, crossing, augment, and game-over states
 - `Health` — reusable health/damage component with events (target-agnostic)
 - `WeaponSystem` + `Weapon` + `WeaponDefinition` — data-driven weapons (Track A): the active weapon fires, weapons switch, upgrades hit the active weapon
-- `SimpleEnemy` + `EnemySpawner` — one enemy, round-scaled spawning, contact damage
+- `SimpleEnemy` + `EnemySpawner` — weighted fish/pigeon profiles, round unlocks, surface/flying movement, and contact damage
 - `FerryDamageTarget` — the ferry as the protected/damageable object
 - `SimpleHUD` — HUD + shop panel + game over panel
-- `SceneFlow` / `BootstrapLoader` / `MainMenuController` / `GameplayMenuInput` — bootstrap → menu → main flow, New Game / Settings / Quit, Esc/Cancel returns gameplay to the menu
+- `SceneFlow` / `BootstrapLoader` / `MainMenuController` / `GameplayMenuInput` — bootstrap → menu → main flow plus an in-game pause overlay
+- `FerryController` / `RoundStartConsole` — alternating physical crossings started manually from the ferry house
 - Project-wide **Input System** layer (`PrototypeInputActions` + `Assets/InputSystem_Actions.inputactions`) — gameplay and menu read `InputAction` callbacks instead of polling devices
 - `PrototypeAudioEvents` — Wwise hook points (shoot / hit / enemy death / ferry damage)
 - Fraunz player visual + a vending-machine asset (recently merged)
@@ -54,7 +55,7 @@ weapon code are not rebuilt twice.
 Cheap, unblocks honest testing. Depends on: nothing.
 
 - Visible ferry damage / low-health feedback (uses existing `Health` events).
-- Tuning pass: enemy speed, spawn timing, ferry health, weapon damage, shop prices, crossing duration.
+- Tuning pass: enemy mix/speed, spawn timing, ferry speed/health, weapon damage, and shop prices.
 - Confirm a clean fresh clone + Play Mode (through Bootstrap → Menu → Main) on a teammate machine.
 
 ### Tier 1 — System foundations (build the logic before the content)
