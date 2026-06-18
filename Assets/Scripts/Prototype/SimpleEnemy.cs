@@ -4,10 +4,17 @@ using UnityEngine.Events;
 
 namespace RollfaehrenFury.Prototype
 {
+    public enum EnemyMovementMode
+    {
+        Surface,
+        Flying
+    }
+
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(Health))]
     public sealed class SimpleEnemy : MonoBehaviour
     {
+        [SerializeField] private EnemyMovementMode movementMode = EnemyMovementMode.Surface;
         [SerializeField] private float moveSpeed = 3f;
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
@@ -25,6 +32,7 @@ namespace RollfaehrenFury.Prototype
         public event Action<SimpleEnemy> Removed;
 
         public int KillReward => killReward;
+        public EnemyMovementMode MovementMode => movementMode;
 
         private void Awake()
         {
@@ -58,7 +66,10 @@ namespace RollfaehrenFury.Prototype
 
             Vector3 targetPosition = ferryTarget.AimPoint.position;
             Vector3 direction = targetPosition - transform.position;
-            direction.y = 0f;
+            if (movementMode == EnemyMovementMode.Surface)
+            {
+                direction.y = 0f;
+            }
 
             if (direction.sqrMagnitude < 0.01f)
             {

@@ -156,9 +156,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e16fe28055ef441c9cca04bdcadd9a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.SimpleEnemy
+  movementMode: 1
   moveSpeed: 5
-  contactDamage: 10
-  killReward: 10
+  contactDamage: 8
+  killReward: 12
   faceTarget: 1
   reachedFerry:
     m_PersistentCalls:

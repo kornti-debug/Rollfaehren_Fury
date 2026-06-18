@@ -4,8 +4,50 @@ using UnityEngine;
 
 namespace RollfaehrenFury.Prototype
 {
+    [System.Serializable]
+    public sealed class EnemySpawnProfile
+    {
+        [SerializeField] private string displayName = "Enemy";
+        [SerializeField] private SimpleEnemy prefab;
+        [SerializeField] private Transform[] spawnPoints;
+        [SerializeField, Min(1)] private int firstRound = 1;
+        [SerializeField, Min(0f)] private float spawnWeight = 1f;
+        [SerializeField] private bool useFixedSpawnHeight;
+        [SerializeField] private float fixedSpawnHeight;
+
+        public string DisplayName => displayName;
+        public SimpleEnemy Prefab => prefab;
+        public Transform[] SpawnPoints => spawnPoints;
+        public int FirstRound => Mathf.Max(1, firstRound);
+        public float SpawnWeight => Mathf.Max(0f, spawnWeight);
+        public bool UseFixedSpawnHeight => useFixedSpawnHeight;
+        public float FixedSpawnHeight => fixedSpawnHeight;
+
+        public void Configure(
+            string profileName,
+            SimpleEnemy enemyPrefab,
+            Transform[] points,
+            int unlockRound,
+            float weight,
+            bool useFixedHeight,
+            float spawnHeight)
+        {
+            displayName = profileName;
+            prefab = enemyPrefab;
+            spawnPoints = points;
+            firstRound = Mathf.Max(1, unlockRound);
+            spawnWeight = Mathf.Max(0f, weight);
+            useFixedSpawnHeight = useFixedHeight;
+            fixedSpawnHeight = spawnHeight;
+        }
+    }
+
     public sealed class EnemySpawner : MonoBehaviour
     {
+        [Header("Enemy Types")]
+        [SerializeField] private EnemySpawnProfile[] enemyProfiles;
+
+        [Header("Legacy Fish Setup")]
         [SerializeField] private SimpleEnemy enemyPrefab;
         [SerializeField] private FerryDamageTarget ferryTarget;
         [SerializeField] private Transform[] spawnPoints;
@@ -30,12 +72,20 @@ namespace RollfaehrenFury.Prototype
         private float augmentHealthMultiplier = 1f;
 
         public int AliveCount => aliveEnemies.Count;
+        public EnemySpawnProfile[] EnemyProfiles => enemyProfiles;
 
         public void Configure(SimpleEnemy prefab, FerryDamageTarget target, Transform[] points, GameManager manager)
         {
             enemyPrefab = prefab;
             ferryTarget = target;
             spawnPoints = points;
+            gameManager = manager;
+        }
+
+        public void ConfigureProfiles(EnemySpawnProfile[] profiles, FerryDamageTarget target, GameManager manager)
+        {
+            enemyProfiles = profiles;
+            ferryTarget = target;
             gameManager = manager;
         }
 
@@ -113,45 +163,107 @@ namespace RollfaehrenFury.Prototype
 
         private void SpawnEnemy()
         {
-            if (enemyPrefab == null || ferryTarget == null)
+            if (ferryTarget == null)
             {
-                Debug.LogWarning("EnemySpawner is missing an enemy prefab or ferry target.", this);
+                Debug.LogWarning("EnemySpawner is missing the ferry target.", this);
                 return;
             }
 
-            Vector3 spawnPosition = GetSpawnPosition();
-            SimpleEnemy enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
-            enemy.name = $"Prototype Enemy R{activeRound}";
+            EnemySpawnProfile profile = SelectProfile();
+            SimpleEnemy prefab = profile != null ? profile.Prefab : enemyPrefab;
+            if (prefab == null)
+            {
+                Debug.LogWarning("EnemySpawner has no eligible enemy prefab for this round.", this);
+                return;
+            }
+
+            Vector3 spawnPosition = GetSpawnPosition(profile);
+            SimpleEnemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
+            string profileName = profile != null && !string.IsNullOrWhiteSpace(profile.DisplayName)
+                ? profile.DisplayName
+                : prefab.name;
+            enemy.name = $"{profileName} R{activeRound}";
             enemy.Removed += HandleEnemyRemoved;
             aliveEnemies.Add(enemy);
 
             float speedMultiplier = 1f + (activeRound - 1) * speedScalePerRound;
             float healthMultiplier = (1f + (activeRound - 1) * healthScalePerRound) * augmentHealthMultiplier;
-            int reward = baseKillReward + (activeRound - 1) * 2;
+            int reward = Mathf.Max(baseKillReward, enemy.KillReward) + (activeRound - 1) * 2;
             enemy.Initialize(ferryTarget, gameManager, reward, speedMultiplier, healthMultiplier);
         }
 
-        private Vector3 GetSpawnPosition()
+        private EnemySpawnProfile SelectProfile()
         {
-            if (spawnPoints != null && spawnPoints.Length > 0)
+            if (enemyProfiles == null || enemyProfiles.Length == 0)
             {
-                Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
+                return null;
+            }
+
+            float totalWeight = 0f;
+            for (int i = 0; i < enemyProfiles.Length; i++)
+            {
+                EnemySpawnProfile profile = enemyProfiles[i];
+                if (IsEligible(profile))
+                {
+                    totalWeight += profile.SpawnWeight;
+                }
+            }
+
+            if (totalWeight <= 0f)
+            {
+                return null;
+            }
+
+            float selection = Random.value * totalWeight;
+            for (int i = 0; i < enemyProfiles.Length; i++)
+            {
+                EnemySpawnProfile profile = enemyProfiles[i];
+                if (!IsEligible(profile))
+                {
+                    continue;
+                }
+
+                selection -= profile.SpawnWeight;
+                if (selection <= 0f)
+                {
+                    return profile;
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsEligible(EnemySpawnProfile profile)
+        {
+            return profile != null
+                && profile.Prefab != null
+                && profile.SpawnWeight > 0f
+                && activeRound >= profile.FirstRound;
+        }
+
+        private Vector3 GetSpawnPosition(EnemySpawnProfile profile)
+        {
+            Transform[] points = profile != null ? profile.SpawnPoints : spawnPoints;
+            if (points != null && points.Length > 0)
+            {
+                Transform point = points[Random.Range(0, points.Length)];
                 if (point != null)
                 {
-                    return ApplySpawnHeight(point.position);
+                    return ApplySpawnHeight(point.position, profile);
                 }
             }
 
             Vector2 randomCircle = Random.insideUnitCircle.normalized * fallbackSpawnRadius;
             Vector3 center = ferryTarget != null ? ferryTarget.transform.position : transform.position;
-            return ApplySpawnHeight(center + new Vector3(randomCircle.x, 0f, randomCircle.y));
+            return ApplySpawnHeight(center + new Vector3(randomCircle.x, 0f, randomCircle.y), profile);
         }
 
-        private Vector3 ApplySpawnHeight(Vector3 position)
+        private Vector3 ApplySpawnHeight(Vector3 position, EnemySpawnProfile profile)
         {
-            if (useFixedSpawnHeight)
+            bool fixedHeight = profile != null ? profile.UseFixedSpawnHeight : useFixedSpawnHeight;
+            if (fixedHeight)
             {
-                position.y = spawnHeight;
+                position.y = profile != null ? profile.FixedSpawnHeight : spawnHeight;
             }
 
             return position;
