@@ -571,12 +571,12 @@ namespace RollfaehrenFury.Editor
         {
             Vector3[] positions =
             {
-                new Vector3(-58.7f, 5.15f, -39.1f),
-                new Vector3(57.3f, 5.15f, -39.1f),
-                new Vector3(-65.7f, 5.15f, -5.1f),
-                new Vector3(64.3f, 5.15f, -5.1f),
-                new Vector3(-58.7f, 5.15f, 28.9f),
-                new Vector3(57.3f, 5.15f, 28.9f)
+                new Vector3(-55f, 5.15f, 35f),
+                new Vector3(55f, 5.15f, 35f),
+                new Vector3(-35f, 5.15f, 60f),
+                new Vector3(35f, 5.15f, 60f),
+                new Vector3(-15f, 5.15f, 78f),
+                new Vector3(15f, 5.15f, 78f)
             };
 
             return RebuildSpawnPointGroup("Fish Spawn Points", ferry, "Fish Spawn", positions);
@@ -586,12 +586,12 @@ namespace RollfaehrenFury.Editor
         {
             Vector3[] positions =
             {
-                new Vector3(-52f, 22f, -42f),
-                new Vector3(52f, 25f, -42f),
-                new Vector3(-68f, 20f, -6f),
-                new Vector3(68f, 26f, -6f),
-                new Vector3(-52f, 24f, 34f),
-                new Vector3(52f, 21f, 34f)
+                new Vector3(-70f, 22f, 30f),
+                new Vector3(70f, 25f, 30f),
+                new Vector3(-45f, 20f, 60f),
+                new Vector3(45f, 26f, 60f),
+                new Vector3(-20f, 24f, 90f),
+                new Vector3(20f, 21f, 90f)
             };
 
             return RebuildSpawnPointGroup("Pigeon Spawn Points", ferry, "Pigeon Spawn", positions);
@@ -926,8 +926,8 @@ namespace RollfaehrenFury.Editor
             SetObject(ferryController, "dockA", dockA);
             SetObject(ferryController, "dockB", dockB);
             SetObject(ferryController, "playerController", player);
-            SetFloat(ferryController, "crossingSpeed", 12f);
-            SetFloat(ferryController, "departureDistance", 35f);
+            SetFloat(ferryController, "crossingSpeed", 6f);
+            SetFloat(ferryController, "departureDistance", 70f);
             SetInt(ferryController, "routeSamples", 64);
             SetObject(gameManager, "ferryController", ferryController);
 
@@ -937,8 +937,11 @@ namespace RollfaehrenFury.Editor
             SimpleEnemy pigeonPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PigeonEnemyPrefabPath)?.GetComponent<SimpleEnemy>();
             ConfigureEnemyProfiles(spawner, fishPrefab, fishPoints, pigeonPrefab, pigeonPoints);
             SetObject(spawner, "ferryTarget", ferryTarget);
+            SetObject(spawner, "ferryController", ferryController);
             SetObject(spawner, "enemyPrefab", fishPrefab);
             SetObjectArray(spawner, "spawnPoints", fishPoints);
+            SetFloat(spawner, "spawnStartProgress", 0.05f);
+            SetFloat(spawner, "spawnEndProgress", 0.9f);
 
             EnsureVendingMachine(gameManager);
             EnsureRoundStartConsole(ferry.transform, gameManager, hud);

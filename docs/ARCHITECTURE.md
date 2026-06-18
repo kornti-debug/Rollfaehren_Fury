@@ -87,7 +87,9 @@ Planned systems and responsibilities:
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
 prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
 height. `SimpleEnemy` remains shared and selects either planar `Surface`
-movement or full 3D `Flying` movement from the prefab.
+movement or full 3D `Flying` movement from the prefab. Spawn points are
+ferry-relative forward attack arcs, while spawn timing is distributed across
+configured ferry-progress thresholds so enemies do not all appear at departure.
 
 ## Key Relationships
 

@@ -72,6 +72,10 @@ Current enemy types:
 2. Pigeons spawn at aerial points, dive in full 3D, and join the mix from round 2.
 3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
+During a crossing, enemies spawn ahead and beside the moving ferry rather than
+behind it. The wave is spread from roughly 5% to 90% crossing progress, keeping
+combat active without requiring every enemy to outrun the ferry.
+
 Enemy behavior should be simple:
 
 - Spawn outside the ferry area.

@@ -50,8 +50,11 @@ namespace RollfaehrenFury.Prototype
         [Header("Legacy Fish Setup")]
         [SerializeField] private SimpleEnemy enemyPrefab;
         [SerializeField] private FerryDamageTarget ferryTarget;
+        [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
         [SerializeField] private float spawnInterval = 1.6f;
+        [SerializeField, Range(0f, 1f)] private float spawnStartProgress = 0.05f;
+        [SerializeField, Range(0f, 1f)] private float spawnEndProgress = 0.9f;
         [SerializeField] private int baseEnemiesPerRound = 8;
         [SerializeField] private int extraEnemiesPerRound = 5;
         [SerializeField] private int maxAliveEnemies = 14;
@@ -80,6 +83,7 @@ namespace RollfaehrenFury.Prototype
             ferryTarget = target;
             spawnPoints = points;
             gameManager = manager;
+            ferryController = target != null ? target.GetComponentInParent<FerryController>() : null;
         }
 
         public void ConfigureProfiles(EnemySpawnProfile[] profiles, FerryDamageTarget target, GameManager manager)
@@ -87,12 +91,18 @@ namespace RollfaehrenFury.Prototype
             enemyProfiles = profiles;
             ferryTarget = target;
             gameManager = manager;
+            ferryController = target != null ? target.GetComponentInParent<FerryController>() : null;
         }
 
         public void BeginRound(int round, GameManager manager)
         {
             gameManager = manager;
             activeRound = Mathf.Max(1, round);
+            if (ferryController == null && ferryTarget != null)
+            {
+                ferryController = ferryTarget.GetComponentInParent<FerryController>();
+            }
+
             StopRound(true);
             isSpawning = true;
             spawnRoutine = StartCoroutine(SpawnRound());
@@ -148,15 +158,23 @@ namespace RollfaehrenFury.Prototype
         {
             int targetCount = Mathf.Max(1, Mathf.RoundToInt((baseEnemiesPerRound + (activeRound - 1) * extraEnemiesPerRound) * augmentCountMultiplier));
             int spawned = 0;
+            float startProgress = Mathf.Clamp01(spawnStartProgress);
+            float endProgress = Mathf.Clamp(spawnEndProgress, startProgress, 1f);
 
             while (isSpawning && spawned < targetCount)
             {
-                if (aliveEnemies.Count < maxAliveEnemies)
+                float targetProgress = targetCount <= 1
+                    ? startProgress
+                    : Mathf.Lerp(startProgress, endProgress, spawned / (float)(targetCount - 1));
+
+                if (GetCrossingProgress() < targetProgress || aliveEnemies.Count >= maxAliveEnemies)
                 {
-                    SpawnEnemy();
-                    spawned++;
+                    yield return null;
+                    continue;
                 }
 
+                SpawnEnemy();
+                spawned++;
                 yield return new WaitForSeconds(GetSpawnDelay());
             }
         }
@@ -272,6 +290,13 @@ namespace RollfaehrenFury.Prototype
         private float GetSpawnDelay()
         {
             return Mathf.Max(0.35f, spawnInterval - (activeRound - 1) * spawnDelayReductionPerRound);
+        }
+
+        private float GetCrossingProgress()
+        {
+            return ferryController != null && ferryController.IsCrossing
+                ? ferryController.Progress
+                : 0f;
         }
 
         private void HandleEnemyRemoved(SimpleEnemy enemy)
