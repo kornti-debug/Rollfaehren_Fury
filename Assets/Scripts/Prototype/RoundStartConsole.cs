@@ -3,10 +3,8 @@ using UnityEngine.InputSystem;
 
 namespace RollfaehrenFury.Prototype
 {
-    /// <summary>
-    /// Walk-up vending-machine shop using the shared Player/Interact action.
-    /// </summary>
-    public sealed class ShopInteractable : MonoBehaviour
+    [RequireComponent(typeof(Collider))]
+    public sealed class RoundStartConsole : MonoBehaviour
     {
         [SerializeField] private GameManager gameManager;
         [SerializeField] private float interactRange = 3.5f;
@@ -27,6 +25,8 @@ namespace RollfaehrenFury.Prototype
             {
                 player = controller.transform;
             }
+
+            GetComponent<Collider>().isTrigger = true;
         }
 
         private void OnEnable()
@@ -47,54 +47,42 @@ namespace RollfaehrenFury.Prototype
                 interactAction.Disable();
             }
 
-            if (promptObject != null)
-            {
-                promptObject.SetActive(false);
-            }
+            SetPromptVisible(false);
         }
 
         private void Update()
         {
-            if (gameManager == null)
-            {
-                return;
-            }
-
-            bool open = gameManager.IsShopOverlayOpen;
-            bool inRange = gameManager.AllowsShopInteraction && IsPlayerInRange();
-
-            if (promptObject != null)
-            {
-                promptObject.SetActive(inRange && !open);
-            }
+            SetPromptVisible(CanInteract());
         }
 
         private void HandleInteract(InputAction.CallbackContext context)
         {
-            if (gameManager == null)
+            if (CanInteract() && gameManager.BeginCrossing())
             {
-                return;
+                SetPromptVisible(false);
             }
+        }
 
-            bool open = gameManager.IsShopOverlayOpen;
-            if (open)
-            {
-                gameManager.CloseShopOverlay();
-            }
-            else if (gameManager.AllowsShopInteraction && IsPlayerInRange())
-            {
-                gameManager.OpenShopOverlay();
-            }
+        private bool CanInteract()
+        {
+            return gameManager != null
+                && gameManager.State == PrototypeGameState.Preparation
+                && !gameManager.IsShopOverlayOpen
+                && IsPlayerInRange();
         }
 
         private bool IsPlayerInRange()
         {
-            if (player == null)
-            {
-                return false;
-            }
+            return player != null
+                && (player.position - transform.position).sqrMagnitude <= interactRange * interactRange;
+        }
 
-            return (player.position - transform.position).sqrMagnitude <= interactRange * interactRange;
+        private void SetPromptVisible(bool visible)
+        {
+            if (promptObject != null && promptObject.activeSelf != visible)
+            {
+                promptObject.SetActive(visible);
+            }
         }
     }
 }
