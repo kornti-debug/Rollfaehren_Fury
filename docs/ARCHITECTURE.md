@@ -8,13 +8,16 @@ The current implemented flow is:
 Bootstrap
   -> Menu
       -> Main
-          -> Shop overlay
-              -> Main with harder round
+          -> Docked preparation
+              -> Ferry console starts crossing
+                  -> Augment draft
+                      -> Docked preparation at opposite shore
+          -> Shop overlay while docked
           -> GameOver overlay
-          -> Menu via Cancel/Esc
+          -> Pause overlay via Cancel/Esc
 ```
 
-`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds. `Assets/Scenes/Menu.unity` has New Game, Settings, and Quit. `Assets/Scenes/Main.unity` stays the gameplay scene; shop and game over are UI overlays inside that scene.
+`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds. `Assets/Scenes/Menu.unity` has New Game, Settings, and Quit. `Assets/Scenes/Main.unity` stays the gameplay scene; preparation, shop, pause, augment, and game over remain inside that scene.
 
 ## Entity Hierarchy
 
@@ -59,7 +62,8 @@ Planned systems and responsibilities:
 - `SceneFlow`: tiny static scene loader for bootstrap, menu, main, and quit.
 - `BootstrapLoader`: redirects the bootstrap scene to the menu scene.
 - `MainMenuController`: handles menu buttons and menu cancel input.
-- `GameplayMenuInput`: listens for UI Cancel/Esc in gameplay and returns to the menu.
+- `GameplayMenuInput`: owns the in-game pause overlay. Cancel/Esc closes an
+  open shop first, opens or resumes pause, and navigates back from pause settings.
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: implemented (Track A) — owns the player's weapons and the firing input (`Player/Attack`), switches the active weapon (`Player/Next` / `Player/Previous`), and forwards fire/hit events so HUD and audio do not care which weapon is active.
 - `Weapon`: implemented — data-driven runtime weapon. Reads a `WeaponDefinition` and fires by fire mode (hitscan / spread). Keeps runtime copies of the stats, so upgrades never mutate the shared asset.
@@ -69,10 +73,20 @@ Planned systems and responsibilities:
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
 - `UpgradeDefinition` (Track B): implemented — polymorphic ScriptableObject upgrade; subclasses define the effect via `Apply(UpgradeContext)`: `WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, and the master `RicochetUpgrade`. Weapon upgrades route through `WeaponSystem` to the active weapon.
 - `ShopManager` (Track B): implemented — holds a catalog of `UpgradeDefinition` assets + parallel UI buttons; purchases go through `GameManager.TryPurchase`. One-off "master" upgrades (non-repeatable) are tracked per run.
-- `ShopInteractable` (Track C): implemented — vending-machine on the deck. Walk within range and press B to open/close the shop overlay any time during a round (`GameManager.OpenShopOverlay`/`CloseShopOverlay`); the round keeps running while open.
+- `ShopInteractable` (Track C): vending-machine interaction available while
+  docked in `Preparation`; it uses the shared `Player/Interact` action.
+- `RoundStartConsole`: ferry-house interaction available only during
+  `Preparation`; `Player/Interact` starts the next crossing.
 - `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. v1 augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP). The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.
-- `FerryController`: ferry movement and crossing progress.
+- `FerryController`: moves a kinematic ferry between two dock transforms,
+  carries the player CharacterController by frame displacement, reports
+  distance-based progress, and signals arrival to `GameManager`.
 - `Cargo`: later destructible cargo with reward value.
+
+`EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
+prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
+height. `SimpleEnemy` remains shared and selects either planar `Surface`
+movement or full 3D `Flying` movement from the prefab.
 
 ## Key Relationships
 
@@ -99,7 +113,8 @@ Current action usage:
 - `Player/Jump`: queued jump.
 - `Player/Sprint`: sprint held state.
 - `Player/Attack`: hold-to-fire weapon input and cursor relock.
-- `UI/Cancel`: menu back action and gameplay return-to-menu action.
+- `Player/Interact`: context interaction for the vending machine and ferry console.
+- `UI/Cancel`: menu back action and gameplay pause/resume navigation.
 
 ## Suggested Project Structure
 
@@ -121,7 +136,7 @@ Create folders when the first script or prefab needs them. Empty folders are not
 
 1. `GameManager` with basic game states.
 2. Bootstrap/menu scene flow plus gameplay, shop, and game over overlays.
-3. Timed crossing progress.
+3. Physical ferry crossing progress and dock arrival.
 4. Shared `Health`.
 5. Player controller and hitscan weapon.
 6. One enemy prefab and `EnemySpawner`.

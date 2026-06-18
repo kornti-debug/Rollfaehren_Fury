@@ -42,7 +42,8 @@ Do not commit `Library/`, `Logs/`, `UserSettings/`, generated `.csproj` files, o
    - `WASD` moves.
    - Mouse looks.
    - Left click shoots.
-   - `Esc` / Cancel returns from gameplay to the menu.
+   - `E` uses the vending machine and ferry-house start console.
+   - `Esc` / Cancel opens the gameplay pause menu.
    - Enemies approach the ferry.
    - Ferry health drops when enemies touch it.
    - Killing enemies grants money.

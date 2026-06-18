@@ -18,6 +18,7 @@ namespace RollfaehrenFury.Editor
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
         private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
+        private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
         private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
@@ -25,10 +26,13 @@ namespace RollfaehrenFury.Editor
         private const float EnemySpawnHeight = 7f;
         private const float PlayerVisualScale = 0.85f;
 
-        private static readonly Vector3 FerryStartPosition = new Vector3(276.8f, 1.85f, 481.1f);
-        private static readonly Vector3 PlayerStartPosition = new Vector3(279.7f, 12.25f, 479.2f);
-        private static readonly Vector3 VendingMachinePosition = new Vector3(283.2f, 12.25f, 479.2f);
-        private static readonly Vector3 EnemySpawnParentPosition = new Vector3(292f, 0f, 487f);
+        private static readonly Vector3 FerryStartPosition = new Vector3(261.30118f, 1.85f, 483.7371f);
+        private static readonly Vector3 FerryDockBPosition = new Vector3(796.6012f, 1.85f, 509.9571f);
+        private static readonly Vector3 PlayerStartPosition = new Vector3(259.54834f, 12.25f, 480.7458f);
+        private static readonly Quaternion FerryStartRotation = Quaternion.Euler(0f, 177.139f, 0f);
+        private static readonly Quaternion PlayerStartRotation = Quaternion.Euler(0f, 87.139f, 0f);
+        private static readonly Vector3 VendingMachineLocalPosition = new Vector3(1.9f, 10.4f, 6.4f);
+        private static readonly Vector3 RoundConsoleLocalPosition = new Vector3(-2.8f, 11.1f, 0.8f);
         private static readonly Vector3 FerryAimPointPosition = new Vector3(0f, 4.97f, 0f);
         private static readonly Vector3 FerryDamageColliderCenter = new Vector3(0f, 7.070751f, 2.7608166f);
         private static readonly Vector3 FerryDamageColliderSize = new Vector3(20f, 5.4464755f, 45.15598f);
@@ -52,7 +56,7 @@ namespace RollfaehrenFury.Editor
 
             SimpleFPSController playerController = EnsurePlayer();
             WeaponSystem weaponSystem = EnsureWeapon(playerController);
-            Transform[] spawnPoints = EnsureSpawnPoints();
+            Transform[] spawnPoints = EnsureSpawnPoints(ferry.transform);
             SimpleEnemy enemyPrefab = EnsureEnemyPrefab(enemyMaterial);
 
             CreatePrototypeEnvironment(waterMaterial, shoreMaterial);
@@ -63,7 +67,7 @@ namespace RollfaehrenFury.Editor
             EnsureVendingMachine(gameManager);
             EnsureAugmentSystem(gameManager, gameManager.GetComponent<EnemySpawner>());
             EnsureAudioEvents(gameManager, weaponSystem);
-            EnsureGameplayMenuInputObject();
+            EnsureFerryRoundFlow(ferry, ferryTarget, playerController, gameManager, gameManager.GetComponent<EnemySpawner>(), hud);
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
             ConfigureBuildSettings();
@@ -80,6 +84,37 @@ namespace RollfaehrenFury.Editor
         public static void BuildPrototypeSceneFromCommandLine()
         {
             BuildPrototypeScene();
+        }
+
+        [MenuItem("Rollfaehren Fury/Upgrade Ferry Round Flow Scene")]
+        public static void UpgradeFerryRoundFlowScene()
+        {
+            Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            GameObject ferry = GameObject.Find("Ferry");
+            GameManager gameManager = Object.FindFirstObjectByType<GameManager>();
+            EnemySpawner spawner = Object.FindFirstObjectByType<EnemySpawner>();
+            SimpleFPSController player = Object.FindFirstObjectByType<SimpleFPSController>();
+            SimpleHUD hud = Object.FindFirstObjectByType<SimpleHUD>();
+            FerryDamageTarget ferryTarget = Object.FindFirstObjectByType<FerryDamageTarget>();
+
+            if (ferry == null || gameManager == null || spawner == null || player == null || hud == null || ferryTarget == null)
+            {
+                Debug.LogError("Main.unity is missing a required prototype object. Run Build Prototype Scene first.");
+                return;
+            }
+
+            EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
+            EnsureEventSystem();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Ferry round flow upgraded without replacing terrain or jetty props.");
+        }
+
+        public static void UpgradeFerryRoundFlowSceneFromCommandLine()
+        {
+            UpgradeFerryRoundFlowScene();
         }
 
         [MenuItem("Rollfaehren Fury/Build Bootstrap And Menu Scenes")]
@@ -236,6 +271,7 @@ namespace RollfaehrenFury.Editor
             }
 
             ferry.transform.position = FerryStartPosition;
+            ferry.transform.rotation = FerryStartRotation;
 
             GameObject deck = FindChild(ferry.transform, "Prototype Ferry Deck");
             if (deck != null)
@@ -297,7 +333,7 @@ namespace RollfaehrenFury.Editor
 
         private static SimpleFPSController EnsurePlayer()
         {
-            GameObject player = GameObject.Find("Prototype Player");
+            GameObject player = GameObject.Find("Player") ?? GameObject.Find("Prototype Player");
             if (player == null)
             {
                 player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -305,7 +341,7 @@ namespace RollfaehrenFury.Editor
             }
 
             player.transform.position = PlayerStartPosition;
-            player.transform.rotation = Quaternion.identity;
+            player.transform.rotation = PlayerStartRotation;
 
             HidePrimitivePlayerShell(player);
 
@@ -531,30 +567,57 @@ namespace RollfaehrenFury.Editor
             return definition;
         }
 
-        private static Transform[] EnsureSpawnPoints()
+        private static Transform[] EnsureSpawnPoints(Transform ferry)
         {
-            GameObject parent = GameObject.Find("Enemy Spawn Points");
+            Vector3[] positions =
+            {
+                new Vector3(-58.7f, 5.15f, -39.1f),
+                new Vector3(57.3f, 5.15f, -39.1f),
+                new Vector3(-65.7f, 5.15f, -5.1f),
+                new Vector3(64.3f, 5.15f, -5.1f),
+                new Vector3(-58.7f, 5.15f, 28.9f),
+                new Vector3(57.3f, 5.15f, 28.9f)
+            };
+
+            return RebuildSpawnPointGroup("Fish Spawn Points", ferry, "Fish Spawn", positions);
+        }
+
+        private static Transform[] EnsurePigeonSpawnPoints(Transform ferry)
+        {
+            Vector3[] positions =
+            {
+                new Vector3(-52f, 22f, -42f),
+                new Vector3(52f, 25f, -42f),
+                new Vector3(-68f, 20f, -6f),
+                new Vector3(68f, 26f, -6f),
+                new Vector3(-52f, 24f, 34f),
+                new Vector3(52f, 21f, 34f)
+            };
+
+            return RebuildSpawnPointGroup("Pigeon Spawn Points", ferry, "Pigeon Spawn", positions);
+        }
+
+        private static Transform[] RebuildSpawnPointGroup(string groupName, Transform parentTransform, string pointName, Vector3[] positions)
+        {
+            GameObject oldLegacyGroup = groupName == "Fish Spawn Points" ? GameObject.Find("Enemy Spawn Points") : null;
+            if (oldLegacyGroup != null)
+            {
+                Object.DestroyImmediate(oldLegacyGroup);
+            }
+
+            GameObject parent = GameObject.Find(groupName);
             if (parent != null)
             {
                 Object.DestroyImmediate(parent);
             }
 
-            parent = new GameObject("Enemy Spawn Points");
-            parent.transform.position = EnemySpawnParentPosition;
-            Vector3[] positions =
-            {
-                new Vector3(-58.7f, EnemySpawnHeight, -39.1f),
-                new Vector3(57.3f, EnemySpawnHeight, -39.1f),
-                new Vector3(-65.7f, EnemySpawnHeight, -5.1f),
-                new Vector3(64.3f, EnemySpawnHeight, -5.1f),
-                new Vector3(-58.7f, EnemySpawnHeight, 28.9f),
-                new Vector3(57.3f, EnemySpawnHeight, 28.9f)
-            };
+            parent = new GameObject(groupName);
+            parent.transform.SetParent(parentTransform, false);
 
             Transform[] points = new Transform[positions.Length];
             for (int i = 0; i < positions.Length; i++)
             {
-                GameObject point = new GameObject($"Enemy Spawn {i + 1}");
+                GameObject point = new GameObject($"{pointName} {i + 1}");
                 point.transform.SetParent(parent.transform, false);
                 point.transform.localPosition = positions[i];
                 points[i] = point.transform;
@@ -678,7 +741,7 @@ namespace RollfaehrenFury.Editor
             SimpleEnemy enemyPrefab,
             Transform[] spawnPoints)
         {
-            GameObject managerObject = GameObject.Find("Prototype Game Manager");
+            GameObject managerObject = GameObject.Find("Game Manager") ?? GameObject.Find("Prototype Game Manager");
             if (managerObject == null)
             {
                 managerObject = new GameObject("Prototype Game Manager");
@@ -693,7 +756,6 @@ namespace RollfaehrenFury.Editor
             SetObject(gameManager, "weaponSystem", weaponSystem);
             SetObject(gameManager, "hud", hud);
             SetBool(gameManager, "startOnPlay", true);
-            SetFloat(gameManager, "crossingDuration", 45f);
             SetInt(gameManager, "startingMoney", 100);
 
             SetObject(spawner, "enemyPrefab", enemyPrefab);
@@ -784,8 +846,13 @@ namespace RollfaehrenFury.Editor
                 machine.name = "Vending Machine";
             }
 
-            machine.transform.position = VendingMachinePosition;
-            machine.transform.rotation = Quaternion.identity;
+            GameObject ferry = GameObject.Find("Ferry");
+            if (ferry != null)
+            {
+                machine.transform.SetParent(ferry.transform, false);
+                machine.transform.localPosition = VendingMachineLocalPosition;
+                machine.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+            }
             machine.transform.localScale = new Vector3(1f, 2f, 1f);
 
             Renderer renderer = machine.GetComponent<Renderer>();
@@ -805,18 +872,281 @@ namespace RollfaehrenFury.Editor
             GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
             if (canvasObject == null)
             {
+                canvasObject = Object.FindFirstObjectByType<SimpleHUD>()?.gameObject;
+            }
+
+            if (canvasObject == null)
+            {
                 return null;
             }
 
             Transform existing = canvasObject.transform.Find("Shop Prompt");
             if (existing != null)
             {
+                Text existingPrompt = existing.GetComponent<Text>();
+                if (existingPrompt != null)
+                {
+                    existingPrompt.text = "Press E - Shop";
+                    EditorUtility.SetDirty(existingPrompt);
+                }
+
                 return existing.gameObject;
             }
 
-            Text prompt = CreateText(canvasObject.transform, "Shop Prompt", "Press B  -  Shop", new Vector2(0f, 140f), new Vector2(360f, 40f), 24, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            Text prompt = CreateText(canvasObject.transform, "Shop Prompt", "Press E - Shop", new Vector2(0f, 140f), new Vector2(360f, 40f), 24, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
             prompt.gameObject.SetActive(false);
             return prompt.gameObject;
+        }
+
+        private static void EnsureFerryRoundFlow(
+            GameObject ferry,
+            FerryDamageTarget ferryTarget,
+            SimpleFPSController player,
+            GameManager gameManager,
+            EnemySpawner spawner,
+            SimpleHUD hud)
+        {
+            RemovePlacedPigeon();
+
+            Transform routeRoot = EnsureRootTransform("Ferry Route");
+            Transform dockA = EnsureChildTransform(routeRoot, "Dock A");
+            Transform dockB = EnsureChildTransform(routeRoot, "Dock B");
+            Vector3 dockOffset = FerryDockBPosition - FerryStartPosition;
+            dockA.position = ferry.transform.position;
+            dockB.position = ferry.transform.position + dockOffset;
+            dockA.rotation = ferry.transform.rotation;
+            dockB.rotation = ferry.transform.rotation;
+
+            Rigidbody ferryBody = EnsureComponent<Rigidbody>(ferry);
+            ferryBody.useGravity = false;
+            ferryBody.isKinematic = true;
+            ferryBody.interpolation = RigidbodyInterpolation.Interpolate;
+
+            FerryController ferryController = EnsureComponent<FerryController>(ferry);
+            SetObject(ferryController, "dockA", dockA);
+            SetObject(ferryController, "dockB", dockB);
+            SetObject(ferryController, "playerController", player);
+            SetFloat(ferryController, "crossingSpeed", 12f);
+            SetObject(gameManager, "ferryController", ferryController);
+
+            Transform[] fishPoints = EnsureSpawnPoints(ferry.transform);
+            Transform[] pigeonPoints = EnsurePigeonSpawnPoints(ferry.transform);
+            SimpleEnemy fishPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AnimatedEnemyPrefabPath)?.GetComponent<SimpleEnemy>();
+            SimpleEnemy pigeonPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PigeonEnemyPrefabPath)?.GetComponent<SimpleEnemy>();
+            ConfigureEnemyProfiles(spawner, fishPrefab, fishPoints, pigeonPrefab, pigeonPoints);
+            SetObject(spawner, "ferryTarget", ferryTarget);
+            SetObject(spawner, "enemyPrefab", fishPrefab);
+            SetObjectArray(spawner, "spawnPoints", fishPoints);
+
+            EnsureVendingMachine(gameManager);
+            EnsureRoundStartConsole(ferry.transform, gameManager, hud);
+            EnsureGameplayPauseUi(gameManager, hud);
+        }
+
+        private static void RemovePlacedPigeon()
+        {
+            SimpleEnemy[] sceneEnemies = Object.FindObjectsByType<SimpleEnemy>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (SimpleEnemy enemy in sceneEnemies)
+            {
+                if (enemy.gameObject.scene.IsValid()
+                    && enemy.gameObject.name.StartsWith("CHAR_Pigeon", System.StringComparison.Ordinal))
+                {
+                    Object.DestroyImmediate(enemy.gameObject);
+                }
+            }
+        }
+
+        private static Transform EnsureRootTransform(string name)
+        {
+            GameObject root = GameObject.Find(name);
+            if (root == null)
+            {
+                root = new GameObject(name);
+            }
+
+            return root.transform;
+        }
+
+        private static Transform EnsureChildTransform(Transform parent, string name)
+        {
+            Transform child = parent.Find(name);
+            if (child == null)
+            {
+                child = new GameObject(name).transform;
+                child.SetParent(parent, false);
+            }
+
+            return child;
+        }
+
+        private static void ConfigureEnemyProfiles(
+            EnemySpawner spawner,
+            SimpleEnemy fishPrefab,
+            Transform[] fishPoints,
+            SimpleEnemy pigeonPrefab,
+            Transform[] pigeonPoints)
+        {
+            SerializedObject serializedSpawner = new SerializedObject(spawner);
+            SerializedProperty profiles = serializedSpawner.FindProperty("enemyProfiles");
+            profiles.arraySize = 2;
+            ConfigureEnemyProfileProperty(profiles.GetArrayElementAtIndex(0), "Fish", fishPrefab, fishPoints, 1, 0.7f);
+            ConfigureEnemyProfileProperty(profiles.GetArrayElementAtIndex(1), "Pigeon", pigeonPrefab, pigeonPoints, 2, 0.3f);
+            serializedSpawner.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(spawner);
+        }
+
+        private static void ConfigureEnemyProfileProperty(
+            SerializedProperty profile,
+            string displayName,
+            SimpleEnemy prefab,
+            Transform[] points,
+            int firstRound,
+            float weight)
+        {
+            profile.FindPropertyRelative("displayName").stringValue = displayName;
+            profile.FindPropertyRelative("prefab").objectReferenceValue = prefab;
+            profile.FindPropertyRelative("firstRound").intValue = firstRound;
+            profile.FindPropertyRelative("spawnWeight").floatValue = weight;
+            profile.FindPropertyRelative("useFixedSpawnHeight").boolValue = false;
+
+            SerializedProperty spawnPointProperty = profile.FindPropertyRelative("spawnPoints");
+            spawnPointProperty.arraySize = points.Length;
+            for (int i = 0; i < points.Length; i++)
+            {
+                spawnPointProperty.GetArrayElementAtIndex(i).objectReferenceValue = points[i];
+            }
+        }
+
+        private static void EnsureRoundStartConsole(Transform ferry, GameManager gameManager, SimpleHUD hud)
+        {
+            GameObject console = FindChild(ferry, "Round Start Console");
+            if (console == null)
+            {
+                console = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                console.name = "Round Start Console";
+                console.transform.SetParent(ferry, false);
+            }
+
+            console.transform.localPosition = RoundConsoleLocalPosition;
+            console.transform.localRotation = Quaternion.identity;
+            console.transform.localScale = new Vector3(1.2f, 0.8f, 0.8f);
+            console.GetComponent<Renderer>().sharedMaterial = EnsureMaterial(
+                "Assets/Materials/PrototypeRoundConsole.mat",
+                new Color(0.15f, 0.55f, 0.32f));
+
+            BoxCollider collider = EnsureComponent<BoxCollider>(console);
+            collider.isTrigger = true;
+            collider.size = new Vector3(3f, 3f, 3f);
+
+            GameObject lever = FindChild(console.transform, "Lever");
+            if (lever == null)
+            {
+                lever = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                lever.name = "Lever";
+                lever.transform.SetParent(console.transform, false);
+                Object.DestroyImmediate(lever.GetComponent<Collider>());
+            }
+
+            lever.transform.localPosition = new Vector3(0f, 0.85f, 0f);
+            lever.transform.localRotation = Quaternion.Euler(0f, 0f, -25f);
+            lever.transform.localScale = new Vector3(0.12f, 0.9f, 0.12f);
+            lever.GetComponent<Renderer>().sharedMaterial = EnsureMaterial(
+                "Assets/Materials/PrototypeRoundConsoleLever.mat",
+                new Color(0.9f, 0.22f, 0.12f));
+
+            GameObject prompt = EnsureHudPrompt(hud.transform, "Round Start Prompt", "Press E - Start crossing", new Vector2(0f, 95f));
+            RoundStartConsole interaction = EnsureComponent<RoundStartConsole>(console);
+            SetObject(interaction, "gameManager", gameManager);
+            SetFloat(interaction, "interactRange", 3.5f);
+            SetObject(interaction, "promptObject", prompt);
+        }
+
+        private static GameObject EnsureHudPrompt(Transform hud, string name, string text, Vector2 position)
+        {
+            Transform existing = hud.Find(name);
+            Text prompt;
+            if (existing != null)
+            {
+                prompt = existing.GetComponent<Text>();
+            }
+            else
+            {
+                prompt = CreateText(hud, name, text, position, new Vector2(440f, 40f), 24, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            }
+
+            prompt.text = text;
+            prompt.gameObject.SetActive(false);
+            return prompt.gameObject;
+        }
+
+        private static void EnsureGameplayPauseUi(GameManager gameManager, SimpleHUD hud)
+        {
+            GameObject inputObject = GameObject.Find("Gameplay Menu Input");
+            if (inputObject == null)
+            {
+                inputObject = new GameObject("Gameplay Menu Input");
+            }
+
+            GameplayMenuInput[] staleInputs = Object.FindObjectsByType<GameplayMenuInput>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            foreach (GameplayMenuInput staleInput in staleInputs)
+            {
+                if (staleInput.gameObject != inputObject)
+                {
+                    Object.DestroyImmediate(staleInput);
+                }
+            }
+
+            GameplayMenuInput pauseInput = EnsureComponent<GameplayMenuInput>(inputObject);
+            SetObject(pauseInput, "gameManager", gameManager);
+
+            Transform oldPause = hud.transform.Find("Pause Panel");
+            if (oldPause != null)
+            {
+                Object.DestroyImmediate(oldPause.gameObject);
+            }
+
+            Transform oldSettings = hud.transform.Find("Pause Settings Panel");
+            if (oldSettings != null)
+            {
+                Object.DestroyImmediate(oldSettings.gameObject);
+            }
+
+            GameObject pausePanel = CreateUiPanel(hud.transform, "Pause Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(560f, 520f));
+            EnsureComponent<Image>(pausePanel).color = new Color(0.035f, 0.055f, 0.075f, 0.96f);
+            CreateText(pausePanel.transform, "Pause Title", "Paused", new Vector2(0f, 205f), new Vector2(500f, 48f), 34, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateButton(pausePanel.transform, "Pause Resume Button", "Resume", new Vector2(0f, 125f), out Button resume);
+            CreateButton(pausePanel.transform, "Pause New Game Button", "New Game", new Vector2(0f, 65f), out Button newGame);
+            CreateButton(pausePanel.transform, "Pause Settings Button", "Settings", new Vector2(0f, 5f), out Button settings);
+            CreateButton(pausePanel.transform, "Pause Main Menu Button", "Main Menu", new Vector2(0f, -55f), out Button mainMenu);
+            CreateButton(pausePanel.transform, "Pause Quit Button", "Quit", new Vector2(0f, -115f), out Button quit);
+
+            GameObject settingsPanel = CreateUiPanel(hud.transform, "Pause Settings Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(560f, 320f));
+            EnsureComponent<Image>(settingsPanel).color = new Color(0.035f, 0.055f, 0.075f, 0.96f);
+            CreateText(settingsPanel.transform, "Pause Settings Title", "Settings", new Vector2(0f, 105f), new Vector2(500f, 44f), 32, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateText(settingsPanel.transform, "Pause Settings Placeholder", "Settings options are coming later.", new Vector2(0f, 25f), new Vector2(500f, 36f), 20, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter);
+            CreateButton(settingsPanel.transform, "Pause Settings Back Button", "Back", new Vector2(0f, -85f), out Button back);
+
+            resume.onClick.RemoveAllListeners();
+            newGame.onClick.RemoveAllListeners();
+            settings.onClick.RemoveAllListeners();
+            mainMenu.onClick.RemoveAllListeners();
+            quit.onClick.RemoveAllListeners();
+            back.onClick.RemoveAllListeners();
+            UnityEventTools.AddPersistentListener(resume.onClick, pauseInput.Resume);
+            UnityEventTools.AddPersistentListener(newGame.onClick, pauseInput.RestartRun);
+            UnityEventTools.AddPersistentListener(settings.onClick, pauseInput.ShowSettings);
+            UnityEventTools.AddPersistentListener(mainMenu.onClick, pauseInput.ReturnToMenu);
+            UnityEventTools.AddPersistentListener(quit.onClick, pauseInput.QuitGame);
+            UnityEventTools.AddPersistentListener(back.onClick, pauseInput.BackToPause);
+
+            SetObject(pauseInput, "pausePanel", pausePanel);
+            SetObject(pauseInput, "settingsPanel", settingsPanel);
+            pausePanel.SetActive(false);
+            settingsPanel.SetActive(false);
         }
 
         private static void EnsureAugmentSystem(GameManager gameManager, EnemySpawner spawner)

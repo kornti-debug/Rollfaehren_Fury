@@ -95,3 +95,7 @@ Do not build gameplay around audio before the gameplay event exists. First creat
 The playable MVP branch has a `PrototypeAudioEvents` component that can post the first seven event names above. Missing events and missing banks must not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.
 
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by default so missing Wwise events do not spam the Unity Console. Enable it in the Inspector after the matching Wwise events exist and the soundbanks have been regenerated.
+
+The ferry crossing and enemy-type work does not enable Wwise automatically.
+Generate banks locally and verify authored events only after the gameplay scene
+passes without audio.

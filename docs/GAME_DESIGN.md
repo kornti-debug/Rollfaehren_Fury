@@ -10,14 +10,14 @@ The first target is a prototype, not a content-heavy finished game. Placeholder 
 
 1. Start from the main menu.
 2. Enter the game scene on the ferry.
-3. Ferry begins crossing from shore 1 to shore 2.
-4. Enemies spawn and attack.
-5. Player shoots enemies.
-6. Kills grant money.
-7. Surviving the crossing grants a small round reward.
-8. Player reaches shop/upgrade phase.
-9. Player buys upgrades.
-10. Next round begins with harder enemies.
+3. Player starts the ferry from its house console.
+4. Ferry physically crosses from its current shore to the opposite jetty.
+5. Enemies spawn and attack.
+6. Player shoots enemies.
+7. Kills grant money.
+8. Docking grants a small round reward.
+9. Player chooses an augment and prepares at the opposite shore.
+10. Next round crosses back with harder enemies.
 11. Ferry destruction triggers game over.
 
 ## Scenes and States
@@ -27,10 +27,14 @@ Minimum flow:
 ```text
 Bootstrap -> Main Menu -> Game Scene -> Shop/Upgrade -> Game Scene
                                   -> Game Over
-Game Scene -> Main Menu via Cancel/Esc
+Game Scene -> Pause overlay -> Resume / New Game / Settings / Main Menu / Quit
 ```
 
-The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene, `Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and `Assets/Scenes/Main.unity` for gameplay. Shop and game over are UI panels inside the gameplay scene.
+Each round begins in a docked preparation state. The player may use the vending
+machine, then walks into the ferry house and presses `E` at the start console.
+Enemies and ferry movement begin only after this interaction.
+
+The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene, `Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and `Assets/Scenes/Main.unity` for gameplay. Preparation, shop, pause, augment, and game over are states or overlays inside the gameplay scene.
 
 ## Player Fantasy
 
@@ -58,11 +62,11 @@ Reward condition:
 
 ## Enemies
 
-Prototype enemy priority:
+Current enemy types:
 
-1. One simple enemy that approaches and damages the ferry.
-2. One variation with more health or faster movement.
-3. Later: birds, bats, vampires, swimming enemies, or small boats.
+1. Fish spawn at river-surface points and approach horizontally from round 1.
+2. Pigeons spawn at aerial points, dive in full 3D, and join the mix from round 2.
+3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
 Enemy behavior should be simple:
 
