@@ -131,11 +131,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 ## Audio and Wwise
 
-- [ ] Confirm Wwise project opens.
+- [x] Confirm Wwise project opens.
 - [x] Import the authored Wwise containers, events, SoundBank definition, and source audio.
 - [x] Add guarded `Play_Steps` footsteps to the current player.
-- [ ] Generate initial soundbanks.
-- [x] Keep Wwise runtime disabled by default for fresh clones without soundbanks.
+- [x] Generate and test the initial Windows SoundBanks locally.
+- [x] Enable `WwiseGlobal` in the shared gameplay scene.
 - [x] Keep ferry/round-flow changes independent from local generated SoundBanks.
 - [x] Hook shooting event in Unity.
 - [x] Hook enemy death event.

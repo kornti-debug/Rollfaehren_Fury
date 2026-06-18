@@ -65,7 +65,10 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 
 ## Soundbank Workflow
 
-Generated soundbanks are ignored by Git for now, so a fresh clone should be playable without Wwise banks. `WwiseGlobal` is disabled in `Main.unity` by default and `PrototypeAudioEvents.postEvents` stays disabled until the team has real events and generated banks.
+Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
+`Main.unity`, so each teammate must generate `MainSoundBank` locally before
+entering Play Mode. `PrototypeAudioEvents.postEvents` stays disabled until the
+remaining general gameplay events exist.
 
 Authored content currently tracked in the repository:
 
@@ -80,14 +83,14 @@ Local footsteps test:
 1. Open `Rollfaehren_Fury_WwiseProject.wproj`.
 2. Generate `MainSoundBank` for Windows.
 3. Open `Assets/Scenes/Main.unity`.
-4. Enable `WwiseGlobal` locally.
+4. Confirm `WwiseGlobal` is enabled.
 5. Enter Play Mode and walk/sprint.
 6. Confirm `Play_Steps` plays at different walk and sprint intervals.
 
 `PlayerFootsteps` is already attached to the player and references
-`Play_Steps`. `WwiseGlobal` references `MainSoundBank` but remains disabled in
-the committed scene. The script checks `AkUnitySoundEngine.IsInitialized()`
-before posting, so teammates without generated banks can still play normally.
+`Play_Steps`. `WwiseGlobal` references `MainSoundBank` and is enabled in the
+committed scene. The script checks `AkUnitySoundEngine.IsInitialized()` before
+posting, but missing local banks will still produce Wwise initialization errors.
 
 `Play_HaraldKrullSpeaking` is preserved but is not connected to gameplay yet.
 Do not commit locally generated banks unless the team changes the current

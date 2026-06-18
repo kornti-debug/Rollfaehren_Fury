@@ -89,7 +89,10 @@ Current manual setup:
 6. Walk or sprint to verify the `Play_Steps` footstep event.
 7. See [WWISE.md](WWISE.md) for details.
 
-The gameplay prototype is intentionally configured so Wwise is optional in fresh clones: `WwiseGlobal` is disabled in `Main.unity`, generated soundbanks are ignored, general gameplay event posting is off by default, and footsteps check that the Wwise engine is initialized before posting. Enable Wwise only after generating soundbanks locally.
+`WwiseGlobal` is enabled in `Main.unity`, while generated SoundBanks remain
+ignored by Git. Every fresh clone must therefore generate `MainSoundBank`
+locally before entering Play Mode. Footsteps still check that the Wwise engine
+is initialized before posting.
 
 ## Git Hooks (one-time)
 

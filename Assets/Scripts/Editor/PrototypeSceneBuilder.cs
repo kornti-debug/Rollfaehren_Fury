@@ -837,7 +837,7 @@ namespace RollfaehrenFury.Editor
 
             AkBank bank = EnsureComponent<AkBank>(wwiseGlobal);
             SetWwiseReference(bank, "data", MainSoundBankReferencePath);
-            wwiseGlobal.SetActive(false);
+            wwiseGlobal.SetActive(true);
             EditorUtility.SetDirty(wwiseGlobal);
         }
 
