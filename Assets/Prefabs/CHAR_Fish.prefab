@@ -166,6 +166,8 @@ MonoBehaviour:
   contactDamage: 10
   killReward: 10
   faceTarget: 1
+  contactEffectPrefab: {fileID: 1526100735404244297, guid: 57c2861ca1a64c5409ab415d8564f3b0, type: 3}
+  contactEffectDuration: 1.2583333
   reachedFerry:
     m_PersistentCalls:
       m_Calls: []

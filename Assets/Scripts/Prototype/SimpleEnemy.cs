@@ -19,6 +19,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;
+        [SerializeField] private GameObject contactEffectPrefab;
+        [SerializeField] private float contactEffectDuration = 1.25f;
         [SerializeField] private UnityEvent reachedFerry = new UnityEvent();
         [SerializeField] private UnityEvent diedFromDamage = new UnityEvent();
 
@@ -59,7 +61,7 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
-            if (ferryTarget == null)
+            if (ferryTarget == null || hasHitFerry)
             {
                 return;
             }
@@ -130,6 +132,13 @@ namespace RollfaehrenFury.Prototype
             target.ApplyEnemyDamage(contactDamage);
             gameManager?.RegisterEnemyReachedFerry(this, contactDamage);
             reachedFerry.Invoke();
+
+            if (contactEffectPrefab != null)
+            {
+                GameObject effect = Instantiate(contactEffectPrefab, transform.position, transform.rotation);
+                Destroy(effect, Mathf.Max(0.1f, contactEffectDuration));
+            }
+
             Destroy(gameObject);
         }
 

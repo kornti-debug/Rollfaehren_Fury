@@ -84,6 +84,10 @@ Enemy behavior should be simple:
 - Take damage.
 - Die and reward money.
 
+Fish contact has a short visual payoff: the fish damages the ferry, plays its
+explosion effect, then disappears. The effect does not delay or repeat the
+damage.
+
 ## Weapons
 
 Prototype weapon:

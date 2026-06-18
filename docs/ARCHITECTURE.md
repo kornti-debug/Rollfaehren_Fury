@@ -86,6 +86,10 @@ Planned systems and responsibilities:
   state and posts the authored Wwise `Play_Steps` event at walk/sprint
   intervals. It posts only while the Wwise engine is initialized, so missing
   local SoundBanks do not block gameplay.
+- The player's hidden controller capsule owns the camera, movement, weapons,
+  and collisions. Its child `Fraunz Visual` uses the revised `CHAR_Fraunz`
+  prefab and `FraunzGameplay.controller`: the existing idle clip is the
+  `Idle` state and the revised `Armature|WalkCycle` is the `Running` state.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
@@ -96,6 +100,11 @@ ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
 The pigeon prefab owns an `AlwaysAnimate` Animator using
 `PigeonAnimator.controller`; movement remains script-driven with root motion off.
+The moving fish keeps the proven `CarpAnimator.controller` on its gameplay
+root. On contact, `SimpleEnemy` applies ferry damage once, spawns the temporary
+`FishContactExplosion` visual, then immediately removes the gameplay fish.
+Keeping the second FBX animation on a separate effect prevents animation
+root-transform curves from interfering with scripted enemy navigation.
 
 ## Key Relationships
 

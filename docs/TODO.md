@@ -118,7 +118,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 - [x] Low-poly ferry model.
 - [x] Import the revised Fraunz rig, walk-cycle controller, and character prefab.
-- [ ] Replace the current player visual with the revised Fraunz prefab after animation testing.
+- [x] Replace the current player visual with the revised Fraunz prefab and walking animation.
+- [ ] Verify the revised Fraunz idle/walking animation in Play Mode.
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
@@ -129,7 +130,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Weapon model.
 - [x] First enemy model: animated carp prefab.
 - [x] Import the fish explosion animation asset.
-- [ ] Trigger the fish explosion animation from enemy death.
+- [x] Play the fish explosion animation when it reaches and damages the ferry.
+- [ ] Verify fish still approach the ferry and the contact explosion timing in Play Mode.
 - [x] Vending-machine shop prop.
 - [ ] Optional civilian NPCs.
 
