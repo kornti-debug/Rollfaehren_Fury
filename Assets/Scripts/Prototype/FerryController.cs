@@ -10,11 +10,18 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Transform dockB;
         [SerializeField] private SimpleFPSController playerController;
         [SerializeField, Min(0.1f)] private float crossingSpeed = 12f;
+        [SerializeField, Min(0f)] private float departureDistance = 35f;
+        [SerializeField, Range(16, 128)] private int routeSamples = 64;
 
         private Rigidbody ferryBody;
-        private Vector3 crossingStart;
-        private Vector3 crossingDestination;
-        private float crossingDistance = 1f;
+        private Vector3 routeStart;
+        private Vector3 routeStartHandle;
+        private Vector3 routeEndHandle;
+        private Vector3 routeEnd;
+        private Quaternion routeEndRotation;
+        private float[] routeDistances;
+        private float routeLength = 1f;
+        private float traveledDistance;
         private float speedMultiplier = 1f;
         private bool atDockA = true;
 
@@ -29,6 +36,7 @@ namespace RollfaehrenFury.Prototype
             ferryBody = GetComponent<Rigidbody>();
             ferryBody.isKinematic = true;
             ferryBody.useGravity = false;
+            ferryBody.interpolation = RigidbodyInterpolation.None;
 
             if (playerController == null)
             {
@@ -36,27 +44,41 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private void FixedUpdate()
+        private void LateUpdate()
         {
             if (!IsCrossing)
             {
                 return;
             }
 
-            Vector3 current = ferryBody.position;
-            float step = crossingSpeed * speedMultiplier * Time.fixedDeltaTime;
-            Vector3 next = Vector3.MoveTowards(current, crossingDestination, step);
-            Vector3 delta = next - current;
+            Vector3 previousPosition = transform.position;
+            Quaternion previousRotation = transform.rotation;
 
-            ferryBody.MovePosition(next);
-            playerController?.MoveWithPlatform(delta);
+            traveledDistance = Mathf.Min(
+                routeLength,
+                traveledDistance + crossingSpeed * speedMultiplier * Time.deltaTime);
+            float routeT = GetRouteParameter(traveledDistance);
+            Vector3 nextPosition = EvaluateRoute(routeT);
+            Vector3 tangent = EvaluateRouteTangent(routeT);
+            Quaternion nextRotation = tangent.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(tangent.normalized, Vector3.up)
+                : previousRotation;
 
-            float remaining = Vector3.Distance(next, crossingDestination);
-            Progress = crossingDistance <= 0.001f
+            if (traveledDistance >= routeLength)
+            {
+                nextPosition = routeEnd;
+                nextRotation = routeEndRotation;
+            }
+
+            transform.SetPositionAndRotation(nextPosition, nextRotation);
+            Physics.SyncTransforms();
+            playerController?.MoveWithPlatform(previousPosition, previousRotation, nextPosition, nextRotation);
+
+            Progress = routeLength <= 0.001f
                 ? 1f
-                : Mathf.Clamp01(1f - remaining / crossingDistance);
+                : Mathf.Clamp01(traveledDistance / routeLength);
 
-            if (remaining <= 0.01f)
+            if (traveledDistance >= routeLength)
             {
                 FinishCrossing();
             }
@@ -77,9 +99,8 @@ namespace RollfaehrenFury.Prototype
                 return false;
             }
 
-            crossingStart = ferryBody.position;
-            crossingDestination = destination.position;
-            crossingDistance = Mathf.Max(0.001f, Vector3.Distance(crossingStart, crossingDestination));
+            BuildRoute(transform, destination);
+            traveledDistance = 0f;
             Progress = 0f;
             IsCrossing = true;
             return true;
@@ -97,10 +118,15 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            Vector3 delta = dockA.position - transform.position;
-            ferryBody.position = dockA.position;
-            transform.position = dockA.position;
-            playerController?.MoveWithPlatform(delta);
+            Vector3 previousPosition = transform.position;
+            Quaternion previousRotation = transform.rotation;
+            transform.SetPositionAndRotation(dockA.position, dockA.rotation);
+            Physics.SyncTransforms();
+            playerController?.MoveWithPlatform(
+                previousPosition,
+                previousRotation,
+                dockA.position,
+                dockA.rotation);
         }
 
         public void Stop()
@@ -119,6 +145,72 @@ namespace RollfaehrenFury.Prototype
             Progress = 1f;
             atDockA = !atDockA;
             Arrived?.Invoke();
+        }
+
+        private void BuildRoute(Transform start, Transform destination)
+        {
+            routeStart = start.position;
+            routeEnd = destination.position;
+            routeEndRotation = destination.rotation;
+            routeStartHandle = routeStart + start.forward * departureDistance;
+            routeEndHandle = routeEnd - destination.forward * departureDistance;
+
+            int sampleCount = Mathf.Clamp(routeSamples, 16, 128);
+            routeDistances = new float[sampleCount + 1];
+            Vector3 previous = routeStart;
+            float distance = 0f;
+
+            for (int i = 1; i <= sampleCount; i++)
+            {
+                float t = i / (float)sampleCount;
+                Vector3 point = EvaluateRoute(t);
+                distance += Vector3.Distance(previous, point);
+                routeDistances[i] = distance;
+                previous = point;
+            }
+
+            routeLength = Mathf.Max(0.001f, distance);
+        }
+
+        private float GetRouteParameter(float distance)
+        {
+            if (routeDistances == null || routeDistances.Length < 2)
+            {
+                return Mathf.Clamp01(distance / routeLength);
+            }
+
+            int lastIndex = routeDistances.Length - 1;
+            for (int i = 1; i <= lastIndex; i++)
+            {
+                if (distance > routeDistances[i])
+                {
+                    continue;
+                }
+
+                float segmentStart = routeDistances[i - 1];
+                float segmentLength = Mathf.Max(0.0001f, routeDistances[i] - segmentStart);
+                float segmentT = (distance - segmentStart) / segmentLength;
+                return ((i - 1) + segmentT) / lastIndex;
+            }
+
+            return 1f;
+        }
+
+        private Vector3 EvaluateRoute(float t)
+        {
+            float inverse = 1f - t;
+            return inverse * inverse * inverse * routeStart
+                + 3f * inverse * inverse * t * routeStartHandle
+                + 3f * inverse * t * t * routeEndHandle
+                + t * t * t * routeEnd;
+        }
+
+        private Vector3 EvaluateRouteTangent(float t)
+        {
+            float inverse = 1f - t;
+            return 3f * inverse * inverse * (routeStartHandle - routeStart)
+                + 6f * inverse * t * (routeEndHandle - routeStartHandle)
+                + 3f * t * t * (routeEnd - routeEndHandle);
         }
     }
 }

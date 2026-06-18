@@ -27,7 +27,7 @@ namespace RollfaehrenFury.Editor
         private const float PlayerVisualScale = 0.85f;
 
         private static readonly Vector3 FerryStartPosition = new Vector3(261.30118f, 1.85f, 483.7371f);
-        private static readonly Vector3 FerryDockBPosition = new Vector3(796.6012f, 1.85f, 509.9571f);
+        private static readonly Vector3 FerryDockBPosition = new Vector3(733.9988f, 1.85f, 493.8429f);
         private static readonly Vector3 PlayerStartPosition = new Vector3(259.54834f, 12.25f, 480.7458f);
         private static readonly Quaternion FerryStartRotation = Quaternion.Euler(0f, 177.139f, 0f);
         private static readonly Quaternion PlayerStartRotation = Quaternion.Euler(0f, 87.139f, 0f);
@@ -920,13 +920,15 @@ namespace RollfaehrenFury.Editor
             Rigidbody ferryBody = EnsureComponent<Rigidbody>(ferry);
             ferryBody.useGravity = false;
             ferryBody.isKinematic = true;
-            ferryBody.interpolation = RigidbodyInterpolation.Interpolate;
+            ferryBody.interpolation = RigidbodyInterpolation.None;
 
             FerryController ferryController = EnsureComponent<FerryController>(ferry);
             SetObject(ferryController, "dockA", dockA);
             SetObject(ferryController, "dockB", dockB);
             SetObject(ferryController, "playerController", player);
             SetFloat(ferryController, "crossingSpeed", 12f);
+            SetFloat(ferryController, "departureDistance", 35f);
+            SetInt(ferryController, "routeSamples", 64);
             SetObject(gameManager, "ferryController", ferryController);
 
             Transform[] fishPoints = EnsureSpawnPoints(ferry.transform);

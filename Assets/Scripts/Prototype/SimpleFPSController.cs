@@ -99,14 +99,23 @@ namespace RollfaehrenFury.Prototype
             SetCursorLocked(isEnabled && lockCursorOnPlay);
         }
 
-        public void MoveWithPlatform(Vector3 displacement)
+        public void MoveWithPlatform(
+            Vector3 previousPlatformPosition,
+            Quaternion previousPlatformRotation,
+            Vector3 platformPosition,
+            Quaternion platformRotation)
         {
-            if (controller == null || displacement.sqrMagnitude <= 0f)
+            if (controller == null)
             {
                 return;
             }
 
+            Quaternion rotationDelta = platformRotation * Quaternion.Inverse(previousPlatformRotation);
+            Vector3 previousOffset = transform.position - previousPlatformPosition;
+            Vector3 targetPosition = platformPosition + rotationDelta * previousOffset;
+            Vector3 displacement = targetPosition - transform.position;
             controller.Move(displacement);
+            transform.rotation = rotationDelta * transform.rotation;
         }
 
         private void BindInputActions()

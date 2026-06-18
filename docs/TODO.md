@@ -61,6 +61,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Implement ferry crossing progress.
 - [x] Add physical dock-to-dock ferry controller and arrival-driven round completion.
 - [x] Add alternating Dock A/Dock B route support.
+- [x] Replace sideways linear travel with a curved bow-first route and dock turns.
+- [x] Correct Dock B to remain on the river side of the opposite jetty.
+- [ ] Verify ferry/player motion is visually stable without shaking.
 - [ ] Verify the player remains aboard during a full crossing.
 - [x] Add ferry health.
 - [ ] Add visible damage or warning feedback.

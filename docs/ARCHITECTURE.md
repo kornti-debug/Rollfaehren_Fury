@@ -79,7 +79,8 @@ Planned systems and responsibilities:
   `Preparation`; `Player/Interact` starts the next crossing.
 - `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. v1 augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP). The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.
 - `FerryController`: moves a kinematic ferry between two dock transforms,
-  carries the player CharacterController by frame displacement, reports
+  follows a sampled cubic route aligned to each dock's forward direction,
+  carries the player through matching translation and rotation, reports
   distance-based progress, and signals arrival to `GameManager`.
 - `Cargo`: later destructible cargo with reward value.
 
