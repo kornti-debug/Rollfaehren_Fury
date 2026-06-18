@@ -82,6 +82,10 @@ Planned systems and responsibilities:
   follows a sampled cubic route aligned to each dock's forward direction,
   carries the player through matching translation and rotation, reports
   distance-based progress, and signals arrival to `GameManager`.
+- `PlayerFootsteps`: reads the controller's movement, grounded, and sprint
+  state and posts the authored Wwise `Play_Steps` event at walk/sprint
+  intervals. It posts only while the Wwise engine is initialized, so missing
+  local SoundBanks do not block gameplay.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its

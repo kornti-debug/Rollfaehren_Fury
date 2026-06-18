@@ -50,7 +50,7 @@ Do not commit `Library/`, `Logs/`, `UserSettings/`, generated `.csproj` files, o
    - Crossing completion opens the shop.
    - Ferry health reaching zero opens game over.
 
-If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, menu-return input, and Wwise hook component.
+If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, menu-return input, and guarded Wwise components.
 
 If the menu scenes are missing or broken, run `Rollfaehren Fury > Build Bootstrap And Menu Scenes`. This rebuilds `Bootstrap.unity`, `Menu.unity`, the gameplay menu-return input object, and build settings.
 
@@ -84,10 +84,12 @@ Current manual setup:
 1. Install Wwise `2025.1.5 Build 9095`.
 2. Open `Rollfaehren_Fury_WwiseProject/Rollfaehren_Fury_WwiseProject.wproj` in Wwise.
 3. Open Unity after Wwise is installed.
-4. If Unity reports missing soundbanks, generate them from Wwise.
-5. See [WWISE.md](WWISE.md) for details.
+4. Generate `MainSoundBank` for Windows from Wwise.
+5. In `Main.unity`, enable `WwiseGlobal` locally to test authored audio.
+6. Walk or sprint to verify the `Play_Steps` footstep event.
+7. See [WWISE.md](WWISE.md) for details.
 
-The gameplay prototype is intentionally configured so Wwise is optional in fresh clones: `WwiseGlobal` is disabled in `Main.unity`, generated soundbanks are ignored, and audio event posting is off by default. Enable Wwise only after generating soundbanks locally.
+The gameplay prototype is intentionally configured so Wwise is optional in fresh clones: `WwiseGlobal` is disabled in `Main.unity`, generated soundbanks are ignored, general gameplay event posting is off by default, and footsteps check that the Wwise engine is initialized before posting. Enable Wwise only after generating soundbanks locally.
 
 ## Git Hooks (one-time)
 

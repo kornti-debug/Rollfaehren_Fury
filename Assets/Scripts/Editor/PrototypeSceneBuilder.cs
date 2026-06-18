@@ -23,6 +23,8 @@ namespace RollfaehrenFury.Editor
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/Character/Fraunz/T-Pose.fbx";
         private const string PlayerAnimatorControllerPath = "Assets/Prefabs/Character/Fraunz/FraunzAnimationController.controller";
+        private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
+        private const string MainSoundBankReferencePath = "Assets/Wwise/ScriptableObjects/Soundbank/216757D1-222F-4AA5-8C50-BBE647F38374.asset";
         private const string PlayerVisualName = "Fraunz Visual";
         private const float EnemySpawnHeight = 7f;
         private const float PlayerVisualScale = 0.85f;
@@ -56,6 +58,7 @@ namespace RollfaehrenFury.Editor
             FerryDamageTarget ferryTarget = EnsureFerryDamageTarget(ferry, ferryHealth);
 
             SimpleFPSController playerController = EnsurePlayer();
+            EnsureWwiseFootsteps(playerController);
             WeaponSystem weaponSystem = EnsureWeapon(playerController);
             Transform[] spawnPoints = EnsureSpawnPoints(ferry.transform);
             SimpleEnemy enemyPrefab = EnsureEnemyPrefab(enemyMaterial);
@@ -105,6 +108,7 @@ namespace RollfaehrenFury.Editor
             }
 
             EnsurePigeonAnimator();
+            EnsureWwiseFootsteps(player);
             EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
             EnsureEventSystem();
             EditorSceneManager.MarkSceneDirty(scene);
@@ -117,6 +121,30 @@ namespace RollfaehrenFury.Editor
         public static void UpgradeFerryRoundFlowSceneFromCommandLine()
         {
             UpgradeFerryRoundFlowScene();
+        }
+
+        [MenuItem("Rollfaehren Fury/Integrate Wwise Footsteps")]
+        public static void IntegrateWwiseFootsteps()
+        {
+            Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            SimpleFPSController player = Object.FindFirstObjectByType<SimpleFPSController>();
+            if (player == null)
+            {
+                Debug.LogError("Main.unity is missing the player controller. Run Build Prototype Scene first.");
+                return;
+            }
+
+            EnsureWwiseFootsteps(player);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Wwise footsteps integrated without rebuilding gameplay or UI objects.");
+        }
+
+        public static void IntegrateWwiseFootstepsFromCommandLine()
+        {
+            IntegrateWwiseFootsteps();
         }
 
         [MenuItem("Rollfaehren Fury/Build Bootstrap And Menu Scenes")]
@@ -783,6 +811,34 @@ namespace RollfaehrenFury.Editor
             SetObject(audioEvents, "gameManager", gameManager);
             SetObject(audioEvents, "weaponSystem", weaponSystem);
             SetBool(audioEvents, "postEvents", false);
+        }
+
+        private static void EnsureWwiseFootsteps(SimpleFPSController playerController)
+        {
+            if (playerController == null)
+            {
+                return;
+            }
+
+            GameObject player = playerController.gameObject;
+            EnsureComponent<AkGameObj>(player);
+
+            PlayerFootsteps footsteps = EnsureComponent<PlayerFootsteps>(player);
+            SetFloat(footsteps, "walkInterval", 0.45f);
+            SetFloat(footsteps, "sprintInterval", 0.3f);
+            SetWwiseReference(footsteps, "stepsEvent", StepsEventReferencePath);
+
+            GameObject wwiseGlobal = FindSceneObjectIncludingInactive("WwiseGlobal");
+            if (wwiseGlobal == null)
+            {
+                Debug.LogWarning("WwiseGlobal was not found. The player footsteps are wired, but MainSoundBank could not be assigned.");
+                return;
+            }
+
+            AkBank bank = EnsureComponent<AkBank>(wwiseGlobal);
+            SetWwiseReference(bank, "data", MainSoundBankReferencePath);
+            wwiseGlobal.SetActive(false);
+            EditorUtility.SetDirty(wwiseGlobal);
         }
 
         private static ShopManager EnsureShopManager(GameManager gameManager)
@@ -1544,6 +1600,21 @@ namespace RollfaehrenFury.Editor
             return child != null ? child.gameObject : null;
         }
 
+        private static GameObject FindSceneObjectIncludingInactive(string objectName)
+        {
+            foreach (Transform transform in Object.FindObjectsByType<Transform>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                if (transform.name == objectName)
+                {
+                    return transform.gameObject;
+                }
+            }
+
+            return null;
+        }
+
         private static T EnsureComponent<T>(GameObject gameObject) where T : Component
         {
             T component = gameObject.GetComponent<T>();
@@ -1561,6 +1632,29 @@ namespace RollfaehrenFury.Editor
             }
 
             property.objectReferenceValue = value;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
+        }
+
+        private static void SetWwiseReference(Object target, string propertyName, string assetPath)
+        {
+            Object reference = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+            if (reference == null)
+            {
+                Debug.LogWarning($"Wwise reference asset was not found at '{assetPath}'.", target);
+                return;
+            }
+
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            SerializedProperty referenceProperty = property?.FindPropertyRelative("WwiseObjectReference");
+            if (referenceProperty == null)
+            {
+                Debug.LogWarning($"Wwise property '{propertyName}' was not found on {target.name}.", target);
+                return;
+            }
+
+            referenceProperty.objectReferenceValue = reference;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
         }

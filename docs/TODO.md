@@ -132,7 +132,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 ## Audio and Wwise
 
 - [ ] Confirm Wwise project opens.
-- [ ] Create first test event.
+- [x] Import the authored Wwise containers, events, SoundBank definition, and source audio.
+- [x] Add guarded `Play_Steps` footsteps to the current player.
 - [ ] Generate initial soundbanks.
 - [x] Keep Wwise runtime disabled by default for fresh clones without soundbanks.
 - [x] Keep ferry/round-flow changes independent from local generated SoundBanks.

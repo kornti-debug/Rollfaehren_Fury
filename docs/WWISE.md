@@ -67,18 +67,31 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 
 Generated soundbanks are ignored by Git for now, so a fresh clone should be playable without Wwise banks. `WwiseGlobal` is disabled in `Main.unity` by default and `PrototypeAudioEvents.postEvents` stays disabled until the team has real events and generated banks.
 
-Suggested first workflow for audio work:
+Authored content currently tracked in the repository:
 
-1. Create a test event in Wwise, for example `Play_Test_Click`.
-2. Assign a simple test sound.
-3. Generate soundbanks.
-4. In Unity, enable `WwiseGlobal` in the scene or create it from the Wwise integration if needed.
-5. Enable `PrototypeAudioEvents.postEvents` only after matching events exist.
-6. Add a temporary object with an `AkEvent` or call the event from a test script.
-7. Confirm the sound plays in Play Mode.
-8. Commit Wwise project changes. Commit generated soundbanks only if the team changes the current ignore policy.
+- Random/sequence containers: `Steps`, `HaraldKrullSpeaking`
+- Events: `Play_Steps`, `Play_HaraldKrullSpeaking`
+- User-defined SoundBank: `MainSoundBank`
+- Original footstep and voice WAV files under `Rollfaehren_Fury_WwiseProject/Originals/`
+- Unity Event and SoundBank reference assets under `Assets/Wwise/ScriptableObjects/`
 
-Do not build gameplay around audio before the gameplay event exists. First create the gameplay action, then connect the Wwise event.
+Local footsteps test:
+
+1. Open `Rollfaehren_Fury_WwiseProject.wproj`.
+2. Generate `MainSoundBank` for Windows.
+3. Open `Assets/Scenes/Main.unity`.
+4. Enable `WwiseGlobal` locally.
+5. Enter Play Mode and walk/sprint.
+6. Confirm `Play_Steps` plays at different walk and sprint intervals.
+
+`PlayerFootsteps` is already attached to the player and references
+`Play_Steps`. `WwiseGlobal` references `MainSoundBank` but remains disabled in
+the committed scene. The script checks `AkUnitySoundEngine.IsInitialized()`
+before posting, so teammates without generated banks can still play normally.
+
+`Play_HaraldKrullSpeaking` is preserved but is not connected to gameplay yet.
+Do not commit locally generated banks unless the team changes the current
+ignore policy.
 
 ## Starter Event Ideas
 
