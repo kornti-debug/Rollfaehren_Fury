@@ -9,6 +9,7 @@ Bootstrap
   -> Menu
       -> Main
           -> Docked preparation
+              -> ShopInterior (additive, entered from either shore)
               -> Ferry console starts crossing
                   -> Augment draft
                       -> Docked preparation at opposite shore
@@ -17,7 +18,11 @@ Bootstrap
           -> Pause overlay via Cancel/Esc
 ```
 
-`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds. `Assets/Scenes/Menu.unity` has New Game, Settings, and Quit. `Assets/Scenes/Main.unity` stays the gameplay scene; preparation, shop, pause, augment, and game over remain inside that scene.
+`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds.
+`Assets/Scenes/Menu.unity` has New Game, Settings, and Quit.
+`Assets/Scenes/Main.unity` remains loaded as the authoritative gameplay scene.
+The shared `ShopInterior` scene loads additively, so run state, HUD, player,
+audio, and managers remain owned by Main.
 
 ## Entity Hierarchy
 
@@ -74,7 +79,17 @@ Planned systems and responsibilities:
 - `UpgradeDefinition` (Track B): implemented — polymorphic ScriptableObject upgrade; subclasses define the effect via `Apply(UpgradeContext)`: `WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, and the master `RicochetUpgrade`. Weapon upgrades route through `WeaponSystem` to the active weapon.
 - `ShopManager` (Track B): implemented — holds a catalog of `UpgradeDefinition` assets + parallel UI buttons; purchases go through `GameManager.TryPurchase`. One-off "master" upgrades (non-repeatable) are tracked per run.
 - `ShopInteractable` (Track C): vending-machine interaction available while
-  docked in `Preparation`; it uses the shared `Player/Interact` action.
+  inside the shared shop during `Preparation`; it uses the shared
+  `Player/Interact` action.
+- `ShopScenePortal`: reusable `E` interaction placed on both shore-house door
+  triggers. Each portal carries an unused `shopId` for a possible later catalog
+  split, while both currently load `ShopInterior`.
+- `ShopSceneCoordinator`: saves the exterior player pose, loads/unloads the
+  shop additively, teleports the existing player safely, and restores the exact
+  entrance position on exit.
+- `ShopInteriorExit`: returns the player through the same exterior portal.
+- The ferry vending-machine model remains a visual prop but no longer owns a
+  `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
 - `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. v1 augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP). The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.
@@ -87,9 +102,9 @@ Planned systems and responsibilities:
   intervals. It posts only while the Wwise engine is initialized, so missing
   local SoundBanks do not block gameplay.
 - The player's hidden controller capsule owns the camera, movement, weapons,
-  and collisions. Its child `Fraunz Visual` uses the revised `CHAR_Fraunz`
-  prefab and `FraunzGameplay.controller`: the existing idle clip is the
-  `Idle` state and the revised `Armature|WalkCycle` is the `Running` state.
+  and collisions. Its child `Fraunz Visual` currently renders the captain in
+  a static bind pose. `SimpleFPSController.animateCharacter` remains disabled
+  until the team connects its own authored idle and walking animations.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
@@ -98,6 +113,9 @@ height. `SimpleEnemy` remains shared and selects either planar `Surface`
 movement or full 3D `Flying` movement from the prefab. Spawn points are
 ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
+The spawner ignores points behind the ferry and uses a forward fallback arc.
+The fish profile is fixed to world Y `7`, preventing ferry hierarchy offsets
+from lifting surface enemies above the river.
 The pigeon prefab owns an `AlwaysAnimate` Animator using
 `PigeonAnimator.controller`; movement remains script-driven with root motion off.
 The moving fish keeps the proven `CarpAnimator.controller` on its gameplay

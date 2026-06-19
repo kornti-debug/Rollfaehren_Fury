@@ -30,6 +30,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add shop/upgrade state.
 - [x] Add round restart/next round behavior.
 - [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
+- [x] Add additive shared-shop transition state and reusable shore-house portals.
+- [x] Build and validate the shared `ShopInterior.unity` scene.
+- [ ] Verify entering, buying, exiting, and returning to both doors in Play Mode.
 - [ ] Verify the ferry house console prompt and manual round start in Unity.
 
 ## Player and Weapons
@@ -83,6 +86,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add separate fish and pigeon enemy profiles with surface/flying movement.
 - [x] Add weighted round unlocks: fish from round 1, pigeons from round 2.
 - [x] Replace full spawn rings with ferry-relative forward attack arcs.
+- [x] Reject spawn points behind the ferry after hierarchy/model changes.
+- [x] Lock fish spawning and movement to world Y `7`.
 - [x] Pace enemy spawns across 5%-90% of ferry crossing progress.
 - [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
 - [x] Attach the looping flight Animator to the pigeon prefab.
@@ -104,8 +109,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Verify Track B in Unity: re-run `Build Prototype Scene`, shop purchases apply, ricochet works.
 - [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
 - [ ] Rebalance: upgrade costs lowered to 10/10/10/30 + 100 starting gold (testing values, retune later).
-- [x] Track C: vending-machine shop automat (walk up + B opens the shop overlay any time on deck).
-- [ ] Verify automat in Unity: walk to the machine, press `E`, buy, then close it.
+- [x] Move shop access from the ferry into the shared shore-house interior.
+- [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
 - [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
@@ -117,9 +122,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 ## Art and Scene Props
 
 - [x] Low-poly ferry model.
-- [x] Import the revised Fraunz rig, walk-cycle controller, and character prefab.
-- [x] Replace the current player visual with the revised Fraunz prefab and walking animation.
-- [ ] Verify the revised Fraunz idle/walking animation in Play Mode.
+- [x] Restore Fraunz as the visible player model at the correct ferry-deck height.
+- [x] Keep the player model static while the team creates its own animation work.
+- [ ] Later: connect team-authored idle/walking animation.
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
@@ -133,6 +138,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Play the fish explosion animation when it reaches and damages the ferry.
 - [ ] Verify fish still approach the ferry and the contact explosion timing in Play Mode.
 - [x] Vending-machine shop prop.
+- [x] Keep the vending-machine model on the ferry as non-interactive decoration.
 - [ ] Optional civilian NPCs.
 
 ## Audio and Wwise

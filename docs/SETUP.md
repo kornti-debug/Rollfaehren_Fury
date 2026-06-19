@@ -42,17 +42,22 @@ Do not commit `Library/`, `Logs/`, `UserSettings/`, generated `.csproj` files, o
    - `WASD` moves.
    - Mouse looks.
    - Left click shoots.
-   - `E` uses the vending machine and ferry-house start console.
+   - `E` enters/leaves either shore shop, talks to the shop NPC, and uses the ferry-house start console.
    - `Esc` / Cancel opens the gameplay pause menu.
    - Enemies approach the ferry.
    - Ferry health drops when enemies touch it.
    - Killing enemies grants money.
-   - Crossing completion opens the shop.
+   - Crossing completion opens the augment draft; the shop is available from either shore during preparation.
    - Ferry health reaching zero opens game over.
 
 If scene objects are missing or broken, run `Rollfaehren Fury > Build Prototype Scene`. This rebuilds the prototype player, ferry damage trigger, enemy prefab reference, spawn points, HUD, shop panel, game over panel, menu-return input, and guarded Wwise components.
 
 If the menu scenes are missing or broken, run `Rollfaehren Fury > Build Bootstrap And Menu Scenes`. This rebuilds `Bootstrap.unity`, `Menu.unity`, the gameplay menu-return input object, and build settings.
+
+If the indoor shop is missing or broken, run
+`Rollfaehren Fury > Build Shared Shop Interior`. This recreates the lightweight
+`ShopInterior.unity` room, keeps both shore portals connected, and restores its
+Build Settings entry.
 
 When tuning, start with Inspector values on:
 

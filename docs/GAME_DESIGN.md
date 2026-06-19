@@ -30,15 +30,21 @@ Bootstrap -> Main Menu -> Game Scene -> Shop/Upgrade -> Game Scene
 Game Scene -> Pause overlay -> Resume / New Game / Settings / Main Menu / Quit
 ```
 
-Each round begins in a docked preparation state. The player may use the vending
-machine, then walks into the ferry house and presses `E` at the start console.
-Enemies and ferry movement begin only after this interaction.
+Each round begins in a docked preparation state. The player may enter either
+shore house with `E`; both entrances load the same shop interior and return the
+player to the door they used. The player then boards the ferry and presses `E`
+at the house console. Enemies and ferry movement begin only after this
+interaction.
 
 The ferry departs along its docked heading, turns bow-first across the river,
 then curves back into a parallel docking orientation. It should never translate
 sideways across the full river or stop beyond a jetty on land.
 
-The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene, `Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and `Assets/Scenes/Main.unity` for gameplay. Preparation, shop, pause, augment, and game over are states or overlays inside the gameplay scene.
+The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene,
+`Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and
+`Assets/Scenes/Main.unity` for gameplay. The shared `ShopInterior.unity` loads
+additively during preparation. Pause, augment, and game over remain overlays or
+states owned by Main.
 
 ## Player Fantasy
 
@@ -73,8 +79,9 @@ Current enemy types:
 3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
 During a crossing, enemies spawn ahead and beside the moving ferry rather than
-behind it. The wave is spread from roughly 5% to 90% crossing progress, keeping
-combat active without requiring every enemy to outrun the ferry.
+behind it. Fish stay at world Y `7`, just below the visible water surface. The
+wave is spread from roughly 5% to 90% crossing progress, keeping combat active
+without requiring every enemy to outrun the ferry.
 
 Enemy behavior should be simple:
 

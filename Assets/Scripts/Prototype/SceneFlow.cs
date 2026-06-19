@@ -8,6 +8,7 @@ namespace RollfaehrenFury.Prototype
         public const string BootstrapSceneName = "Bootstrap";
         public const string MenuSceneName = "Menu";
         public const string MainSceneName = "Main";
+        public const string ShopInteriorSceneName = "ShopInterior";
 
         public static void LoadBootstrap()
         {

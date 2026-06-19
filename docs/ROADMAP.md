@@ -9,9 +9,11 @@ rework. This file is about *build order*; the live task checklist lives in
 
 The playable vertical slice already exists and now runs through a real scene
 flow — `Assets/Scenes/Bootstrap.unity` → `Assets/Scenes/Menu.unity` →
-`Assets/Scenes/Main.unity` (gameplay; shop and game over are overlays inside the
-gameplay scene). Scenes are rebuildable via `Rollfaehren Fury > Build Prototype
-Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
+`Assets/Scenes/Main.unity`, with `Assets/Scenes/ShopInterior.unity` loaded
+additively from either shore during preparation. Scenes are rebuildable via
+`Rollfaehren Fury > Build Prototype Scene`,
+`Rollfaehren Fury > Build Bootstrap And Menu Scenes`, and
+`Rollfaehren Fury > Build Shared Shop Interior`.
 
 - `GameManager` — docked preparation, crossing, augment, and game-over states
 - `Health` — reusable health/damage component with events (target-agnostic)
@@ -23,7 +25,8 @@ Scene` and `Rollfaehren Fury > Build Bootstrap And Menu Scenes`.
 - `FerryController` / `RoundStartConsole` — alternating physical crossings started manually from the ferry house
 - Project-wide **Input System** layer (`PrototypeInputActions` + `Assets/InputSystem_Actions.inputactions`) — gameplay and menu read `InputAction` callbacks instead of polling devices
 - `PrototypeAudioEvents` — Wwise hook points (shoot / hit / enemy death / ferry damage)
-- Fraunz player visual + a vending-machine asset (recently merged)
+- Static Fraunz player visual + a non-interactive vending-machine decoration
+- Shared indoor shop scene with additive enter/exit transitions
 
 **The core loop is functionally complete:** start from the menu, move, shoot,
 kill for money, survive the crossing, buy one of three upgrades, face a harder
