@@ -83,6 +83,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add separate fish and pigeon enemy profiles with surface/flying movement.
 - [x] Add weighted round unlocks: fish from round 1, pigeons from round 2.
 - [x] Replace full spawn rings with ferry-relative forward attack arcs.
+- [x] Reject spawn points behind the ferry after hierarchy/model changes.
+- [x] Lock fish spawning and movement to world Y `7`.
 - [x] Pace enemy spawns across 5%-90% of ferry crossing progress.
 - [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
 - [x] Attach the looping flight Animator to the pigeon prefab.

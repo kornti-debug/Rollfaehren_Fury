@@ -73,8 +73,9 @@ Current enemy types:
 3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
 During a crossing, enemies spawn ahead and beside the moving ferry rather than
-behind it. The wave is spread from roughly 5% to 90% crossing progress, keeping
-combat active without requiring every enemy to outrun the ferry.
+behind it. Fish stay at world Y `7`, just below the visible water surface. The
+wave is spread from roughly 5% to 90% crossing progress, keeping combat active
+without requiring every enemy to outrun the ferry.
 
 Enemy behavior should be simple:
 

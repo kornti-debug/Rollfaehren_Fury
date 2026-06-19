@@ -264,16 +264,42 @@ namespace RollfaehrenFury.Prototype
             Transform[] points = profile != null ? profile.SpawnPoints : spawnPoints;
             if (points != null && points.Length > 0)
             {
-                Transform point = points[Random.Range(0, points.Length)];
-                if (point != null)
+                int startIndex = Random.Range(0, points.Length);
+                for (int i = 0; i < points.Length; i++)
                 {
-                    return ApplySpawnHeight(point.position, profile);
+                    Transform point = points[(startIndex + i) % points.Length];
+                    if (point != null && IsAheadOrBesideFerry(point.position))
+                    {
+                        return ApplySpawnHeight(point.position, profile);
+                    }
                 }
             }
 
-            Vector2 randomCircle = Random.insideUnitCircle.normalized * fallbackSpawnRadius;
             Vector3 center = ferryTarget != null ? ferryTarget.transform.position : transform.position;
-            return ApplySpawnHeight(center + new Vector3(randomCircle.x, 0f, randomCircle.y), profile);
+            Transform ferryTransform = ferryTarget != null ? ferryTarget.transform : transform;
+            Vector3 forward = Vector3.ProjectOnPlane(ferryTransform.forward, Vector3.up).normalized;
+            Vector3 right = Vector3.ProjectOnPlane(ferryTransform.right, Vector3.up).normalized;
+            float forwardDistance = fallbackSpawnRadius * Random.Range(0.65f, 1f);
+            float sideDistance = fallbackSpawnRadius * Random.Range(-0.8f, 0.8f);
+            return ApplySpawnHeight(center + forward * forwardDistance + right * sideDistance, profile);
+        }
+
+        private bool IsAheadOrBesideFerry(Vector3 position)
+        {
+            if (ferryTarget == null)
+            {
+                return true;
+            }
+
+            Transform ferryTransform = ferryTarget.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(ferryTransform.forward, Vector3.up);
+            Vector3 offset = Vector3.ProjectOnPlane(position - ferryTransform.position, Vector3.up);
+            if (forward.sqrMagnitude < 0.001f || offset.sqrMagnitude < 0.001f)
+            {
+                return true;
+            }
+
+            return Vector3.Dot(forward.normalized, offset.normalized) >= 0f;
         }
 
         private Vector3 ApplySpawnHeight(Vector3 position, EnemySpawnProfile profile)

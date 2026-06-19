@@ -315,10 +315,14 @@ namespace RollfaehrenFury.Editor
 
         private static GameObject EnsureFerry()
         {
-            GameObject ferry = GameObject.Find("Ferry");
+            GameObject ferry = GameObject.Find("Ferry_Root") ?? GameObject.Find("Ferry");
             if (ferry == null)
             {
-                ferry = new GameObject("Ferry");
+                ferry = new GameObject("Ferry_Root");
+            }
+            else
+            {
+                ferry.name = "Ferry_Root";
             }
 
             ferry.transform.position = FerryStartPosition;
@@ -1244,8 +1248,24 @@ namespace RollfaehrenFury.Editor
             SerializedObject serializedSpawner = new SerializedObject(spawner);
             SerializedProperty profiles = serializedSpawner.FindProperty("enemyProfiles");
             profiles.arraySize = 2;
-            ConfigureEnemyProfileProperty(profiles.GetArrayElementAtIndex(0), "Fish", fishPrefab, fishPoints, 1, 0.7f);
-            ConfigureEnemyProfileProperty(profiles.GetArrayElementAtIndex(1), "Pigeon", pigeonPrefab, pigeonPoints, 2, 0.3f);
+            ConfigureEnemyProfileProperty(
+                profiles.GetArrayElementAtIndex(0),
+                "Fish",
+                fishPrefab,
+                fishPoints,
+                1,
+                0.7f,
+                true,
+                EnemySpawnHeight);
+            ConfigureEnemyProfileProperty(
+                profiles.GetArrayElementAtIndex(1),
+                "Pigeon",
+                pigeonPrefab,
+                pigeonPoints,
+                2,
+                0.3f,
+                false,
+                0f);
             serializedSpawner.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(spawner);
         }
@@ -1256,13 +1276,16 @@ namespace RollfaehrenFury.Editor
             SimpleEnemy prefab,
             Transform[] points,
             int firstRound,
-            float weight)
+            float weight,
+            bool useFixedHeight,
+            float fixedHeight)
         {
             profile.FindPropertyRelative("displayName").stringValue = displayName;
             profile.FindPropertyRelative("prefab").objectReferenceValue = prefab;
             profile.FindPropertyRelative("firstRound").intValue = firstRound;
             profile.FindPropertyRelative("spawnWeight").floatValue = weight;
-            profile.FindPropertyRelative("useFixedSpawnHeight").boolValue = false;
+            profile.FindPropertyRelative("useFixedSpawnHeight").boolValue = useFixedHeight;
+            profile.FindPropertyRelative("fixedSpawnHeight").floatValue = fixedHeight;
 
             SerializedProperty spawnPointProperty = profile.FindPropertyRelative("spawnPoints");
             spawnPointProperty.arraySize = points.Length;

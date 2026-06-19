@@ -98,6 +98,9 @@ height. `SimpleEnemy` remains shared and selects either planar `Surface`
 movement or full 3D `Flying` movement from the prefab. Spawn points are
 ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
+The spawner ignores points behind the ferry and uses a forward fallback arc.
+The fish profile is fixed to world Y `7`, preventing ferry hierarchy offsets
+from lifting surface enemies above the river.
 The pigeon prefab owns an `AlwaysAnimate` Animator using
 `PigeonAnimator.controller`; movement remains script-driven with root motion off.
 The moving fish keeps the proven `CarpAnimator.controller` on its gameplay
