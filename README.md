@@ -9,6 +9,7 @@ Project page: https://kornti-debug.github.io/Rollfaehren_Fury/
 Build a small but complete ferry-only vertical slice with placeholder low-poly assets first:
 
 - Bootstrap/menu flow: `Assets/Scenes/Bootstrap.unity` -> `Assets/Scenes/Menu.unity` -> `Assets/Scenes/Main.unity`
+- Shared additive shop interior: `Assets/Scenes/ShopInterior.unity`
 - FPS player on a prototype ferry deck
 - Enemies approaching the ferry
 - Enemies damage only the ferry on contact, then disappear
@@ -81,12 +82,12 @@ Controls:
 - Scroll / `1`–`4`: switch weapon (`1` Harpoon, `2` Pistol, `3` Shotgun, `4` Flamethrower)
 - `Shift`: sprint
 - `Space`: jump
-- `E`: use the vending machine or start the ferry from the house console
+- `E`: enter/leave either shore shop, talk to the shop NPC, or start the ferry
 - `Esc` / Cancel: open or close the gameplay pause menu
 
 Gameplay input uses subscribed callbacks from the project-wide `Assets/InputSystem_Actions.inputactions` asset.
 
-If scenes get broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` to regenerate the prototype gameplay scene, and `Rollfaehren Fury > Build Bootstrap And Menu Scenes` to regenerate the bootstrap/menu flow.
+If scenes get broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` to regenerate the prototype gameplay scene, `Rollfaehren Fury > Build Bootstrap And Menu Scenes` to regenerate the bootstrap/menu flow, or `Rollfaehren Fury > Build Shared Shop Interior` to rebuild the placeholder shop room.
 
 ## Team Workflow
 

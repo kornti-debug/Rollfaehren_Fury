@@ -31,7 +31,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add round restart/next round behavior.
 - [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
 - [x] Add additive shared-shop transition state and reusable shore-house portals.
-- [ ] Build and verify the shared `ShopInterior.unity` scene.
+- [x] Build and validate the shared `ShopInterior.unity` scene.
+- [ ] Verify entering, buying, exiting, and returning to both doors in Play Mode.
 - [ ] Verify the ferry house console prompt and manual round start in Unity.
 
 ## Player and Weapons
@@ -108,8 +109,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Verify Track B in Unity: re-run `Build Prototype Scene`, shop purchases apply, ricochet works.
 - [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
 - [ ] Rebalance: upgrade costs lowered to 10/10/10/30 + 100 starting gold (testing values, retune later).
-- [x] Track C: vending-machine shop automat (walk up + B opens the shop overlay any time on deck).
-- [ ] Verify automat in Unity: walk to the machine, press `E`, buy, then close it.
+- [x] Move shop access from the ferry into the shared shore-house interior.
+- [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
 - [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
@@ -137,6 +138,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Play the fish explosion animation when it reaches and damages the ferry.
 - [ ] Verify fish still approach the ferry and the contact explosion timing in Play Mode.
 - [x] Vending-machine shop prop.
+- [x] Keep the vending-machine model on the ferry as non-interactive decoration.
 - [ ] Optional civilian NPCs.
 
 ## Audio and Wwise

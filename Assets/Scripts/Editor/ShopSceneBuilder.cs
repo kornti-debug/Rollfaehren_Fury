@@ -14,6 +14,7 @@ namespace RollfaehrenFury.Editor
         private const string MainScenePath = "Assets/Scenes/Main.unity";
         private const string ShopScenePath = "Assets/Scenes/ShopInterior.unity";
         private const string ShopNpcPrefabPath = "Assets/Prefabs/NPC_Shop.prefab";
+        private const string VendingMachinePrefabPath = "Assets/Models/VendingMachine.fbx";
 
         [MenuItem("Rollfaehren Fury/Configure Shared Shop Portals")]
         public static void ConfigureSharedShopPortals()
@@ -198,21 +199,75 @@ namespace RollfaehrenFury.Editor
             Scene mainScene = SceneManager.GetActiveScene();
 
             GameObject ferryNpc = FindSceneObjectIncludingInactive("NPC_Shop");
-            if (ferryNpc != null && ferryNpc.transform.IsChildOf(GameObject.Find("Ferry_Root").transform))
+            GameObject ferryRoot = GameObject.Find("Ferry_Root");
+            if (ferryNpc != null && ferryRoot != null && ferryNpc.transform.IsChildOf(ferryRoot.transform))
             {
                 Object.DestroyImmediate(ferryNpc);
             }
 
-            GameObject vendingMachine = FindSceneObjectIncludingInactive("Vending Machine");
-            ShopInteractable ferryShop = vendingMachine != null ? vendingMachine.GetComponent<ShopInteractable>() : null;
-            if (ferryShop != null)
+            if (ferryRoot != null)
             {
-                ferryShop.enabled = false;
-                EditorUtility.SetDirty(ferryShop);
+                GameObject decoration = FindSceneObjectIncludingInactive("Vending Machine Decoration");
+                if (decoration == null)
+                {
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(VendingMachinePrefabPath);
+                    decoration = prefab != null
+                        ? PrefabUtility.InstantiatePrefab(prefab, ferryRoot.transform) as GameObject
+                        : GameObject.CreatePrimitive(PrimitiveType.Cube);
+                }
+
+                if (decoration != null)
+                {
+                    decoration.name = "Vending Machine Decoration";
+                    decoration.transform.SetParent(ferryRoot.transform, false);
+                    decoration.transform.localPosition = new Vector3(1.9f, 10.4f, 6.4f);
+                    decoration.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+                    decoration.transform.localScale = Vector3.one;
+
+                    ShopInteractable ferryShop = decoration.GetComponent<ShopInteractable>();
+                    if (ferryShop != null)
+                    {
+                        Object.DestroyImmediate(ferryShop);
+                    }
+                }
             }
 
             EditorSceneManager.MarkSceneDirty(mainScene);
             EditorSceneManager.SaveScene(mainScene);
+        }
+
+        public static void ValidateSharedShopSetupFromCommandLine()
+        {
+            Scene mainScene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            if (Object.FindFirstObjectByType<ShopSceneCoordinator>() == null)
+            {
+                throw new System.InvalidOperationException("Main scene is missing ShopSceneCoordinator.");
+            }
+
+            ShopScenePortal[] portals = Object.FindObjectsByType<ShopScenePortal>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            if (portals.Length != 2)
+            {
+                throw new System.InvalidOperationException($"Expected 2 shop portals, found {portals.Length}.");
+            }
+
+            if (FindSceneObjectIncludingInactive("Vending Machine Decoration") == null)
+            {
+                throw new System.InvalidOperationException("Main scene is missing the vending-machine decoration.");
+            }
+
+            Scene shopScene = EditorSceneManager.OpenScene(ShopScenePath, OpenSceneMode.Additive);
+            if (FindSceneObjectInScene(shopScene, "Shop Interior Spawn") == null
+                || FindSceneObjectInScene(shopScene, "Shop Exit") == null
+                || FindSceneObjectInScene(shopScene, "NPC_Shop") == null)
+            {
+                throw new System.InvalidOperationException("ShopInterior scene is missing its spawn, exit, or NPC.");
+            }
+
+            Debug.Log("Shared shop scene validation passed.");
+            EditorSceneManager.CloseScene(shopScene, true);
+            EditorSceneManager.SetActiveScene(mainScene);
         }
 
         private static void AddShopSceneToBuildSettings()
@@ -277,6 +332,22 @@ namespace RollfaehrenFury.Editor
                 if (transform.gameObject.scene.IsValid() && transform.name == objectName)
                 {
                     return transform.gameObject;
+                }
+            }
+
+            return null;
+        }
+
+        private static GameObject FindSceneObjectInScene(Scene scene, string objectName)
+        {
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                foreach (Transform transform in root.GetComponentsInChildren<Transform>(true))
+                {
+                    if (transform.name == objectName)
+                    {
+                        return transform.gameObject;
+                    }
                 }
             }
 

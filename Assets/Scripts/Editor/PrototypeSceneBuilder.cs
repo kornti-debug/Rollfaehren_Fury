@@ -17,6 +17,7 @@ namespace RollfaehrenFury.Editor
         private const string BootstrapScenePath = "Assets/Scenes/Bootstrap.unity";
         private const string MenuScenePath = "Assets/Scenes/Menu.unity";
         private const string MainScenePath = "Assets/Scenes/Main.unity";
+        private const string ShopScenePath = "Assets/Scenes/ShopInterior.unity";
         private const string EnemyPrefabPath = "Assets/Prefabs/PrototypeEnemy.prefab";
         private const string AnimatedEnemyPrefabPath = "Assets/Prefabs/CHAR_Fish.prefab";
         private const string FishAnimatorControllerPath = "Assets/Animations/CarpAnimator.controller";
@@ -25,6 +26,7 @@ namespace RollfaehrenFury.Editor
         private const string FishExplosionAnimationPath = "Assets/Models/Fish_Explode_Anim.fbx";
         private const string PigeonEnemyPrefabPath = "Assets/Prefabs/CHAR_Pigeon.prefab";
         private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
+        private const string VendingMachinePrefabPath = "Assets/Models/VendingMachine.fbx";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
         private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
@@ -1064,32 +1066,36 @@ namespace RollfaehrenFury.Editor
 
         private static void EnsureVendingMachine(GameManager gameManager)
         {
-            GameObject machine = GameObject.Find("Vending Machine");
-            if (machine == null)
+            GameObject legacyMachine = GameObject.Find("Vending Machine");
+            if (legacyMachine != null)
             {
-                machine = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                machine.name = "Vending Machine";
+                Object.DestroyImmediate(legacyMachine);
             }
 
-            GameObject ferry = GameObject.Find("Ferry");
+            GameObject machine = GameObject.Find("Vending Machine Decoration");
+            if (machine == null)
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(VendingMachinePrefabPath);
+                machine = prefab != null
+                    ? PrefabUtility.InstantiatePrefab(prefab) as GameObject
+                    : GameObject.CreatePrimitive(PrimitiveType.Cube);
+            }
+
+            machine.name = "Vending Machine Decoration";
+            GameObject ferry = GameObject.Find("Ferry_Root") ?? GameObject.Find("Ferry");
             if (ferry != null)
             {
                 machine.transform.SetParent(ferry.transform, false);
                 machine.transform.localPosition = VendingMachineLocalPosition;
                 machine.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
             }
-            machine.transform.localScale = new Vector3(1f, 2f, 1f);
+            machine.transform.localScale = Vector3.one;
 
-            Renderer renderer = machine.GetComponent<Renderer>();
-            if (renderer != null)
+            ShopInteractable interactable = machine.GetComponent<ShopInteractable>();
+            if (interactable != null)
             {
-                renderer.sharedMaterial = EnsureMaterial("Assets/Materials/PrototypeVendingMachine.mat", new Color(0.85f, 0.45f, 0.1f));
+                Object.DestroyImmediate(interactable);
             }
-
-            GameObject prompt = EnsureShopPrompt();
-            ShopInteractable interactable = EnsureComponent<ShopInteractable>(machine);
-            SetObject(interactable, "gameManager", gameManager);
-            SetObject(interactable, "promptObject", prompt);
         }
 
         private static GameObject EnsureShopPrompt()
@@ -1767,7 +1773,8 @@ namespace RollfaehrenFury.Editor
             {
                 new EditorBuildSettingsScene(BootstrapScenePath, true),
                 new EditorBuildSettingsScene(MenuScenePath, true),
-                new EditorBuildSettingsScene(MainScenePath, true)
+                new EditorBuildSettingsScene(MainScenePath, true),
+                new EditorBuildSettingsScene(ShopScenePath, true)
             };
         }
 

@@ -88,6 +88,8 @@ Planned systems and responsibilities:
   shop additively, teleports the existing player safely, and restores the exact
   entrance position on exit.
 - `ShopInteriorExit`: returns the player through the same exterior portal.
+- The ferry vending-machine model remains a visual prop but no longer owns a
+  `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
 - `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. v1 augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP). The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.
