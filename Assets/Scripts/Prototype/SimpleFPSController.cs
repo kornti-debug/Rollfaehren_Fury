@@ -14,6 +14,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float jumpHeight = 1.1f;
         [SerializeField] private bool lockCursorOnPlay = true;
+        [SerializeField] private bool animateCharacter;
 
         private static readonly int IsRunningId = Animator.StringToHash("IsRunning");
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
@@ -45,9 +46,13 @@ namespace RollfaehrenFury.Prototype
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
-            animator = GetComponentInChildren<Animator>();
-            ConfigureAnimator();
-            CacheAnimatorParameters();
+            if (animateCharacter)
+            {
+                animator = GetComponentInChildren<Animator>();
+                ConfigureAnimator();
+                CacheAnimatorParameters();
+            }
+
             if (cameraRoot == null)
             {
                 Camera childCamera = GetComponentInChildren<Camera>();

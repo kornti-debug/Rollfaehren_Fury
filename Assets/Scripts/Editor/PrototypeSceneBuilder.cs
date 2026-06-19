@@ -27,9 +27,6 @@ namespace RollfaehrenFury.Editor
         private const string PigeonAnimatorControllerPath = "Assets/Animations/PigeonAnimator.controller";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
-        private const string PlayerAnimatorControllerPath = "Assets/Animations/FraunzGameplay.controller";
-        private const string PlayerIdleAnimationPath = "Assets/Prefabs/Character/Fraunz/Idle.fbx";
-        private const string PlayerWalkAnimationPath = "Assets/Models/CHAR_Fraunz.fbx";
         private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
         private const string MainSoundBankReferencePath = "Assets/Wwise/ScriptableObjects/Soundbank/216757D1-222F-4AA5-8C50-BBE647F38374.asset";
         private const string PlayerVisualName = "Fraunz Visual";
@@ -38,7 +35,7 @@ namespace RollfaehrenFury.Editor
 
         private static readonly Vector3 FerryStartPosition = new Vector3(261.30118f, 1.85f, 483.7371f);
         private static readonly Vector3 FerryDockBPosition = new Vector3(733.9988f, 1.85f, 493.8429f);
-        private static readonly Vector3 PlayerStartPosition = new Vector3(259.54834f, 12.25f, 480.7458f);
+        private static readonly Vector3 PlayerStartPosition = new Vector3(259.54834f, 11.66f, 480.7458f);
         private static readonly Quaternion FerryStartRotation = Quaternion.Euler(0f, 177.139f, 0f);
         private static readonly Quaternion PlayerStartRotation = Quaternion.Euler(0f, 87.139f, 0f);
         private static readonly Vector3 VendingMachineLocalPosition = new Vector3(1.9f, 10.4f, 6.4f);
@@ -207,7 +204,6 @@ namespace RollfaehrenFury.Editor
             }
 
             HidePrimitivePlayerShell(player);
-            EnsureFraunzGameplayController();
             EnsurePlayerVisual(player.transform);
             RemoveStandaloneFraunzPreview(player.transform);
 
@@ -216,7 +212,7 @@ namespace RollfaehrenFury.Editor
             EditorSceneManager.SaveScene(scene);
 
             Selection.activeGameObject = player;
-            Debug.Log("Fraunz player visual integrated. Press Play to test idle/walking animation.");
+            Debug.Log("Static Fraunz player visual restored.");
         }
 
         private static void EnsureProjectFolders()
@@ -426,6 +422,7 @@ namespace RollfaehrenFury.Editor
             SimpleFPSController controller = EnsureComponent<SimpleFPSController>(player);
             SetObject(controller, "cameraRoot", cameraRoot);
             SetFloat(controller, "pitchClamp", 82f);
+            SetBool(controller, "animateCharacter", false);
             EnsurePlayerVisual(player.transform);
             return controller;
         }
@@ -464,8 +461,6 @@ namespace RollfaehrenFury.Editor
 
         private static void EnsurePlayerVisual(Transform player)
         {
-            EnsureFraunzGameplayController();
-
             GameObject visual = FindChild(player, PlayerVisualName);
             if (visual != null && !IsPrefabInstanceFromPath(visual, PlayerVisualPrefabPath))
             {
@@ -492,6 +487,7 @@ namespace RollfaehrenFury.Editor
                 visual.name = PlayerVisualName;
             }
 
+            visual.SetActive(true);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localRotation = Quaternion.identity;
             visual.transform.localScale = Vector3.one * PlayerVisualScale;
@@ -506,79 +502,15 @@ namespace RollfaehrenFury.Editor
                 Object.DestroyImmediate(rigidbody);
             }
 
-            Animator animator = visual.GetComponent<Animator>();
-            if (animator == null)
+            foreach (Animator animator in visual.GetComponentsInChildren<Animator>(true))
             {
-                animator = visual.GetComponentInChildren<Animator>(true);
+                animator.runtimeAnimatorController = null;
+                animator.applyRootMotion = false;
+                animator.enabled = false;
+                EditorUtility.SetDirty(animator);
             }
 
-            if (animator == null)
-            {
-                animator = visual.AddComponent<Animator>();
-            }
-
-            RuntimeAnimatorController controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerAnimatorControllerPath);
-            if (controller != null)
-            {
-                animator.runtimeAnimatorController = controller;
-            }
-            else
-            {
-                Debug.LogWarning($"Player animator controller was not found at '{PlayerAnimatorControllerPath}'.");
-            }
-
-            animator.applyRootMotion = false;
-            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             EditorUtility.SetDirty(visual);
-            EditorUtility.SetDirty(animator);
-        }
-
-        private static AnimatorController EnsureFraunzGameplayController()
-        {
-            AnimationClip idleClip = LoadAnimationClip(PlayerIdleAnimationPath, "mixamo.com");
-            AnimationClip walkClip = LoadAnimationClip(PlayerWalkAnimationPath, "Armature|WalkCycle");
-            if (idleClip == null || walkClip == null)
-            {
-                Debug.LogWarning("Fraunz idle or walk animation clip could not be loaded.");
-                return AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerAnimatorControllerPath);
-            }
-
-            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerAnimatorControllerPath);
-            if (controller == null)
-            {
-                controller = AnimatorController.CreateAnimatorControllerAtPath(PlayerAnimatorControllerPath);
-            }
-
-            controller.parameters = new[]
-            {
-                new AnimatorControllerParameter
-                {
-                    name = "IsRunning",
-                    type = AnimatorControllerParameterType.Bool
-                },
-                new AnimatorControllerParameter
-                {
-                    name = "IsIdle",
-                    type = AnimatorControllerParameterType.Bool,
-                    defaultBool = true
-                }
-            };
-
-            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
-            foreach (ChildAnimatorState childState in stateMachine.states)
-            {
-                stateMachine.RemoveState(childState.state);
-            }
-
-            AnimatorState idleState = stateMachine.AddState("Idle", new Vector3(220f, 100f));
-            idleState.motion = idleClip;
-            AnimatorState runningState = stateMachine.AddState("Running", new Vector3(220f, 220f));
-            runningState.motion = walkClip;
-            stateMachine.defaultState = idleState;
-
-            EditorUtility.SetDirty(controller);
-            AssetDatabase.SaveAssets();
-            return controller;
         }
 
         private static void EnsureFishContactAnimation()

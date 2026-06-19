@@ -117,9 +117,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 ## Art and Scene Props
 
 - [x] Low-poly ferry model.
-- [x] Import the revised Fraunz rig, walk-cycle controller, and character prefab.
-- [x] Replace the current player visual with the revised Fraunz prefab and walking animation.
-- [ ] Verify the revised Fraunz idle/walking animation in Play Mode.
+- [x] Restore Fraunz as the visible player model at the correct ferry-deck height.
+- [x] Keep the player model static while the team creates its own animation work.
+- [ ] Later: connect team-authored idle/walking animation.
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
