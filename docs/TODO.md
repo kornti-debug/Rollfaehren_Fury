@@ -30,6 +30,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add shop/upgrade state.
 - [x] Add round restart/next round behavior.
 - [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
+- [x] Add additive shared-shop transition state and reusable shore-house portals.
+- [ ] Build and verify the shared `ShopInterior.unity` scene.
 - [ ] Verify the ferry house console prompt and manual round start in Unity.
 
 ## Player and Weapons

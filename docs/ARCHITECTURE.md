@@ -9,6 +9,7 @@ Bootstrap
   -> Menu
       -> Main
           -> Docked preparation
+              -> ShopInterior (additive, entered from either shore)
               -> Ferry console starts crossing
                   -> Augment draft
                       -> Docked preparation at opposite shore
@@ -17,7 +18,11 @@ Bootstrap
           -> Pause overlay via Cancel/Esc
 ```
 
-`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds. `Assets/Scenes/Menu.unity` has New Game, Settings, and Quit. `Assets/Scenes/Main.unity` stays the gameplay scene; preparation, shop, pause, augment, and game over remain inside that scene.
+`Assets/Scenes/Bootstrap.unity` exists as the stable first scene for builds.
+`Assets/Scenes/Menu.unity` has New Game, Settings, and Quit.
+`Assets/Scenes/Main.unity` remains loaded as the authoritative gameplay scene.
+The shared `ShopInterior` scene loads additively, so run state, HUD, player,
+audio, and managers remain owned by Main.
 
 ## Entity Hierarchy
 
@@ -74,7 +79,15 @@ Planned systems and responsibilities:
 - `UpgradeDefinition` (Track B): implemented — polymorphic ScriptableObject upgrade; subclasses define the effect via `Apply(UpgradeContext)`: `WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, and the master `RicochetUpgrade`. Weapon upgrades route through `WeaponSystem` to the active weapon.
 - `ShopManager` (Track B): implemented — holds a catalog of `UpgradeDefinition` assets + parallel UI buttons; purchases go through `GameManager.TryPurchase`. One-off "master" upgrades (non-repeatable) are tracked per run.
 - `ShopInteractable` (Track C): vending-machine interaction available while
-  docked in `Preparation`; it uses the shared `Player/Interact` action.
+  inside the shared shop during `Preparation`; it uses the shared
+  `Player/Interact` action.
+- `ShopScenePortal`: reusable `E` interaction placed on both shore-house door
+  triggers. Each portal carries an unused `shopId` for a possible later catalog
+  split, while both currently load `ShopInterior`.
+- `ShopSceneCoordinator`: saves the exterior player pose, loads/unloads the
+  shop additively, teleports the existing player safely, and restores the exact
+  entrance position on exit.
+- `ShopInteriorExit`: returns the player through the same exterior portal.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
 - `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. v1 augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP). The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.

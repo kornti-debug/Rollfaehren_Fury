@@ -42,8 +42,15 @@ namespace RollfaehrenFury.Prototype
         public PrototypeGameState State { get; private set; } = PrototypeGameState.Idle;
         public bool AllowsGameplayInput => !IsPaused
             && (State == PrototypeGameState.Playing || State == PrototypeGameState.Preparation);
-        public bool AllowsShopInteraction => !IsPaused && State == PrototypeGameState.Preparation;
+        public bool AllowsShopSceneEntry => !IsPaused
+            && State == PrototypeGameState.Preparation
+            && !IsInsideShop
+            && !IsShopOverlayOpen;
+        public bool AllowsShopInteraction => !IsPaused
+            && State == PrototypeGameState.Preparation
+            && IsInsideShop;
         public bool IsPaused { get; private set; }
+        public bool IsInsideShop { get; private set; }
         public int Money => money;
         public int Round => round;
         public float CrossingProgress => ferryController != null ? ferryController.Progress : 0f;
@@ -133,6 +140,7 @@ namespace RollfaehrenFury.Prototype
             round = 1;
             money = startingMoney;
             IsPaused = false;
+            IsInsideShop = false;
             perRoundHealFraction = 0f;
             ferryHealth?.ResetHealth();
             shopManager?.ResetPurchases();
@@ -226,6 +234,48 @@ namespace RollfaehrenFury.Prototype
             SetPlayerInput(true, false);
         }
 
+        public bool TryBeginShopVisit()
+        {
+            if (!AllowsShopSceneEntry)
+            {
+                return false;
+            }
+
+            IsInsideShop = true;
+            SetPlayerInput(false, false);
+            return true;
+        }
+
+        public void CompleteShopEntry()
+        {
+            if (IsInsideShop && !IsPaused)
+            {
+                SetPlayerInput(true, false);
+            }
+        }
+
+        public void PrepareShopExit()
+        {
+            if (!IsInsideShop)
+            {
+                return;
+            }
+
+            if (IsShopOverlayOpen)
+            {
+                CloseShopOverlay();
+            }
+
+            SetPlayerInput(false, false);
+        }
+
+        public void CompleteShopExit()
+        {
+            IsInsideShop = false;
+            IsShopOverlayOpen = false;
+            RestoreInputForCurrentState();
+        }
+
         public void ApplyCrossingSpeedup(float factor)
         {
             float durationFactor = Mathf.Clamp(factor, 0.1f, 1f);
@@ -247,7 +297,7 @@ namespace RollfaehrenFury.Prototype
 
         public bool BeginCrossing()
         {
-            if (State != PrototypeGameState.Preparation || ferryController == null)
+            if (State != PrototypeGameState.Preparation || IsInsideShop || ferryController == null)
             {
                 return false;
             }

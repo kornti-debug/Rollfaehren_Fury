@@ -1138,6 +1138,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.34, y: 4.98, z: 6.36}
   m_Center: {x: 0, y: 2.53, z: 0}
+--- !u!114 &191296961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191296957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bc76622399c49fd9957407fe29a35fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.ShopScenePortal
+  sceneName: ShopInterior
+  shopId: ShoreA
+  promptObject: {fileID: 1096950671}
 --- !u!1001 &211862470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3108,6 +3123,7 @@ RectTransform:
   - {fileID: 1143488619}
   - {fileID: 165130323}
   - {fileID: 1980004925}
+  - {fileID: 1096950672}
   m_Father: {fileID: 1839899393}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6672,6 +6688,85 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1091149119}
   m_CullTransparentMesh: 1
+--- !u!1 &1096950671
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1096950672}
+  - component: {fileID: 1096950674}
+  - component: {fileID: 1096950673}
+  m_Layer: 0
+  m_Name: Shop Scene Prompt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1096950672
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096950671}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 526884701}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 140}
+  m_SizeDelta: {x: 500, y: 40}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1096950673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096950671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 24
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Press E - Enter shop
+--- !u!222 &1096950674
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096950671}
+  m_CullTransparentMesh: 1
 --- !u!1 &1115022636
 GameObject:
   m_ObjectHideFlags: 0
@@ -8802,6 +8897,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.26, y: 5.2, z: 6.92}
   m_Center: {x: 0, y: 2.66, z: 0.15}
+--- !u!114 &1513335305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513335301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bc76622399c49fd9957407fe29a35fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.ShopScenePortal
+  sceneName: ShopInterior
+  shopId: ShoreB
+  promptObject: {fileID: 1096950671}
 --- !u!1 &1523465909
 GameObject:
   m_ObjectHideFlags: 0
@@ -9143,6 +9253,7 @@ GameObject:
   - component: {fileID: 1557749297}
   - component: {fileID: 1557749298}
   - component: {fileID: 1557749299}
+  - component: {fileID: 1557749300}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -9318,6 +9429,20 @@ MonoBehaviour:
   - {fileID: 1696897680}
   - {fileID: 816807421}
   - {fileID: 1407555495}
+--- !u!114 &1557749300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557749293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aa457bd1b8f4f6aa52c03f8c410c179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.ShopSceneCoordinator
+  gameManager: {fileID: 1557749295}
+  playerController: {fileID: 217455385}
 --- !u!1 &1565550256
 GameObject:
   m_ObjectHideFlags: 0
@@ -11986,6 +12111,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
       insertIndex: -1
       addedObject: {fileID: 191296959}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 191296961}
   m_SourcePrefab: {fileID: 100100000, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
 --- !u!1 &1947480985
 GameObject:
@@ -13072,6 +13200,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1513335303}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1513335305}
   m_SourcePrefab: {fileID: 100100000, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
 --- !u!1 &2084479374
 GameObject:

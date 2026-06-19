@@ -22,6 +22,11 @@ namespace RollfaehrenFury.Prototype
                 gameManager = FindFirstObjectByType<GameManager>();
             }
 
+            if (promptObject == null)
+            {
+                promptObject = FindSceneObject("Shop Prompt");
+            }
+
             SimpleFPSController controller = FindFirstObjectByType<SimpleFPSController>();
             if (controller != null)
             {
@@ -44,7 +49,6 @@ namespace RollfaehrenFury.Prototype
             if (interactAction != null)
             {
                 interactAction.performed -= HandleInteract;
-                interactAction.Disable();
             }
 
             if (promptObject != null)
@@ -95,6 +99,19 @@ namespace RollfaehrenFury.Prototype
             }
 
             return (player.position - transform.position).sqrMagnitude <= interactRange * interactRange;
+        }
+
+        private static GameObject FindSceneObject(string objectName)
+        {
+            foreach (Transform transform in Resources.FindObjectsOfTypeAll<Transform>())
+            {
+                if (transform.gameObject.scene.IsValid() && transform.name == objectName)
+                {
+                    return transform.gameObject;
+                }
+            }
+
+            return null;
         }
     }
 }

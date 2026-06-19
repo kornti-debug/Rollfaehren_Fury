@@ -126,6 +126,30 @@ namespace RollfaehrenFury.Prototype
             transform.rotation = rotationDelta * transform.rotation;
         }
 
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            if (controller == null)
+            {
+                controller = GetComponent<CharacterController>();
+            }
+
+            bool wasEnabled = controller != null && controller.enabled;
+            if (wasEnabled)
+            {
+                controller.enabled = false;
+            }
+
+            transform.SetPositionAndRotation(position, rotation);
+            verticalVelocity = -2f;
+
+            if (wasEnabled)
+            {
+                controller.enabled = true;
+            }
+
+            Physics.SyncTransforms();
+        }
+
         private void BindInputActions()
         {
             moveAction ??= PrototypeInputActions.Find("Player/Move");
