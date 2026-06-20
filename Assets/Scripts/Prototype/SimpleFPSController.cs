@@ -16,18 +16,22 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private bool lockCursorOnPlay = true;
         [SerializeField] private bool animateCharacter;
 
-        private static readonly int IsRunningId = Animator.StringToHash("IsRunning");
+        private static readonly int IsWalkingId = Animator.StringToHash("IsWalking");
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
-        private static readonly int RunningStateId = Animator.StringToHash("Base Layer.Running");
-        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Idle");
+        private static readonly int WalkingStateId = Animator.StringToHash("Base Layer.Armature|WalkCycle");
+        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|Idle");
+        private static readonly string WalkingStateName = "Base Layer.Armature|WalkCycle";
+        private static readonly string IdleStateName = "Base Layer.Armature|Idle";
 
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
         private Animator animator;
-        private bool animatorHasIsRunning;
+        private bool animatorHasIsWalking;
         private bool animatorHasIsIdle;
         private int activeAnimationStateId;
+        private bool lastLoggedIsMoving;
+        private int lastLoggedTargetStateId;
         private InputAction moveAction;
         private InputAction lookAction;
         private InputAction jumpAction;
@@ -46,11 +50,26 @@ namespace RollfaehrenFury.Prototype
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            animator = GetComponentInChildren<Animator>();
+
             if (animateCharacter)
             {
-                animator = GetComponentInChildren<Animator>();
-                ConfigureAnimator();
-                CacheAnimatorParameters();
+                if (animator == null)
+                {
+                    Debug.LogWarning($"[{name}] Character animation is enabled, but no child Animator was found.", this);
+                }
+                else
+                {
+                    ConfigureAnimator();
+                    CacheAnimatorParameters();
+                    Debug.Log($"[{name}] Character animation is enabled with controller '{animator.runtimeAnimatorController?.name ?? "<none>"}'. " +
+                              $"States: idle='{IdleStateName}', walk='{WalkingStateName}'. Parameters: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}.", this);
+                }
+            }
+            else if (animator != null)
+            {
+                Debug.Log($"[{name}] Character animation is disabled; child Animator '{animator.name}' will stay static.", this);
+                animator = null;
             }
 
             if (cameraRoot == null)
@@ -322,9 +341,9 @@ namespace RollfaehrenFury.Prototype
             }
 
             bool isMoving = moveInput.sqrMagnitude > 0.001f;
-            if (animatorHasIsRunning)
+            if (animatorHasIsWalking)
             {
-                animator.SetBool(IsRunningId, isMoving);
+                animator.SetBool(IsWalkingId, isMoving);
             }
 
             if (animatorHasIsIdle)
@@ -332,7 +351,14 @@ namespace RollfaehrenFury.Prototype
                 animator.SetBool(IsIdleId, !isMoving);
             }
 
-            int targetStateId = isMoving ? RunningStateId : IdleStateId;
+            int targetStateId = isMoving ? WalkingStateId : IdleStateId;
+            if (isMoving != lastLoggedIsMoving || targetStateId != lastLoggedTargetStateId)
+            {
+                Debug.Log($"[{name}] Animator update: moveInput={moveInput}, sprint={isSprinting}, isMoving={isMoving}, target={DescribeAnimatorState(targetStateId)}, current={DescribeCurrentAnimatorState(0)}.", this);
+                lastLoggedIsMoving = isMoving;
+                lastLoggedTargetStateId = targetStateId;
+            }
+
             PlayAnimationState(targetStateId, !isMoving);
             animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
         }
@@ -340,6 +366,8 @@ namespace RollfaehrenFury.Prototype
         private void ConfigureAnimator()
         {
             activeAnimationStateId = 0;
+            lastLoggedIsMoving = false;
+            lastLoggedTargetStateId = 0;
 
             if (animator == null)
             {
@@ -356,7 +384,7 @@ namespace RollfaehrenFury.Prototype
 
         private void CacheAnimatorParameters()
         {
-            animatorHasIsRunning = false;
+            animatorHasIsWalking = false;
             animatorHasIsIdle = false;
 
             if (animator == null)
@@ -366,21 +394,29 @@ namespace RollfaehrenFury.Prototype
 
             foreach (AnimatorControllerParameter parameter in animator.parameters)
             {
-                if (parameter.nameHash == IsRunningId && parameter.type == AnimatorControllerParameterType.Bool)
+                if (parameter.nameHash == IsWalkingId && parameter.type == AnimatorControllerParameterType.Bool)
                 {
-                    animatorHasIsRunning = true;
+                    animatorHasIsWalking = true;
                 }
                 else if (parameter.nameHash == IsIdleId && parameter.type == AnimatorControllerParameterType.Bool)
                 {
                     animatorHasIsIdle = true;
                 }
             }
+
+            Debug.Log($"[{name}] Animator parameters cached: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}.", this);
         }
 
         private void PlayAnimationState(int stateId, bool forceRestart)
         {
             if (animator == null)
             {
+                return;
+            }
+
+            if (!animator.HasState(0, stateId))
+            {
+                Debug.LogWarning($"[{name}] Animator controller '{animator.runtimeAnimatorController?.name ?? "<none>"}' is missing state '{DescribeAnimatorState(stateId)}'. Current state: {DescribeCurrentAnimatorState(0)}.", this);
                 return;
             }
 
@@ -391,6 +427,32 @@ namespace RollfaehrenFury.Prototype
 
             animator.CrossFadeInFixedTime(stateId, 0.1f);
             activeAnimationStateId = stateId;
+        }
+
+        private string DescribeAnimatorState(int stateId)
+        {
+            if (stateId == WalkingStateId)
+            {
+                return WalkingStateName;
+            }
+
+            if (stateId == IdleStateId)
+            {
+                return IdleStateName;
+            }
+
+            return $"hash {stateId}";
+        }
+
+        private string DescribeCurrentAnimatorState(int layerIndex)
+        {
+            if (animator == null)
+            {
+                return "<no animator>";
+            }
+
+            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(layerIndex);
+            return $"{DescribeAnimatorState(currentState.fullPathHash)} (hash={currentState.fullPathHash}, normalized={currentState.normalizedTime:0.00}, transitioning={animator.IsInTransition(layerIndex)})";
         }
 
         private static void SetCursorLocked(bool locked)

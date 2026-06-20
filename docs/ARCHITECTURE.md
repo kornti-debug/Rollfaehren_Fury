@@ -102,9 +102,7 @@ Planned systems and responsibilities:
   intervals. It posts only while the Wwise engine is initialized, so missing
   local SoundBanks do not block gameplay.
 - The player's hidden controller capsule owns the camera, movement, weapons,
-  and collisions. Its child `Fraunz Visual` currently renders the captain in
-  a static bind pose. `SimpleFPSController.animateCharacter` remains disabled
-  until the team connects its own authored idle and walking animations.
+  and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its

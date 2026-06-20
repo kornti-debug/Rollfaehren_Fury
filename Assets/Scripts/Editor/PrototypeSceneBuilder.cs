@@ -29,6 +29,7 @@ namespace RollfaehrenFury.Editor
         private const string VendingMachinePrefabPath = "Assets/Models/VendingMachine.fbx";
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
+        private const string PlayerAnimatorControllerPath = "Assets/Animations/FraunzAnimator.controller";
         private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
         private const string MainSoundBankReferencePath = "Assets/Wwise/ScriptableObjects/Soundbank/216757D1-222F-4AA5-8C50-BBE647F38374.asset";
         private const string PlayerVisualName = "Fraunz Visual";
@@ -428,7 +429,7 @@ namespace RollfaehrenFury.Editor
             SimpleFPSController controller = EnsureComponent<SimpleFPSController>(player);
             SetObject(controller, "cameraRoot", cameraRoot);
             SetFloat(controller, "pitchClamp", 82f);
-            SetBool(controller, "animateCharacter", false);
+            SetBool(controller, "animateCharacter", true);
             EnsurePlayerVisual(player.transform);
             return controller;
         }
@@ -508,14 +509,22 @@ namespace RollfaehrenFury.Editor
                 Object.DestroyImmediate(rigidbody);
             }
 
+            RuntimeAnimatorController playerAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerAnimatorControllerPath);
+            if (playerAnimatorController == null)
+            {
+                Debug.LogWarning($"Player animator controller was not found at '{PlayerAnimatorControllerPath}'. Fraunz will remain static until the controller is restored.");
+            }
+
             foreach (Animator animator in visual.GetComponentsInChildren<Animator>(true))
             {
-                animator.runtimeAnimatorController = null;
+                animator.runtimeAnimatorController = playerAnimatorController;
                 animator.applyRootMotion = false;
-                animator.enabled = false;
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                animator.enabled = playerAnimatorController != null;
                 EditorUtility.SetDirty(animator);
             }
 
+            Debug.Log($"Configured player visual '{visual.name}' with animator controller '{playerAnimatorController?.name ?? "<none>"}'.", visual);
             EditorUtility.SetDirty(visual);
         }
 
