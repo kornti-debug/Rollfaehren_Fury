@@ -27,6 +27,10 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private int startingMoney = 0;
         [SerializeField] private int roundCompletionReward = 25;
 
+        [Header("Testing (turn off later)")]
+        [Tooltip("Overrides ferry max health for testing. 0 = use the scene value.")]
+        [SerializeField] private float testFerryMaxHealth = 100f;
+
         private int money;
         private int round = 1;
         private float perRoundHealFraction;
@@ -143,6 +147,10 @@ namespace RollfaehrenFury.Prototype
             IsInsideShop = false;
             perRoundHealFraction = 0f;
             ferryHealth?.ResetHealth();
+            if (testFerryMaxHealth > 0f)
+            {
+                ferryHealth?.SetMaxHealth(testFerryMaxHealth, true);
+            }
             shopManager?.ResetPurchases();
             enemySpawner?.ResetAugments();
             enemySpawner?.StopRound(true);
@@ -159,6 +167,11 @@ namespace RollfaehrenFury.Prototype
         public void RestartGame()
         {
             StartNewGame();
+        }
+
+        public void ShowSwarmWarning(int swarmSize)
+        {
+            hud?.ShowWarning($"⚠ Großer Schwarm! ({swarmSize})", 2.5f);
         }
 
         public void SetPaused(bool paused)

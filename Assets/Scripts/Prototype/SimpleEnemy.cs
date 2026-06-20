@@ -16,6 +16,13 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private EnemyMovementMode movementMode = EnemyMovementMode.Surface;
         [SerializeField] private float moveSpeed = 3f;
+        [SerializeField] private bool useSwarmMovement = true;
+
+        [Header("Catch-up Ramp")]
+        [Tooltip("While behind the ferry's travel direction, this enemy keeps accelerating so it eventually reaches the boat.")]
+        [SerializeField] private bool behindRampEnabled = true;
+        [SerializeField] private float behindRampPerSecond = 1f;
+        [SerializeField] private float maxRampSpeed = 18f;
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;
@@ -27,6 +34,7 @@ namespace RollfaehrenFury.Prototype
         private FerryDamageTarget ferryTarget;
         private GameManager gameManager;
         private Health health;
+        private SwarmMovement swarmMovement;
         private bool rewardOnDeath = true;
         private bool hasHitFerry;
         private float activeMoveSpeed;
@@ -36,17 +44,38 @@ namespace RollfaehrenFury.Prototype
         public int KillReward => killReward;
         public EnemyMovementMode MovementMode => movementMode;
 
+        // Exposed so an attached SwarmMovement can drive locomotion while this
+        // component keeps owning health, contact damage and rewards.
+        public bool CanMove => ferryTarget != null && !hasHitFerry;
+        public Vector3 TargetPosition => ferryTarget != null ? ferryTarget.AimPoint.position : transform.position;
+        public float ActiveMoveSpeed => activeMoveSpeed;
+        public bool FaceTarget => faceTarget;
+
+        // True when the player killed this enemy (vs. it reaching the ferry); used by the
+        // spawner's adaptive escalation to measure how fast a swarm gets cleared.
+        public bool WasKilledByDamage { get; private set; }
+
         private void Awake()
         {
             health = GetComponent<Health>();
             activeMoveSpeed = moveSpeed;
             health.Died += HandleDied;
+
+            if (useSwarmMovement)
+            {
+                swarmMovement = GetComponent<SwarmMovement>();
+                if (swarmMovement == null)
+                {
+                    swarmMovement = gameObject.AddComponent<SwarmMovement>();
+                }
+            }
         }
 
         private void OnEnable()
         {
             rewardOnDeath = true;
             hasHitFerry = false;
+            WasKilledByDamage = false;
         }
 
         private void OnDestroy()
@@ -61,6 +90,13 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
+            RampSpeedIfBehind();
+
+            if (swarmMovement != null && swarmMovement.enabled)
+            {
+                return; // SwarmMovement owns locomotion when present.
+            }
+
             if (ferryTarget == null || hasHitFerry)
             {
                 return;
@@ -87,12 +123,35 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speedMultiplier, float healthMultiplier)
+        // While behind the ferry (relative to its travel direction), keep accelerating so the
+        // enemy is never left behind for good and eventually forces the player to deal with it.
+        private void RampSpeedIfBehind()
+        {
+            if (!behindRampEnabled || ferryTarget == null || hasHitFerry)
+            {
+                return;
+            }
+
+            Transform ferry = ferryTarget.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(ferry.forward, Vector3.up);
+            Vector3 offset = Vector3.ProjectOnPlane(transform.position - ferry.position, Vector3.up);
+            if (forward.sqrMagnitude < 0.0001f)
+            {
+                return;
+            }
+
+            if (Vector3.Dot(forward, offset) < 0f)
+            {
+                activeMoveSpeed = Mathf.Min(maxRampSpeed, activeMoveSpeed + behindRampPerSecond * Time.deltaTime);
+            }
+        }
+
+        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speedMultiplier, float healthMultiplier, float speedBonus = 0f)
         {
             ferryTarget = target;
             gameManager = manager;
             killReward = Mathf.Max(0, reward);
-            activeMoveSpeed = Mathf.Max(0.1f, moveSpeed * speedMultiplier);
+            activeMoveSpeed = Mathf.Max(0.1f, moveSpeed * speedMultiplier + speedBonus);
 
             if (health == null)
             {
@@ -144,6 +203,8 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleDied(Health deadHealth)
         {
+            WasKilledByDamage = true;
+
             if (rewardOnDeath)
             {
                 gameManager?.RegisterEnemyKilled(killReward);
