@@ -1667,8 +1667,10 @@ namespace RollfaehrenFury.Editor
             fillObject.transform.SetParent(backgroundObject.transform, false);
             Image fill = EnsureComponent<Image>(fillObject);
             fill.color = fillColor;
+            fill.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
             fill.type = Image.Type.Filled;
             fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
             fill.fillAmount = 1f;
 
             RectTransform fillRect = fill.rectTransform;

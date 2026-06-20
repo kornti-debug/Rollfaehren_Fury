@@ -84,7 +84,7 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Add the ferry's velocity along the spawn line to each enemy's speed, so swarms spawning behind catch up at the same time as those ahead.")]
         [SerializeField] private bool catchUpSpeedCompensation = true;
         [Tooltip("0 = no catch-up help (behind swarms stay slow), 1 = full equalization (behind swarms very fast).")]
-        [SerializeField, Range(0f, 1f)] private float catchUpStrength = 0.25f;
+        [SerializeField, Range(0f, 1f)] private float catchUpStrength = 0.12f;
         [Tooltip("Global multiplier on enemy move speed. Below 1 makes all swarms slower.")]
         [SerializeField, Range(0.2f, 2f)] private float enemySpeedScale = 0.6f;
 

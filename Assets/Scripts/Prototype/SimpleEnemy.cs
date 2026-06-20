@@ -21,8 +21,8 @@ namespace RollfaehrenFury.Prototype
         [Header("Catch-up Ramp")]
         [Tooltip("While behind the ferry's travel direction, this enemy keeps accelerating so it eventually reaches the boat.")]
         [SerializeField] private bool behindRampEnabled = true;
-        [SerializeField] private float behindRampPerSecond = 1f;
-        [SerializeField] private float maxRampSpeed = 18f;
+        [SerializeField] private float behindRampPerSecond = 0.5f;
+        [SerializeField] private float maxRampSpeed = 16f;
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;

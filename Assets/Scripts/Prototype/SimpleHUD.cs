@@ -201,6 +201,10 @@ namespace RollfaehrenFury.Prototype
                 statusBackground.raycastTarget = false;
             }
 
+            // A Filled Image needs a sprite, or fillAmount is silently ignored (bar always full).
+            MakeFillable(ferryHealthFill);
+            MakeFillable(crossingFill);
+
             // Give the bars a clear "empty" colour so the lost/remaining part reads off the bar.
             TintBarBackground(ferryHealthFill, new Color(0.14f, 0.14f, 0.16f, 0.85f));
             TintBarBackground(crossingFill, new Color(0.14f, 0.14f, 0.16f, 0.85f));
@@ -317,6 +321,36 @@ namespace RollfaehrenFury.Prototype
                     background.color = color;
                 }
             }
+        }
+
+        private static Sprite solidBarSprite;
+
+        // Ensures the bar can actually clip by fillAmount: a Filled Image with no sprite
+        // renders a full quad and ignores fillAmount, so we assign a plain white sprite.
+        private static void MakeFillable(Image bar)
+        {
+            if (bar == null)
+            {
+                return;
+            }
+
+            if (bar.sprite == null)
+            {
+                if (solidBarSprite == null)
+                {
+                    Texture2D texture = Texture2D.whiteTexture;
+                    solidBarSprite = Sprite.Create(
+                        texture,
+                        new Rect(0f, 0f, texture.width, texture.height),
+                        new Vector2(0.5f, 0.5f));
+                }
+
+                bar.sprite = solidBarSprite;
+            }
+
+            bar.type = Image.Type.Filled;
+            bar.fillMethod = Image.FillMethod.Horizontal;
+            bar.fillOrigin = (int)Image.OriginHorizontal.Left;
         }
 
         private static Color HealthColor(float fill)
