@@ -52,16 +52,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private FerryDamageTarget ferryTarget;
         [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
-        [SerializeField] private float spawnInterval = 1.6f;
-        [SerializeField, Range(0f, 1f)] private float spawnStartProgress = 0.05f;
-        [SerializeField, Range(0f, 1f)] private float spawnEndProgress = 0.9f;
-        [SerializeField] private int baseEnemiesPerRound = 8;
-        [SerializeField] private int extraEnemiesPerRound = 5;
-        [SerializeField] private int maxAliveEnemies = 14;
         [SerializeField] private int baseKillReward = 10;
         [SerializeField] private float healthScalePerRound = 0.35f;
-        [SerializeField] private float speedScalePerRound = 0.15f;
-        [SerializeField] private float spawnDelayReductionPerRound = 0.18f;
         [SerializeField] private float fallbackSpawnRadius = 65f;
         [SerializeField] private bool useFixedSpawnHeight = true;
         [SerializeField] private float spawnHeight = 7f;
@@ -89,12 +81,6 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float enemyBaseSpeed = 7f;
         [SerializeField] private float enemySpeedPerRound = 0.3f;
 
-        [Header("Testing Flood (turn off later)")]
-        [Tooltip("Ignores crossing pacing and pours swarms in continuously up to floodAliveCap. Test-only.")]
-        [SerializeField] private bool floodForTesting = true;
-        [SerializeField] private int floodAliveCap = 31;
-        [SerializeField] private int floodPerRound = 500;
-
         private readonly List<SimpleEnemy> aliveEnemies = new List<SimpleEnemy>();
         private Coroutine spawnRoutine;
         private GameManager gameManager;
@@ -104,8 +90,6 @@ namespace RollfaehrenFury.Prototype
         private float augmentHealthMultiplier = 1f;
         private float augmentSpeedMultiplier = 1f;
         private float augmentRewardMultiplier = 1f;
-
-        private int roundTargetCount = 1;
 
         public int AliveCount => aliveEnemies.Count;
         public EnemySpawnProfile[] EnemyProfiles => enemyProfiles;
@@ -201,40 +185,20 @@ namespace RollfaehrenFury.Prototype
 
         private IEnumerator SpawnRound()
         {
-            roundTargetCount = floodForTesting
-                ? Mathf.Max(1, floodPerRound)
-                : Mathf.Max(1, Mathf.RoundToInt((baseEnemiesPerRound + (activeRound - 1) * extraEnemiesPerRound) * augmentCountMultiplier));
-            int aliveCap = floodForTesting ? Mathf.Max(1, floodAliveCap) : maxAliveEnemies;
-            int spawned = 0;
-            Debug.Log($"[SpeedCheck] round {activeRound}: enemy speed = {enemyBaseSpeed + (activeRound - 1) * enemySpeedPerRound:0.0} m/s | ferry = {(ferryController != null ? ferryController.CurrentSpeed : 0f):0.0} m/s", this);
-            float startProgress = Mathf.Clamp01(spawnStartProgress);
-            float endProgress = Mathf.Clamp(spawnEndProgress, startProgress, 1f);
+            int low = Mathf.Min(minSwarmSize, maxSwarmSize);
+            int high = Mathf.Max(minSwarmSize, maxSwarmSize);
 
-            while (isSpawning && (floodForTesting || spawned < roundTargetCount))
+            while (isSpawning)
             {
-                float targetProgress = roundTargetCount <= 1
-                    ? startProgress
-                    : Mathf.Lerp(startProgress, endProgress, spawned / (float)(roundTargetCount - 1));
-
-                bool gateOpen = floodForTesting || GetCrossingProgress() >= targetProgress;
-                if (!gateOpen || (!floodForTesting && aliveEnemies.Count >= aliveCap))
-                {
-                    yield return null;
-                    continue;
-                }
-
                 // Drop a whole swarm around one procedurally chosen origin so it forms immediately.
                 Vector3 clusterCenter = GetClusterCenter();
-                int low = Mathf.Min(minSwarmSize, maxSwarmSize);
-                int high = Mathf.Max(minSwarmSize, maxSwarmSize);
-                int burst = Random.Range(low, high + 1);
-                for (int i = 0; i < burst && (floodForTesting || (spawned < roundTargetCount && aliveEnemies.Count < aliveCap)); i++)
+                int burst = Mathf.Max(1, Mathf.RoundToInt(Random.Range(low, high + 1) * augmentCountMultiplier));
+                for (int i = 0; i < burst; i++)
                 {
                     SpawnEnemy(clusterCenter);
-                    spawned++;
                 }
 
-                yield return new WaitForSeconds(floodForTesting ? swarmInterval : GetSpawnDelay());
+                yield return new WaitForSeconds(swarmInterval);
             }
         }
 
@@ -475,18 +439,6 @@ namespace RollfaehrenFury.Prototype
             position.x = Mathf.Clamp(position.x, bounds.min.x + margin, bounds.max.x - margin);
             position.z = Mathf.Clamp(position.z, bounds.min.z + margin, bounds.max.z - margin);
             return position;
-        }
-
-        private float GetSpawnDelay()
-        {
-            return Mathf.Max(0.35f, spawnInterval - (activeRound - 1) * spawnDelayReductionPerRound);
-        }
-
-        private float GetCrossingProgress()
-        {
-            return ferryController != null && ferryController.IsCrossing
-                ? ferryController.Progress
-                : 0f;
         }
 
         private void HandleEnemyRemoved(SimpleEnemy enemy)
