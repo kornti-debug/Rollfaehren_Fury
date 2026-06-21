@@ -23,6 +23,9 @@ Bootstrap
 `Assets/Scenes/Main.unity` remains loaded as the authoritative gameplay scene.
 The shared `ShopInterior` scene loads additively, so run state, HUD, player,
 audio, and managers remain owned by Main.
+Its complete room hierarchy lives below `Shop Interior Root` at an isolated
+world position outside the terrain bounds. This prevents exterior TerrainData
+from intersecting the indoor floor while preserving the additive state flow.
 
 ## Entity Hierarchy
 
@@ -83,12 +86,13 @@ Planned systems and responsibilities:
   `Player/Interact` action.
 - `ShopScenePortal`: reusable `E` interaction placed on both shore-house door
   triggers. Each portal carries an unused `shopId` for a possible later catalog
-  split, while both currently load `ShopInterior`.
+  split, while both currently load `ShopInterior`. The portal containing the
+  player owns the shared HUD prompt so the distant portal cannot hide it.
 - `ShopSceneCoordinator`: saves the exterior player pose, loads/unloads the
   shop additively, teleports the existing player safely, and restores the exact
   entrance position on exit.
 - `ShopInteriorExit`: returns the player through the same exterior portal.
-- The ferry vending-machine model remains a visual prop but no longer owns a
+- The ferry vending-machine model is optional decoration and must not own a
   `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.

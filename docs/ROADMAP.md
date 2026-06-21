@@ -13,7 +13,8 @@ flow — `Assets/Scenes/Bootstrap.unity` → `Assets/Scenes/Menu.unity` →
 additively from either shore during preparation. Scenes are rebuildable via
 `Rollfaehren Fury > Build Prototype Scene`,
 `Rollfaehren Fury > Build Bootstrap And Menu Scenes`, and
-`Rollfaehren Fury > Build Shared Shop Interior`.
+`Rollfaehren Fury > Build Shared Shop Interior`. Once the shop exists, that
+last command repairs required references without replacing manual room edits.
 
 - `GameManager` — docked preparation, crossing, augment, and game-over states
 - `Health` — reusable health/damage component with events (target-agnostic)
@@ -25,8 +26,9 @@ additively from either shore during preparation. Scenes are rebuildable via
 - `FerryController` / `RoundStartConsole` — alternating physical crossings started manually from the ferry house
 - Project-wide **Input System** layer (`PrototypeInputActions` + `Assets/InputSystem_Actions.inputactions`) — gameplay and menu read `InputAction` callbacks instead of polling devices
 - `PrototypeAudioEvents` — Wwise hook points (shoot / hit / enemy death / ferry damage)
-- Static Fraunz player visual + a non-interactive vending-machine decoration
-- Shared indoor shop scene with additive enter/exit transitions
+- Static Fraunz player visual
+- Shared indoor shop scene with additive enter/exit transitions, an isolated
+  room root, and working portals on both shores
 
 **The core loop is functionally complete:** start from the menu, move, shoot,
 kill for money, survive the crossing, buy one of three upgrades, face a harder
@@ -34,10 +36,11 @@ round, game over on ferry death, Esc back to the menu.
 
 ### Known shortcuts in the current code (these drive the order below)
 
-- Upgrades and their costs are **hardcoded in `GameManager`** — not data-driven (Track B).
 - The **Settings panel exists but has no real options yet**.
-- Wwise **hooks exist but banks/events are not wired up** (banks are gitignored;
-  generate them locally — see [WWISE.md](WWISE.md)).
+- Shop prices, augments, enemy pacing, and ferry values need a balancing pass.
+- Ferry damage has no strong visual low-health feedback yet.
+- Core Wwise gameplay events are connected, but UI sounds and river/ferry
+  ambience remain open. Generated banks stay local; see [WWISE.md](WWISE.md).
 
 ## Where we want to get to
 
@@ -114,7 +117,8 @@ Mostly independent of Tier 1/2; can run in parallel.
 
 - **Main menu + scene flow — done** (Bootstrap → Menu → Main, New Game / Settings / Quit, Esc/Cancel back to menu, project-wide Input System). Remaining: real **Settings** options (audio/sensitivity), and pause/resume polish.
 - **Fraunz character** animation states + first-person presence (partially merged).
-- **Vending-machine shop** interaction/flavor (asset merged) — depends on `ShopManager`.
+- **Shared shore shop — done:** both exterior houses enter one additive,
+  spatially isolated interior. Any ferry vending machine is decoration only.
 - HUD/UI styling pass.
 
 ### Tier 4 — Art & presentation
@@ -123,7 +127,8 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 
 - Low-poly ferry, shore, weapon, and enemy models replacing the primitives.
 - Water, lighting, and low-poly art direction.
-- Wwise audio (deferred from Tier 0 — nothing depends on it): generate SoundBanks, wire the events matching `PrototypeAudioEvents`, then mix + river/ferry ambience + music. Until then the `Init.bnk not found` Console errors are expected noise.
+- Wwise polish: generate SoundBanks locally, verify connected gameplay events,
+  then add UI feedback, river/ferry ambience, and final mixing.
 - Animations where they clarify behaviour.
 
 ### Tier 5 — Ship
@@ -132,12 +137,9 @@ Depends on the systems being stable so art replaces placeholders cleanly.
 - Windows build from `Bootstrap.unity`; verify no missing assets or Wwise banks.
 - Demo script; update README controls and known issues.
 
-## Critical path (shortest line to "more than a tech demo")
+## Critical path (shortest line to a presentable slice)
 
-Tier 0 (damage feedback + tuning) → Track A (A1 `Weapon` base + A2 `WeaponSystem`)
-→ Tier 2 (a second weapon + one enemy variant) → Tier 4/5 polish. The main menu
-and scene flow are already in place, so framing is no longer on the critical path.
-
-Track B (B1 `UpgradeSystem` + B2 `ShopManager`) only becomes urgent once you want
-more than the current three upgrades — do it right before expanding the shop, not
-before. Track A and Track B can progress in parallel.
+Fresh-clone and Play Mode regression testing → shop/enemy/ferry balancing →
+visible ferry damage feedback → Wwise ambience/UI polish → Windows build and
+presentation capture. The weapon, upgrade, menu, ferry, enemy, and shared-shop
+foundations are already implemented.

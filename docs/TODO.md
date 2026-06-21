@@ -32,6 +32,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
 - [x] Add additive shared-shop transition state and reusable shore-house portals.
 - [x] Build and validate the shared `ShopInterior.unity` scene.
+- [x] Isolate the additive shop interior outside the exterior terrain without rebuilding manual room edits.
+- [x] Prevent the two shore portals from fighting over the shared interaction prompt.
+- [ ] Verify both doors show `Press E - Enter shop` and return the player to the correct entrance.
 - [ ] Verify entering, buying, exiting, and returning to both doors in Play Mode.
 - [ ] Verify the ferry house console prompt and manual round start in Unity.
 
@@ -138,7 +141,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Play the fish explosion animation when it reaches and damages the ferry.
 - [ ] Verify fish still approach the ferry and the contact explosion timing in Play Mode.
 - [x] Vending-machine shop prop.
-- [x] Keep the vending-machine model on the ferry as non-interactive decoration.
+- [ ] Optional: restore the vending-machine model as non-interactive ferry decoration.
 - [ ] Optional civilian NPCs.
 
 ## Audio and Wwise
