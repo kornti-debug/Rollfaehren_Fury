@@ -102,7 +102,7 @@ namespace RollfaehrenFury.Prototype
                 else
                 {
                     string mag = isReloading ? "Reloading" : $"Ammo {Mathf.Max(0, ammoInMagazine)}/{magazineSize}";
-                    ammo = $"{mag}   Reserve {Mathf.Max(0, reserveAmmo)}";
+                    ammo = $"{mag}   Magazine {Mathf.Max(0, reserveAmmo)}";
                 }
 
                 weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
@@ -137,6 +137,15 @@ namespace RollfaehrenFury.Prototype
         public void ShowShopOverlay(int money)
         {
             ShowShopPanel("Shop", money, false);
+        }
+
+        /// <summary>Updates just the shop's money label (e.g. after a node-tree purchase) without re-toggling panels.</summary>
+        public void SetShopMoney(int money)
+        {
+            if (shopMoneyText != null)
+            {
+                shopMoneyText.text = $"Money: ${money}";
+            }
         }
 
         private void ShowShopPanel(string title, int money, bool showNextRound)

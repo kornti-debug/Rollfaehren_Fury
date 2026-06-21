@@ -59,6 +59,8 @@ namespace RollfaehrenFury.Prototype
         /// <summary>Rounds left in reserve (outside the magazine); -1 for an infinite-ammo weapon.</summary>
         public int ReserveAmmo { get { EnsureStats(); return magazineSize <= 0 ? -1 : currentReserve; } }
         public int MaxReserveAmmo { get { EnsureStats(); return maxReserve; } }
+        /// <summary>True when the magazine and reserve are both topped up (or the weapon is unlimited).</summary>
+        public bool IsAmmoFull { get { EnsureStats(); return magazineSize <= 0 || (currentAmmo >= magazineSize && currentReserve >= maxReserve); } }
         public bool IsReloading => isReloading;
 
         /// <summary>0 at reload start, 1 when the magazine is ready again (1 while not reloading).</summary>
@@ -305,7 +307,8 @@ namespace RollfaehrenFury.Prototype
                 EffectiveDamage,
                 definition.ProjectileLifetime,
                 ignoredRoot,
-                hitMask);
+                hitMask,
+                ricochetBounces);
         }
 
         private void FireSingleRay(Camera fireCamera, Transform ignoredRoot, LayerMask hitMask)

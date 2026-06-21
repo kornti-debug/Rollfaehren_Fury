@@ -221,6 +221,21 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
+        /// <summary>Spends money for the node-tree shop (effect is applied by the shop on success).</summary>
+        public bool TrySpendMoney(int cost)
+        {
+            if (!TrySpend(cost))
+            {
+                hud?.ShowMessage("Not enough money");
+                return false;
+            }
+
+            UpgradeBought?.Invoke();
+            hud?.SetShopMoney(money);
+            RefreshHud();
+            return true;
+        }
+
         public bool TryPurchase(UpgradeDefinition upgrade, int cost)
         {
             if (upgrade == null)
@@ -398,7 +413,7 @@ namespace RollfaehrenFury.Prototype
             enemySpawner?.StopRound(true);
             SetPlayerInput(true, false);
             hud?.ShowGameplay();
-            hud?.ShowMessage("Use the console in the ferry house to start");
+            hud?.ShowMessage(string.Empty);
             RefreshHud();
         }
 
