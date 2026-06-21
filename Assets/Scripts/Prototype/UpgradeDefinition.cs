@@ -20,6 +20,15 @@ namespace RollfaehrenFury.Prototype
         public int Cost => cost;
         public int MaxPurchases => Mathf.Max(1, maxPurchases);
 
+        /// <summary>Configures a runtime-created upgrade (used when the shop adds entries from code rather than assets).</summary>
+        public void InitRuntime(string upgradeName, string upgradeDescription, int upgradeCost, int upgradeMaxPurchases)
+        {
+            displayName = upgradeName;
+            description = upgradeDescription;
+            cost = Mathf.Max(0, upgradeCost);
+            maxPurchases = Mathf.Max(1, upgradeMaxPurchases);
+        }
+
         public abstract void Apply(UpgradeContext context);
     }
 }

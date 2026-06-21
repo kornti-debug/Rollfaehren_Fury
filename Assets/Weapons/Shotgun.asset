@@ -15,11 +15,15 @@ MonoBehaviour:
   displayName: Shotgun
   fireMode: 1
   damage: 11
-  range: 85
+  range: 150
   fireCooldown: 0.75
   aimAssistRadius: 0
   pelletsPerShot: 8
   spreadAngle: 12
+  automatic: 0
+  magazineSize: 4
+  reloadTime: 2.2
+  reserveMagazines: 8
   projectileSpeed: 40
   projectileGravity: 18
   projectileLifetime: 4

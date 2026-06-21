@@ -41,6 +41,8 @@ namespace RollfaehrenFury.Prototype
         private Vector2 pendingLookDelta;
         private bool jumpQueued;
         private bool isSprinting;
+        private float speedBuffMultiplier = 1f;
+        private float speedBuffUntil;
 
         public bool InputEnabled { get; private set; } = true;
         public Vector2 MoveInput => moveInput;
@@ -309,9 +311,18 @@ namespace RollfaehrenFury.Prototype
             cameraRoot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
         }
 
+        /// <summary>Applies a temporary movement-speed multiplier (e.g. the Adrenaline kill-streak augment).</summary>
+        public void ApplyTimedSpeedMultiplier(float multiplier, float duration)
+        {
+            speedBuffMultiplier = Mathf.Max(1f, multiplier);
+            speedBuffUntil = Time.time + Mathf.Max(0f, duration);
+        }
+
+        private float ActiveSpeedMultiplier => Time.time < speedBuffUntil ? speedBuffMultiplier : 1f;
+
         private void HandleMovement()
         {
-            float speed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
+            float speed = (isSprinting ? moveSpeed * sprintMultiplier : moveSpeed) * ActiveSpeedMultiplier;
             Vector3 movement = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
 
             UpdateAnimator(moveInput, isSprinting);

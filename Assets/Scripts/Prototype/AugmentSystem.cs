@@ -15,8 +15,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private EnemySpawner spawner;
         [SerializeField] private List<AugmentDefinition> pool = new List<AugmentDefinition>();
         [SerializeField] private List<Button> draftButtons = new List<Button>();
+        [Tooltip("Add the weapon/utility augments (Bilge Pump, Reload Fury, Rapid Reload, Adrenaline) to the pool at startup.")]
+        [SerializeField] private bool addExtraAugments = true;
 
         private readonly List<AugmentDefinition> offered = new List<AugmentDefinition>();
+        private bool extraAugmentsAdded;
 
         private void Awake()
         {
@@ -29,6 +32,36 @@ namespace RollfaehrenFury.Prototype
             {
                 spawner = FindFirstObjectByType<EnemySpawner>();
             }
+
+            AddExtraAugments();
+        }
+
+        // Appends the newer augments to the pool as runtime instances, so they appear in the draft
+        // without needing separate assets or scene wiring (their values come from the script defaults).
+        private void AddExtraAugments()
+        {
+            if (!addExtraAugments || extraAugmentsAdded)
+            {
+                return;
+            }
+
+            extraAugmentsAdded = true;
+
+            BilgePumpAugment bilge = ScriptableObject.CreateInstance<BilgePumpAugment>();
+            bilge.InitRuntime("Bilge Pump", "Repair 1 ferry HP on every kill");
+            pool.Add(bilge);
+
+            ReloadFuryAugment fury = ScriptableObject.CreateInstance<ReloadFuryAugment>();
+            fury.InitRuntime("Reload Fury", "+50% weapon damage for 10s after each reload");
+            pool.Add(fury);
+
+            RapidReloadAugment rapid = ScriptableObject.CreateInstance<RapidReloadAugment>();
+            rapid.InitRuntime("Rapid Reload", "All weapons reload 30% faster");
+            pool.Add(rapid);
+
+            AdrenalineAugment adrenaline = ScriptableObject.CreateInstance<AdrenalineAugment>();
+            adrenaline.InitRuntime("Adrenaline", "+40% move speed for 5s every 5th kill");
+            pool.Add(adrenaline);
         }
 
         /// <summary>Called by GameManager at round end.</summary>

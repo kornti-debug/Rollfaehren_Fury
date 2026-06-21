@@ -34,6 +34,12 @@ namespace RollfaehrenFury.Prototype
         public float ActiveDamage => ActiveWeapon != null ? ActiveWeapon.Damage : 0f;
         public float ActiveShotsPerSecond => ActiveWeapon != null ? ActiveWeapon.ShotsPerSecond : 0f;
         public string ActiveWeaponName => ActiveWeapon != null ? ActiveWeapon.DisplayName : "None";
+        public int ActiveAmmo => ActiveWeapon != null ? ActiveWeapon.CurrentAmmo : 0;
+        public int ActiveMagazineSize => ActiveWeapon != null ? ActiveWeapon.MagazineSize : 0;
+        public int ActiveReserveAmmo => ActiveWeapon != null ? ActiveWeapon.ReserveAmmo : 0;
+        public bool ActiveHasInfiniteAmmo => ActiveWeapon == null || ActiveWeapon.HasInfiniteAmmo;
+        public bool ActiveIsReloading => ActiveWeapon != null && ActiveWeapon.IsReloading;
+        public float ActiveReloadProgress => ActiveWeapon != null ? ActiveWeapon.ReloadProgress01 : 1f;
 
         private void Awake()
         {
@@ -49,6 +55,7 @@ namespace RollfaehrenFury.Prototype
         {
             BindActions();
             SubscribeWeapon(ActiveWeapon);
+            RefreshEquipped();
         }
 
         private void OnDisable()
@@ -71,10 +78,22 @@ namespace RollfaehrenFury.Prototype
             }
 
             HandleSwitchInput();
+            HandleReloadInput();
 
-            if (fireHeld)
+            // Held-fire only continues for automatic weapons; semi-auto fires once per press
+            // (handled in HandleFirePerformed), so the pistol needs a click per shot.
+            if (fireHeld && ActiveWeapon != null && ActiveWeapon.IsAutomatic)
             {
-                ActiveWeapon?.Fire(fireCamera, ignoredRoot, hitMask);
+                ActiveWeapon.Fire(fireCamera, ignoredRoot, hitMask);
+            }
+        }
+
+        private void HandleReloadInput()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
+            {
+                ActiveWeapon?.Reload();
             }
         }
 
@@ -113,9 +132,9 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        public void AddDamageToActive(float amount)
+        public void MultiplyDamageToActive(float factor)
         {
-            ActiveWeapon?.AddDamage(amount);
+            ActiveWeapon?.MultiplyDamage(factor);
         }
 
         public void MultiplyActiveCooldown(float multiplier)
@@ -126,6 +145,39 @@ namespace RollfaehrenFury.Prototype
         public void AddRicochetToActive(int bounces)
         {
             ActiveWeapon?.AddRicochet(bounces);
+        }
+
+        public void AddMagazineSizeToActive(int amount)
+        {
+            ActiveWeapon?.AddMagazineSize(amount);
+        }
+
+        public void AddReserveMagazinesToActive(int magazines)
+        {
+            ActiveWeapon?.AddReserveMagazines(magazines);
+        }
+
+        public void MultiplyActiveReloadDuration(float multiplier)
+        {
+            ActiveWeapon?.MultiplyReloadDuration(multiplier);
+        }
+
+        /// <summary>Augment hook: shortens reload time on every weapon.</summary>
+        public void MultiplyAllReloadDuration(float multiplier)
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                weapons[i]?.MultiplyReloadDuration(multiplier);
+            }
+        }
+
+        /// <summary>Augment hook: every weapon gains a timed damage boost after each reload.</summary>
+        public void EnableReloadDamageBuffOnAll(float multiplier, float duration)
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                weapons[i]?.EnableReloadDamageBuff(multiplier, duration);
+            }
         }
 
         public void SwitchTo(int index)
@@ -142,9 +194,38 @@ namespace RollfaehrenFury.Prototype
             }
 
             UnsubscribeWeapon(ActiveWeapon);
+            ActiveWeapon?.SetEquipped(false);
             activeIndex = wrapped;
+            ActiveWeapon?.SetEquipped(true);
             SubscribeWeapon(ActiveWeapon);
             WeaponChanged?.Invoke(ActiveWeapon);
+        }
+
+        /// <summary>Marks only the active weapon as equipped so holstered weapons pause their reload.</summary>
+        private void RefreshEquipped()
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                weapons[i]?.SetEquipped(i == activeIndex);
+            }
+        }
+
+        /// <summary>Tops every weapon's magazine and reserve back to full (e.g. restock at the dock).</summary>
+        public void RefillAllAmmo()
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                weapons[i]?.RefillAmmo();
+            }
+        }
+
+        /// <summary>Resets every weapon to its definition defaults for a fresh run (clears upgrades + augment buffs, refills ammo).</summary>
+        public void ResetAllWeapons()
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                weapons[i]?.ResetStats();
+            }
         }
 
         private void BindActions()

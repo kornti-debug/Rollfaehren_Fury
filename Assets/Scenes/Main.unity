@@ -6679,7 +6679,7 @@ MonoBehaviour:
   shopManager: {fileID: 1557749298}
   augmentSystem: {fileID: 1557749299}
   startOnPlay: 1
-  startingMoney: 100
+  startingMoney: 40
   roundCompletionReward: 25
 --- !u!4 &1557749296
 Transform:

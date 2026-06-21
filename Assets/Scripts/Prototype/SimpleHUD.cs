@@ -35,6 +35,9 @@ namespace RollfaehrenFury.Prototype
         private float warningHideTime;
         private float healthFillTarget = 1f;
         private float crossingFillTarget;
+        private GameObject reloadBarRoot;
+        private Image reloadBarFill;
+        private Text reloadBarLabel;
 
         private void Awake()
         {
@@ -61,7 +64,7 @@ namespace RollfaehrenFury.Prototype
             gameManager = manager;
         }
 
-        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, float weaponDamage, float shotsPerSecond)
+        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, float weaponDamage, float shotsPerSecond, int ammoInMagazine, int magazineSize, int reserveAmmo, bool infiniteAmmo, bool isReloading, float reloadProgress)
         {
             if (ferryHealthText != null)
             {
@@ -91,7 +94,29 @@ namespace RollfaehrenFury.Prototype
             if (weaponStatsText != null)
             {
                 string slot = weaponCount > 1 ? $" [{weaponIndex}/{weaponCount}]" : string.Empty;
-                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM";
+                string ammo;
+                if (infiniteAmmo)
+                {
+                    ammo = "Ammo ∞";
+                }
+                else
+                {
+                    string mag = isReloading ? "Reloading" : $"Ammo {Mathf.Max(0, ammoInMagazine)}/{magazineSize}";
+                    ammo = $"{mag}   Reserve {Mathf.Max(0, reserveAmmo)}";
+                }
+
+                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
+            }
+
+            bool showReload = isReloading && !infiniteAmmo;
+            if (reloadBarRoot != null)
+            {
+                reloadBarRoot.SetActive(showReload);
+            }
+
+            if (reloadBarFill != null)
+            {
+                reloadBarFill.fillAmount = Mathf.Clamp01(reloadProgress);
             }
         }
 
@@ -246,7 +271,7 @@ namespace RollfaehrenFury.Prototype
                 RectTransform panelRect = weaponPanel.GetComponent<RectTransform>();
                 panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(1f, 0f);
                 panelRect.anchoredPosition = new Vector2(-28f, 28f);
-                panelRect.sizeDelta = new Vector2(440f, 76f);
+                panelRect.sizeDelta = new Vector2(440f, 104f);
 
                 Image background = weaponPanel.GetComponent<Image>();
                 background.color = new Color(0.04f, 0.06f, 0.09f, 0.55f);
@@ -277,6 +302,59 @@ namespace RollfaehrenFury.Prototype
             warningText.color = new Color(1f, 0.35f, 0.2f);
             warningText.raycastTarget = false;
             warningObject.SetActive(false);
+
+            BuildReloadBar(root);
+        }
+
+        // A separate reload progress bar that appears centered below the crosshair only while
+        // reloading. It fills left-to-right in proportion to reload progress so the player can
+        // time the next shot.
+        private void BuildReloadBar(RectTransform root)
+        {
+            reloadBarRoot = new GameObject("Reload HUD", typeof(RectTransform), typeof(Image));
+            reloadBarRoot.transform.SetParent(root, false);
+            RectTransform barRect = reloadBarRoot.GetComponent<RectTransform>();
+            barRect.anchorMin = barRect.anchorMax = barRect.pivot = new Vector2(0.5f, 0.5f);
+            barRect.anchoredPosition = new Vector2(0f, -86f);
+            barRect.sizeDelta = new Vector2(320f, 22f);
+
+            Image barBackground = reloadBarRoot.GetComponent<Image>();
+            barBackground.color = new Color(0.05f, 0.06f, 0.09f, 0.85f);
+            barBackground.raycastTarget = false;
+
+            GameObject fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            fillObject.transform.SetParent(reloadBarRoot.transform, false);
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = new Vector2(3f, 3f);
+            fillRect.offsetMax = new Vector2(-3f, -3f);
+
+            reloadBarFill = fillObject.GetComponent<Image>();
+            reloadBarFill.color = new Color(1f, 0.72f, 0.18f);
+            reloadBarFill.raycastTarget = false;
+            MakeFillable(reloadBarFill);
+            reloadBarFill.fillAmount = 0f;
+
+            GameObject labelObject = new GameObject("Label", typeof(RectTransform));
+            labelObject.transform.SetParent(reloadBarRoot.transform, false);
+            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0f, 1f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.pivot = new Vector2(0.5f, 0f);
+            labelRect.anchoredPosition = new Vector2(0f, 4f);
+            labelRect.sizeDelta = new Vector2(0f, 26f);
+
+            reloadBarLabel = labelObject.AddComponent<Text>();
+            reloadBarLabel.font = ResolveFont();
+            reloadBarLabel.fontSize = 20;
+            reloadBarLabel.fontStyle = FontStyle.Bold;
+            reloadBarLabel.alignment = TextAnchor.MiddleCenter;
+            reloadBarLabel.color = new Color(1f, 0.85f, 0.5f);
+            reloadBarLabel.text = "RELOADING";
+            reloadBarLabel.raycastTarget = false;
+
+            reloadBarRoot.SetActive(false);
         }
 
         private Font ResolveFont()
