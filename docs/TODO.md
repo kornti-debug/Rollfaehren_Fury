@@ -164,7 +164,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Rewrite the GitHub Pages ePortfolio for Assignment 2.
 - [x] Add updated feature, system-design, system-infrastructure, requirements, and team sections.
 - [ ] Add four current gameplay screenshots to `docs/assets/assignment2/`.
-- [ ] Add the Assignment 2 time-plan and task-distribution workbook.
+- [x] Add the Assignment 2 time-plan and task-distribution workbook.
 - [ ] Add screenshots or GIFs when the prototype is visible.
 - [ ] Update GitHub Pages with current prototype status.
 - [ ] Prepare final demo build instructions.
