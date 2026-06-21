@@ -25,19 +25,79 @@ namespace RollfaehrenFury.Prototype
         private int ricochetBounces;
         private bool statsInitialized;
 
+        private int magazineSize;
+        private float reloadDuration;
+        private int currentAmmo;
+        private int currentReserve;
+        private int maxReserve;
+        private bool isReloading;
+        private float reloadRemaining;
+        private bool isEquipped = true;
+
+        private float reloadDamageMultiplier = 1f;
+        private float reloadDamageDuration;
+        private float damageBuffUntil;
+
         public event Action Fired;
         public event Action<RaycastHit> HitSomething;
         public event Action<Health> HitHealth;
+        public event Action ReloadStarted;
+        public event Action ReloadCompleted;
 
         public WeaponDefinition Definition => definition;
         public string DisplayName => definition != null ? definition.DisplayName : name;
         public float Damage => currentDamage;
         public float FireCooldown => currentCooldown;
         public float ShotsPerSecond => currentCooldown <= 0f ? 0f : 1f / currentCooldown;
+        public bool IsAutomatic => definition != null && definition.Automatic;
+
+        /// <summary>True when this weapon never runs out of ammo (magazine size 0).</summary>
+        public bool HasInfiniteAmmo { get { EnsureStats(); return magazineSize <= 0; } }
+        public int MagazineSize { get { EnsureStats(); return magazineSize; } }
+        /// <summary>Rounds left in the magazine; -1 for an infinite-ammo weapon.</summary>
+        public int CurrentAmmo { get { EnsureStats(); return magazineSize <= 0 ? -1 : currentAmmo; } }
+        /// <summary>Rounds left in reserve (outside the magazine); -1 for an infinite-ammo weapon.</summary>
+        public int ReserveAmmo { get { EnsureStats(); return magazineSize <= 0 ? -1 : currentReserve; } }
+        public int MaxReserveAmmo { get { EnsureStats(); return maxReserve; } }
+        public bool IsReloading => isReloading;
+
+        /// <summary>0 at reload start, 1 when the magazine is ready again (1 while not reloading).</summary>
+        public float ReloadProgress01
+        {
+            get
+            {
+                if (!isReloading || reloadDuration <= 0f)
+                {
+                    return 1f;
+                }
+
+                return Mathf.Clamp01(1f - reloadRemaining / reloadDuration);
+            }
+        }
 
         private void Awake()
         {
             EnsureStats();
+        }
+
+        private void Update()
+        {
+            // The reload only advances while this weapon is the equipped one, so switching to
+            // another gun and back pauses the reload instead of finishing it in the background.
+            if (isReloading && isEquipped)
+            {
+                reloadRemaining -= Time.deltaTime;
+                if (reloadRemaining <= 0f)
+                {
+                    CompleteReload();
+                }
+            }
+        }
+
+        /// <summary>Marks whether this weapon is currently selected. Reloads pause while holstered.</summary>
+        public void SetEquipped(bool equipped)
+        {
+            isEquipped = equipped;
         }
 
         /// <summary>Copies definition stats into runtime fields once.</summary>
@@ -50,13 +110,18 @@ namespace RollfaehrenFury.Prototype
 
             currentDamage = definition.Damage;
             currentCooldown = definition.FireCooldown;
+            magazineSize = definition.MagazineSize;
+            reloadDuration = definition.ReloadTime;
+            currentAmmo = magazineSize;
+            maxReserve = magazineSize * definition.ReserveMagazines;
+            currentReserve = maxReserve;
             statsInitialized = true;
         }
 
-        public void AddDamage(float amount)
+        public void MultiplyDamage(float factor)
         {
             EnsureStats();
-            currentDamage = Mathf.Max(1f, currentDamage + amount);
+            currentDamage = Mathf.Max(1f, currentDamage * Mathf.Max(0.01f, factor));
         }
 
         public void MultiplyCooldown(float multiplier)
@@ -72,18 +137,134 @@ namespace RollfaehrenFury.Prototype
 
         public bool CanFire()
         {
-            return Time.time >= nextFireTime;
+            EnsureStats();
+            return Time.time >= nextFireTime
+                && !isReloading
+                && (magazineSize <= 0 || currentAmmo > 0);
+        }
+
+        /// <summary>Begins a reload if the magazine is not full, not already reloading, and reserve ammo is left.</summary>
+        public void Reload()
+        {
+            EnsureStats();
+            if (magazineSize <= 0 || isReloading || currentAmmo >= magazineSize || currentReserve <= 0)
+            {
+                return;
+            }
+
+            isReloading = true;
+            reloadRemaining = Mathf.Max(0.05f, reloadDuration);
+            ReloadStarted?.Invoke();
+        }
+
+        private void CompleteReload()
+        {
+            int needed = magazineSize - currentAmmo;
+            int take = Mathf.Min(needed, currentReserve);
+            currentAmmo += take;
+            currentReserve -= take;
+            isReloading = false;
+
+            // Reload Fury augment: finishing a reload grants a timed damage boost.
+            if (reloadDamageMultiplier > 1f && reloadDamageDuration > 0f)
+            {
+                damageBuffUntil = Time.time + reloadDamageDuration;
+            }
+
+            ReloadCompleted?.Invoke();
+        }
+
+        /// <summary>Enables a timed damage boost that triggers each time a reload completes.</summary>
+        public void EnableReloadDamageBuff(float multiplier, float duration)
+        {
+            reloadDamageMultiplier = Mathf.Max(1f, multiplier);
+            reloadDamageDuration = Mathf.Max(0f, duration);
+        }
+
+        /// <summary>Damage actually dealt this instant, including the post-reload buff while it lasts.</summary>
+        private float EffectiveDamage => Time.time < damageBuffUntil ? currentDamage * reloadDamageMultiplier : currentDamage;
+
+        /// <summary>Tops the magazine and reserve back up to full and cancels any reload (e.g. restock at the dock).</summary>
+        public void RefillAmmo()
+        {
+            EnsureStats();
+            isReloading = false;
+            currentAmmo = magazineSize;
+            currentReserve = maxReserve;
+        }
+
+        /// <summary>Restores the weapon to its definition defaults for a fresh run: clears upgrades, buffs, and refills ammo.</summary>
+        public void ResetStats()
+        {
+            statsInitialized = false;
+            isReloading = false;
+            reloadRemaining = 0f;
+            reloadDamageMultiplier = 1f;
+            reloadDamageDuration = 0f;
+            damageBuffUntil = 0f;
+            nextFireTime = 0f;
+            ricochetBounces = 0;
+            EnsureStats();
+        }
+
+        public void AddMagazineSize(int amount)
+        {
+            EnsureStats();
+            if (magazineSize <= 0)
+            {
+                return; // unlimited weapons have no magazine to grow
+            }
+
+            magazineSize = Mathf.Max(1, magazineSize + amount);
+        }
+
+        public void AddReserveMagazines(int magazines)
+        {
+            EnsureStats();
+            if (magazineSize <= 0)
+            {
+                return;
+            }
+
+            int extra = Mathf.Max(0, magazines) * magazineSize;
+            maxReserve += extra;
+            currentReserve += extra;
+        }
+
+        public void MultiplyReloadDuration(float multiplier)
+        {
+            EnsureStats();
+            reloadDuration = Mathf.Max(0.1f, reloadDuration * multiplier);
         }
 
         public bool Fire(Camera fireCamera, Transform ignoredRoot, LayerMask hitMask)
         {
-            if (definition == null || fireCamera == null || !CanFire())
+            if (definition == null || fireCamera == null)
             {
                 return false;
             }
 
             EnsureStats();
+
+            // Empty magazine: start the reload instead of firing (auto-reload on a dry trigger).
+            if (magazineSize > 0 && currentAmmo <= 0)
+            {
+                Reload();
+                return false;
+            }
+
+            if (!CanFire())
+            {
+                return false;
+            }
+
             nextFireTime = Time.time + currentCooldown;
+
+            if (magazineSize > 0)
+            {
+                currentAmmo--;
+            }
+
             fired.Invoke();
             Fired?.Invoke();
 
@@ -98,6 +279,12 @@ namespace RollfaehrenFury.Prototype
                 {
                     FireSingleRay(fireCamera, ignoredRoot, hitMask);
                 }
+            }
+
+            // Firing the last round kicks off the reload immediately, so the HUD bar appears at once.
+            if (magazineSize > 0 && currentAmmo <= 0)
+            {
+                Reload();
             }
 
             return true;
@@ -115,7 +302,7 @@ namespace RollfaehrenFury.Prototype
             projectile.Initialize(
                 direction * definition.ProjectileSpeed,
                 definition.ProjectileGravity,
-                currentDamage,
+                EffectiveDamage,
                 definition.ProjectileLifetime,
                 ignoredRoot,
                 hitMask);
@@ -141,7 +328,7 @@ namespace RollfaehrenFury.Prototype
             Health health = hit.collider.GetComponentInParent<Health>();
             if (health != null)
             {
-                health.Damage(currentDamage);
+                health.Damage(EffectiveDamage);
                 hitHealth.Invoke();
                 HitHealth?.Invoke(health);
 
@@ -172,7 +359,7 @@ namespace RollfaehrenFury.Prototype
                 Health nextHealth = next.GetComponent<Health>();
                 if (nextHealth != null)
                 {
-                    nextHealth.Damage(currentDamage);
+                    nextHealth.Damage(EffectiveDamage);
                     HitHealth?.Invoke(nextHealth);
                 }
 

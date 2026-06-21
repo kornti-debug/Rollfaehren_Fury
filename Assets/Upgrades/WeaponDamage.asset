@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6874972fde5d6cc4385441f7b4144d98, type: 3}
   m_Name: WeaponDamage
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDamageUpgrade
-  displayName: Damage +10
-  description: More weapon damage.
-  cost: 10
+  displayName: Damage +25%
+  description: '+25% damage to the active weapon (each shotgun pellet too).'
+  cost: 15
   maxPurchases: 3
-  amount: 10
+  damageMultiplier: 1.25

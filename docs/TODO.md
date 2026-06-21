@@ -60,7 +60,13 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Tracer originates from the crosshair; widen Shotgun spread; add Flamethrower (spread).
 - [x] Add `Projectile` fire mode + `Projectile` (gravity parabola, raycast hit, trail); Harpoon throws an arcing projectile.
 - [x] Weapon switching: mouse scroll + keys `1`–`4` (1 Harpoon, 2 Pistol, 3 Shotgun, 4 Flamethrower).
+- [x] Magazine & reload system: Pistol 6, Assault Rifle 20, Shotgun 4, Harpoon unlimited. Empty magazine (or `R`) starts a timed reload; firing the last round auto-reloads. HUD shows ammo in the weapon panel + a centered reload progress bar while reloading.
+- [x] Reload pauses while a weapon is holstered (only the equipped weapon's reload advances), so switching weapons no longer skips the reload wait.
+- [x] Max-ammo / reserve magazines: Pistol 8, Assault Rifle 6, Shotgun 8 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
+- [x] Fire modes: Assault Rifle stays automatic (hold to fire); Pistol/Shotgun/Harpoon are semi-auto — one shot per press.
+- [x] Widen Shotgun range (85 → 150) so it reaches the spawn arc.
 - [ ] Verify projectiles in Unity: re-run `Build Prototype Scene`, Harpoon arcs and hits.
+- [ ] Verify reload + ammo in Unity: weapon empties, reload bar fills, reserve drains; switching mid-reload pauses it; running fully dry leaves only the Harpoon.
 
 ## Ferry and Cargo
 
@@ -99,8 +105,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
 - [x] Swarm flocking (`SwarmMovement`, boids) auto-attached to enemies; cluster spawns with varied size.
 - [x] Intercept-lead spawn: swarms spawn ahead + to the side of the moving ferry (computed lead) so they reach its flank instead of trailing behind; spawns constrained to the water-surface bounds.
-- [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream on a tunable `swarmInterval` is now the normal spawn behavior (crossing-paced/flood-test path removed).
+- [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream is now the normal spawn behavior (crossing-paced/flood-test path removed).
 - [x] Removed the adaptive-escalation / big-swarm-warning mechanic; swarms are plain random-size waves.
+- [x] Progressive per-round difficulty: swarm size grows (`baseSwarmMin/Max` + `swarmSizePerRound`, capped) and the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored) each round; round 1 stays small + slow (`firstRoundIntervalFactor`) so it is beatable with harpoon/pistol.
 - [x] More round-end augments: Sluggish Tide (slower enemies), Bounty (+kill reward), War Chest (instant cash), Reinforced Hull (+ferry max HP).
 - [ ] Verify swarm feel in Unity. (`testFerryMaxHealth` in GameManager still forces 100 ferry HP — drop if undesired.)
 - [ ] Later: add boss fish or boss pigeon variants.
@@ -117,15 +124,19 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add next-round difficulty increase.
 - [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
 - [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
-- [ ] Verify Track B in Unity: re-run `Build Prototype Scene`, shop purchases apply, ricochet works.
-- [ ] Later: per-weapon base upgrades + more master upgrades (need magazine/reload, knockback, fuel).
-- [ ] Rebalance: upgrade costs lowered to 10/10/10/30 + 100 starting gold (testing values, retune later).
+- [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
+- [x] Weapon-ammo upgrades in the shop: Bigger Magazine (+rounds), Extra Ammo (+reserve mags), Faster Reload (shorter reload), Resupply Ammo (refill mags + reserve). Added to the catalog at runtime with tunable cost/amount on `ShopManager` (~15–20 each, coherent with the base upgrades).
+- [x] Weapon Damage upgrade is now a **percentage** (+25%/buy) instead of flat +10, so it scales every weapon evenly (no more per-pellet blow-up on the shotgun). Harpoon base damage 120 → 140 (one-shots fish through ~round 6).
+- [ ] Verify Track B in Unity: shop purchases apply (damage, fire rate, ferry HP, ricochet, magazine, reserve, reload, resupply); buttons lay out for the full catalog.
+- [ ] Later: per-weapon base upgrades + more master upgrades (knockback, fuel); optionally turn the runtime ammo upgrades into tunable assets.
+- [x] Economy pass: per-purchase cost escalation (×1.7 per owned copy; Resupply stays flat), kill reward flattened to ~6/kill (was 10 +2/round), starting gold 40. Stops the shop being maxed by ~round 2; tunable via `costGrowthPerPurchase` / `killRewardScale` / GameManager `startingMoney`.
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
 - [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
-- [ ] Verify augments in Unity: re-run `Build Prototype Scene`, survive a round → 3-augment draft → pick → effect applies.
+- [x] Track C augments v2 (added to the pool at runtime): Bilge Pump (heal per kill), Reload Fury (+50% damage 10s after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+40% move speed 5s every 5th kill). Kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
+- [ ] Verify augments in Unity: survive a round → draft shows the new augments → pick → effect applies (heal-on-kill, post-reload damage, faster reload, kill-streak speed).
 - [ ] Later: mechanic-heavy augments (mines, gulls, oil slick, shield...) + the spec's master weapon upgrades.
 - [ ] Track C: round-end augment draft (1 of 3) — replaces the round-end shop popup. (Next.)
 - [ ] Later: add cargo survival reward.

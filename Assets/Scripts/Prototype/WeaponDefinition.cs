@@ -26,6 +26,16 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(1)] private int pelletsPerShot = 1;
         [SerializeField] private float spreadAngle = 0f;
 
+        [Header("Firing & Reload")]
+        [Tooltip("When true, holding fire keeps shooting at the cooldown. When false the weapon is semi-auto: one shot per press.")]
+        [SerializeField] private bool automatic = false;
+        [Tooltip("Rounds per magazine. 0 (or less) = unlimited ammo, no reload, no reserve.")]
+        [SerializeField, Min(0)] private int magazineSize = 0;
+        [Tooltip("Seconds to refill an empty magazine.")]
+        [SerializeField, Min(0.1f)] private float reloadTime = 1.5f;
+        [Tooltip("Spare magazines carried in reserve (beyond the loaded one). Total reserve ammo = this x magazineSize. Ignored for unlimited weapons.")]
+        [SerializeField, Min(0)] private int reserveMagazines = 6;
+
         [Header("Projectile (fire mode = Projectile)")]
         [SerializeField] private float projectileSpeed = 40f;
         [SerializeField] private float projectileGravity = 18f;
@@ -39,6 +49,10 @@ namespace RollfaehrenFury.Prototype
         public float AimAssistRadius => aimAssistRadius;
         public int PelletsPerShot => Mathf.Max(1, pelletsPerShot);
         public float SpreadAngle => Mathf.Max(0f, spreadAngle);
+        public bool Automatic => automatic;
+        public int MagazineSize => Mathf.Max(0, magazineSize);
+        public float ReloadTime => Mathf.Max(0.1f, reloadTime);
+        public int ReserveMagazines => Mathf.Max(0, reserveMagazines);
         public float ProjectileSpeed => projectileSpeed;
         public float ProjectileGravity => projectileGravity;
         public float ProjectileLifetime => projectileLifetime;

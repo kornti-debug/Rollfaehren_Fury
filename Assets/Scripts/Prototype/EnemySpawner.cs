@@ -53,23 +53,41 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
         [SerializeField] private int baseKillReward = 10;
+        [Tooltip("Scales the per-kill reward. Flat (no per-round growth) so income grows with how many you kill, not exponentially. 0.6 x base 10 = 6 gold/kill.")]
+        [SerializeField, Min(0f)] private float killRewardScale = 0.6f;
         [SerializeField] private float healthScalePerRound = 0.35f;
         [SerializeField] private float fallbackSpawnRadius = 65f;
         [SerializeField] private bool useFixedSpawnHeight = true;
         [SerializeField] private float spawnHeight = 7f;
+        [Tooltip("Spawn height for flying enemies (birds) that have no fixed spawn height. Keeps them in the air, above the surface fish.")]
+        [SerializeField] private float flyingSpawnHeight = 16f;
+        [SerializeField] private float flyingSpawnHeightJitter = 3f;
 
         [Header("Cluster Spawning")]
-        [Tooltip("Each swarm spawns a random count in this range, scattered within clusterRadius so they flock.")]
-        [SerializeField, Min(1)] private int minSwarmSize = 3;
-        [SerializeField, Min(1)] private int maxSwarmSize = 8;
+        [Tooltip("Enemies in one swarm are scattered within this radius so they flock together.")]
         [SerializeField, Min(0f)] private float clusterRadius = 5f;
-        [Tooltip("Seconds between swarm spawns.")]
-        [SerializeField, Min(0.1f)] private float swarmInterval = 1.5f;
+
+        [Header("Round Progression")]
+        [Tooltip("Round-1 swarm size: each swarm spawns a random count in [baseSwarmMin, baseSwarmMax].")]
+        [SerializeField, Min(1)] private int baseSwarmMin = 2;
+        [SerializeField, Min(1)] private int baseSwarmMax = 3;
+        [Tooltip("Swarm size added to both min and max for every round past round 1 (accumulated, then rounded).")]
+        [SerializeField, Min(0f)] private float swarmSizePerRound = 1f;
+        [Tooltip("Hard cap on a single swarm so very late rounds stay sane.")]
+        [SerializeField, Min(1)] private int swarmSizeCap = 16;
+        [Tooltip("Seconds between swarm spawns in round 1 (before the first-round factor below).")]
+        [SerializeField, Min(0.2f)] private float baseSwarmInterval = 2.4f;
+        [Tooltip("Seconds shaved off the spawn interval each round, floored at minSwarmInterval.")]
+        [SerializeField, Min(0f)] private float intervalStepPerRound = 0.18f;
+        [Tooltip("Fastest the swarm interval ever gets, no matter how high the round.")]
+        [SerializeField, Min(0.2f)] private float minSwarmInterval = 0.8f;
+        [Tooltip("Extra slow-down on the round-1 interval only (>1 = gentler first crossing, beatable with harpoon/pistol).")]
+        [SerializeField, Min(1f)] private float firstRoundIntervalFactor = 1.5f;
 
         [Header("Procedural Placement")]
         [Tooltip("Spawn each swarm on a ring around the ferry's CURRENT position (any angle, incl. behind) instead of fixed spawn points.")]
         [SerializeField] private bool spawnRelativeToFerry = true;
-        [SerializeField] private float spawnRadius = 55f;
+        [SerializeField] private float spawnRadius = 70f;
         [SerializeField] private float spawnRadiusJitter = 10f;
         [Tooltip("How far AHEAD of the moving ferry swarms spawn so they reach its side (multiplier on the computed intercept lead).")]
         [SerializeField, Min(0f)] private float spawnLeadFactor = 1.5f;
@@ -185,24 +203,37 @@ namespace RollfaehrenFury.Prototype
 
         private IEnumerator SpawnRound()
         {
-            int low = Mathf.Min(minSwarmSize, maxSwarmSize);
-            int high = Mathf.Max(minSwarmSize, maxSwarmSize);
+            // Progressive difficulty: swarms grow and arrive faster every round. Round 1 stays
+            // small + slow (beatable with just harpoon/pistol); later rounds ramp up.
+            int sizeBonus = Mathf.FloorToInt((activeRound - 1) * swarmSizePerRound);
+            int low = Mathf.Clamp(Mathf.Min(baseSwarmMin, baseSwarmMax) + sizeBonus, 1, swarmSizeCap);
+            int high = Mathf.Clamp(Mathf.Max(baseSwarmMin, baseSwarmMax) + sizeBonus, low, swarmSizeCap);
+
+            float interval = Mathf.Max(minSwarmInterval, baseSwarmInterval - (activeRound - 1) * intervalStepPerRound);
+            if (activeRound <= 1)
+            {
+                // Ease the player in: the very first crossing spawns at an even slower interval.
+                interval *= Mathf.Max(1f, firstRoundIntervalFactor);
+            }
 
             while (isSpawning)
             {
-                // Drop a whole swarm around one procedurally chosen origin so it forms immediately.
-                Vector3 clusterCenter = GetClusterCenter();
+                // One swarm = one enemy type, around one origin. Picking the profile per swarm (not
+                // per enemy) keeps fish and birds in separate clusters at their own spawn heights,
+                // so they no longer pile up on top of each other.
+                EnemySpawnProfile profile = SelectProfile();
+                Vector3 clusterCenter = GetClusterCenter(profile);
                 int burst = Mathf.Max(1, Mathf.RoundToInt(Random.Range(low, high + 1) * augmentCountMultiplier));
                 for (int i = 0; i < burst; i++)
                 {
-                    SpawnEnemy(clusterCenter);
+                    SpawnEnemy(clusterCenter, profile);
                 }
 
-                yield return new WaitForSeconds(swarmInterval);
+                yield return new WaitForSeconds(interval);
             }
         }
 
-        private SimpleEnemy SpawnEnemy(Vector3? clusterCenter = null)
+        private SimpleEnemy SpawnEnemy(Vector3 clusterCenter, EnemySpawnProfile profile)
         {
             if (ferryTarget == null)
             {
@@ -210,7 +241,6 @@ namespace RollfaehrenFury.Prototype
                 return null;
             }
 
-            EnemySpawnProfile profile = SelectProfile();
             SimpleEnemy prefab = profile != null ? profile.Prefab : enemyPrefab;
             if (prefab == null)
             {
@@ -218,9 +248,7 @@ namespace RollfaehrenFury.Prototype
                 return null;
             }
 
-            Vector3 spawnPosition = clusterCenter.HasValue
-                ? ApplyClusterOffset(clusterCenter.Value, profile)
-                : GetSpawnPosition(profile);
+            Vector3 spawnPosition = ApplyClusterOffset(clusterCenter, profile);
             SimpleEnemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
             string profileName = profile != null && !string.IsNullOrWhiteSpace(profile.DisplayName)
                 ? profile.DisplayName
@@ -231,7 +259,7 @@ namespace RollfaehrenFury.Prototype
 
             float speed = (enemyBaseSpeed + (activeRound - 1) * enemySpeedPerRound) * augmentSpeedMultiplier;
             float healthMultiplier = (1f + (activeRound - 1) * healthScalePerRound) * augmentHealthMultiplier;
-            int reward = Mathf.RoundToInt((Mathf.Max(baseKillReward, enemy.KillReward) + (activeRound - 1) * 2) * augmentRewardMultiplier);
+            int reward = Mathf.RoundToInt(Mathf.Max(baseKillReward, enemy.KillReward) * killRewardScale * augmentRewardMultiplier);
             enemy.Initialize(ferryTarget, gameManager, reward, speed, healthMultiplier);
             return enemy;
         }
@@ -333,7 +361,14 @@ namespace RollfaehrenFury.Prototype
             bool fixedHeight = profile != null ? profile.UseFixedSpawnHeight : useFixedSpawnHeight;
             if (fixedHeight)
             {
+                // Surface enemies (fish) are pinned to the water plane.
                 position.y = profile != null ? profile.FixedSpawnHeight : spawnHeight;
+            }
+            else if (profile != null)
+            {
+                // Flying enemies (birds) spawn up in the air, well above the fish, with a little
+                // vertical scatter so a swarm does not form a flat sheet.
+                position.y = flyingSpawnHeight + Random.Range(-flyingSpawnHeightJitter, flyingSpawnHeightJitter);
             }
 
             return position;
@@ -347,7 +382,8 @@ namespace RollfaehrenFury.Prototype
 
         // Procedural swarm origin: a point on a ring around the ferry's CURRENT position
         // (any angle, including behind) so swarms keep appearing around the moving ferry.
-        private Vector3 GetClusterCenter()
+        // The height comes from the swarm's profile (fish on the water, birds in the air).
+        private Vector3 GetClusterCenter(EnemySpawnProfile profile)
         {
             if (spawnRelativeToFerry && ferryTarget != null)
             {
@@ -388,14 +424,14 @@ namespace RollfaehrenFury.Prototype
                     Vector3 candidate = ferryPosition + direction * r;
                     if (IsOverWater(candidate))
                     {
-                        return ApplySpawnHeight(candidate, null);
+                        return ApplySpawnHeight(candidate, profile);
                     }
                 }
 
-                return ApplySpawnHeight(ferryPosition, null);
+                return ApplySpawnHeight(ferryPosition, profile);
             }
 
-            return GetSpawnPosition(null);
+            return GetSpawnPosition(profile);
         }
 
         private Renderer GetWaterRenderer()

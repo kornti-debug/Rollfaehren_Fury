@@ -24,7 +24,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private ShopManager shopManager;
         [SerializeField] private AugmentSystem augmentSystem;
         [SerializeField] private bool startOnPlay = true;
-        [SerializeField] private int startingMoney = 0;
+        [SerializeField] private int startingMoney = 40;
         [SerializeField] private int roundCompletionReward = 25;
 
         [Header("Testing (turn off later)")]
@@ -34,6 +34,12 @@ namespace RollfaehrenFury.Prototype
         private int money;
         private int round = 1;
         private float perRoundHealFraction;
+        private int healPerKill;
+        private bool killStreakEnabled;
+        private int killStreakEvery = 5;
+        private float killStreakSpeedMultiplier = 1.4f;
+        private float killStreakSpeedDuration = 5f;
+        private int killStreakCount;
 
         public static GameManager Instance { get; private set; }
 
@@ -146,6 +152,9 @@ namespace RollfaehrenFury.Prototype
             IsPaused = false;
             IsInsideShop = false;
             perRoundHealFraction = 0f;
+            healPerKill = 0;
+            killStreakEnabled = false;
+            killStreakCount = 0;
             ferryHealth?.ResetHealth();
             if (testFerryMaxHealth > 0f)
             {
@@ -154,6 +163,7 @@ namespace RollfaehrenFury.Prototype
             shopManager?.ResetPurchases();
             enemySpawner?.ResetAugments();
             enemySpawner?.StopRound(true);
+            weaponSystem?.ResetAllWeapons(); // fresh run: clear weapon upgrades/augment buffs + full ammo (afterwards refill only via the shop)
             ferryController?.ResetToDockA();
             EnterPreparation();
         }
@@ -184,6 +194,23 @@ namespace RollfaehrenFury.Prototype
         public void RegisterEnemyKilled(int reward)
         {
             money += Mathf.Max(0, reward);
+
+            // Bilge Pump augment: each kill patches a little ferry health.
+            if (healPerKill > 0)
+            {
+                ferryHealth?.Heal(healPerKill);
+            }
+
+            // Adrenaline augment: every Nth kill grants a short movement-speed burst.
+            if (killStreakEnabled)
+            {
+                killStreakCount++;
+                if (killStreakCount % Mathf.Max(1, killStreakEvery) == 0)
+                {
+                    playerController?.ApplyTimedSpeedMultiplier(killStreakSpeedMultiplier, killStreakSpeedDuration);
+                }
+            }
+
             EnemyKilled?.Invoke();
             RefreshHud();
         }
@@ -194,14 +221,14 @@ namespace RollfaehrenFury.Prototype
             RefreshHud();
         }
 
-        public bool TryPurchase(UpgradeDefinition upgrade)
+        public bool TryPurchase(UpgradeDefinition upgrade, int cost)
         {
             if (upgrade == null)
             {
                 return false;
             }
 
-            if (!TrySpend(upgrade.Cost))
+            if (!TrySpend(cost))
             {
                 hud?.ShowMessage("Not enough money");
                 return false;
@@ -293,6 +320,29 @@ namespace RollfaehrenFury.Prototype
         public void AddPerRoundHeal(float fraction)
         {
             perRoundHealFraction += Mathf.Max(0f, fraction);
+        }
+
+        public void AddHealPerKill(int amount)
+        {
+            healPerKill += Mathf.Max(0, amount);
+        }
+
+        public void EnableKillStreakSpeed(int everyKills, float speedMultiplier, float duration)
+        {
+            killStreakEnabled = true;
+            killStreakEvery = Mathf.Max(1, everyKills);
+            killStreakSpeedMultiplier = Mathf.Max(1f, speedMultiplier);
+            killStreakSpeedDuration = Mathf.Max(0.1f, duration);
+        }
+
+        public void EnableReloadDamageBuff(float multiplier, float duration)
+        {
+            weaponSystem?.EnableReloadDamageBuffOnAll(multiplier, duration);
+        }
+
+        public void MultiplyWeaponReload(float multiplier)
+        {
+            weaponSystem?.MultiplyAllReloadDuration(multiplier);
         }
 
         public void GrantMoney(int amount)
@@ -440,7 +490,13 @@ namespace RollfaehrenFury.Prototype
             string weaponName = weaponSystem != null ? weaponSystem.ActiveWeaponName : "None";
             int weaponSlot = weaponSystem != null ? weaponSystem.ActiveIndex + 1 : 0;
             int weaponCount = weaponSystem != null ? weaponSystem.WeaponCount : 0;
-            hud?.SetStats(current, max, money, round, CrossingProgress, weaponName, weaponSlot, weaponCount, weaponDamage, shotsPerSecond);
+            int ammoInMagazine = weaponSystem != null ? weaponSystem.ActiveAmmo : 0;
+            int magazineSize = weaponSystem != null ? weaponSystem.ActiveMagazineSize : 0;
+            int reserveAmmo = weaponSystem != null ? weaponSystem.ActiveReserveAmmo : 0;
+            bool infiniteAmmo = weaponSystem == null || weaponSystem.ActiveHasInfiniteAmmo;
+            bool isReloading = weaponSystem != null && weaponSystem.ActiveIsReloading;
+            float reloadProgress = weaponSystem != null ? weaponSystem.ActiveReloadProgress : 1f;
+            hud?.SetStats(current, max, money, round, CrossingProgress, weaponName, weaponSlot, weaponCount, weaponDamage, shotsPerSecond, ammoInMagazine, magazineSize, reserveAmmo, infiniteAmmo, isReloading, reloadProgress);
         }
 
         private void ResolveReferences()

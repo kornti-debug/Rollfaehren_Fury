@@ -14,6 +14,13 @@ namespace RollfaehrenFury.Prototype
         public string DisplayName => displayName;
         public string Description => description;
 
+        /// <summary>Sets the label/description for a runtime-created augment (when the pool adds entries from code rather than assets).</summary>
+        public void InitRuntime(string augmentName, string augmentDescription)
+        {
+            displayName = augmentName;
+            description = augmentDescription;
+        }
+
         public abstract void Apply(AugmentContext context);
     }
 }

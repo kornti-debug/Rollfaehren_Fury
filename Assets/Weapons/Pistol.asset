@@ -20,6 +20,10 @@ MonoBehaviour:
   aimAssistRadius: 0.45
   pelletsPerShot: 1
   spreadAngle: 0
+  automatic: 0
+  magazineSize: 6
+  reloadTime: 1.2
+  reserveMagazines: 4
   projectileSpeed: 40
   projectileGravity: 18
   projectileLifetime: 4

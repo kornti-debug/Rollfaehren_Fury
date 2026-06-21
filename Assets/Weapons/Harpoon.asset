@@ -14,12 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDefinition
   displayName: Harpoon
   fireMode: 2
-  damage: 120
+  damage: 140
   range: 300
   fireCooldown: 1.4
   aimAssistRadius: 0
   pelletsPerShot: 1
   spreadAngle: 0
+  automatic: 0
+  magazineSize: 0
+  reloadTime: 1.5
+  reserveMagazines: 0
   projectileSpeed: 45
   projectileGravity: 18
   projectileLifetime: 4
