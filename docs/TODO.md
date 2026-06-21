@@ -95,10 +95,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Attach the looping flight Animator to the pigeon prefab.
 - [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
 - [x] Swarm flocking (`SwarmMovement`, boids) auto-attached to enemies; cluster spawns with varied size.
-- [x] Procedural ring spawn around the ferry with a front no-spawn cone; rear enemies ramp speed to catch up.
-- [x] Adaptive escalation: clearing a swarm fast spawns a bigger/faster next swarm + on-screen warning.
-- [x] Match pigeon contact damage to fish; global speed scale + dampened catch-up for readability.
-- [ ] Verify swarm feel + escalation in Unity; retune `floodForTesting`/`testFerryMaxHealth` test toggles before final.
+- [x] Intercept-lead spawn: swarms spawn ahead + to the side of the moving ferry (computed lead) so they reach its flank instead of trailing behind; spawns constrained to the water-surface bounds.
+- [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream on a tunable `swarmInterval`.
+- [x] Removed the adaptive-escalation / big-swarm-warning mechanic; swarms are plain random-size waves.
+- [x] More round-end augments: Sluggish Tide (slower enemies), Bounty (+kill reward), War Chest (instant cash), Reinforced Hull (+ferry max HP).
+- [ ] Verify swarm feel in Unity; retune `floodForTesting`/`testFerryMaxHealth` + remove the `[SpeedCheck]` log before final.
 - [ ] Later: add boss fish or boss pigeon variants.
 
 ## Score, Money, and Upgrades

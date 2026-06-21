@@ -187,6 +187,12 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
+            // Idempotent: never build the runtime panels twice on the same HUD.
+            if (root.Find("Weapon HUD") != null)
+            {
+                return;
+            }
+
             // Compact + subtle card background behind the top-left status cluster.
             if (gameplayPanel != null)
             {

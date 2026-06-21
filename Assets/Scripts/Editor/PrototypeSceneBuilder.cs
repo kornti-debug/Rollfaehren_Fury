@@ -1443,6 +1443,14 @@ namespace RollfaehrenFury.Editor
                     augment => { SetFloat(augment, "countMultiplier", 2f); SetFloat(augment, "healthMultiplier", 0.5f); }),
                 EnsureAugment<BruisersAugment>("Assets/Augments/Bruisers.asset", "Bruisers", "Half enemies, 2x HP.",
                     augment => { SetFloat(augment, "countMultiplier", 0.5f); SetFloat(augment, "healthMultiplier", 2f); }),
+                EnsureAugment<SluggishTideAugment>("Assets/Augments/SluggishTide.asset", "Sluggish Tide", "Enemies move 20% slower.",
+                    augment => SetFloat(augment, "speedMultiplier", 0.8f)),
+                EnsureAugment<BountyAugment>("Assets/Augments/Bounty.asset", "Bounty", "+50% money per kill.",
+                    augment => SetFloat(augment, "rewardMultiplier", 1.5f)),
+                EnsureAugment<WarChestAugment>("Assets/Augments/WarChest.asset", "War Chest", "Instant $75.",
+                    augment => SetInt(augment, "money", 75)),
+                EnsureAugment<ReinforcedHullAugment>("Assets/Augments/ReinforcedHull.asset", "Reinforced Hull", "+50 ferry max HP.",
+                    augment => SetFloat(augment, "bonusHealth", 50f)),
             };
 
             AugmentSystem augmentSystem = EnsureComponent<AugmentSystem>(gameManager.gameObject);

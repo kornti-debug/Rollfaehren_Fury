@@ -169,11 +169,6 @@ namespace RollfaehrenFury.Prototype
             StartNewGame();
         }
 
-        public void ShowSwarmWarning(int swarmSize)
-        {
-            hud?.ShowWarning($"⚠ Großer Schwarm! ({swarmSize})", 2.5f);
-        }
-
         public void SetPaused(bool paused)
         {
             IsPaused = paused;
@@ -298,6 +293,23 @@ namespace RollfaehrenFury.Prototype
         public void AddPerRoundHeal(float fraction)
         {
             perRoundHealFraction += Mathf.Max(0f, fraction);
+        }
+
+        public void GrantMoney(int amount)
+        {
+            money += Mathf.Max(0, amount);
+            RefreshHud();
+        }
+
+        public void AddFerryMaxHealth(float amount)
+        {
+            if (ferryHealth == null || amount <= 0f)
+            {
+                return;
+            }
+
+            ferryHealth.SetMaxHealth(ferryHealth.MaxHealth + amount, false);
+            ferryHealth.Heal(amount);
         }
 
         private void ApplyPerRoundHeal()

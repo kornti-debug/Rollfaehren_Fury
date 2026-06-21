@@ -69,37 +69,31 @@ namespace RollfaehrenFury.Prototype
         [Header("Cluster Spawning")]
         [Tooltip("Each swarm spawns a random count in this range, scattered within clusterRadius so they flock.")]
         [SerializeField, Min(1)] private int minSwarmSize = 3;
-        [SerializeField, Min(1)] private int maxSwarmSize = 10;
+        [SerializeField, Min(1)] private int maxSwarmSize = 8;
         [SerializeField, Min(0f)] private float clusterRadius = 5f;
-        [Tooltip("Show an on-screen warning when a spawned swarm is at least this big.")]
-        [SerializeField, Min(1)] private int bigSwarmWarningThreshold = 12;
+        [Tooltip("Seconds between swarm spawns.")]
+        [SerializeField, Min(0.1f)] private float swarmInterval = 1.5f;
 
         [Header("Procedural Placement")]
         [Tooltip("Spawn each swarm on a ring around the ferry's CURRENT position (any angle, incl. behind) instead of fixed spawn points.")]
         [SerializeField] private bool spawnRelativeToFerry = true;
-        [SerializeField] private float spawnRadius = 70f;
+        [SerializeField] private float spawnRadius = 55f;
         [SerializeField] private float spawnRadiusJitter = 10f;
-        [Tooltip("No swarm spawns within this half-angle (deg) of the ferry's forward direction.")]
-        [SerializeField, Range(0f, 120f)] private float frontExclusionAngle = 55f;
-        [Tooltip("Add the ferry's velocity along the spawn line to each enemy's speed, so swarms spawning behind catch up at the same time as those ahead.")]
-        [SerializeField] private bool catchUpSpeedCompensation = true;
-        [Tooltip("0 = no catch-up help (behind swarms stay slow), 1 = full equalization (behind swarms very fast).")]
-        [SerializeField, Range(0f, 1f)] private float catchUpStrength = 0.12f;
-        [Tooltip("Global multiplier on enemy move speed. Below 1 makes all swarms slower.")]
-        [SerializeField, Range(0.2f, 2f)] private float enemySpeedScale = 0.6f;
+        [Tooltip("How far AHEAD of the moving ferry swarms spawn so they reach its side (multiplier on the computed intercept lead).")]
+        [SerializeField, Min(0f)] private float spawnLeadFactor = 1.5f;
+        [Tooltip("Swarms only spawn over this water surface's XZ bounds. Found by name at runtime if not assigned.")]
+        [SerializeField] private Renderer waterRenderer;
+        [SerializeField] private string waterObjectName = "River Water Surface";
+        [Header("Enemy Speed")]
+        [Tooltip("Absolute move speed (m/s) of a round-1 enemy. The ferry crosses at ~6 m/s; below that, enemies trail it.")]
+        [SerializeField] private float enemyBaseSpeed = 7f;
+        [SerializeField] private float enemySpeedPerRound = 0.3f;
 
         [Header("Testing Flood (turn off later)")]
         [Tooltip("Ignores crossing pacing and pours swarms in continuously up to floodAliveCap. Test-only.")]
         [SerializeField] private bool floodForTesting = true;
-        [SerializeField] private int floodAliveCap = 24;
+        [SerializeField] private int floodAliveCap = 31;
         [SerializeField] private int floodPerRound = 500;
-
-        [Header("Adaptive Escalation")]
-        [Tooltip("If at least this fraction of a swarm is killed within the time window, the next swarm doubles in size and speed. Testing value; production ~0.5.")]
-        [SerializeField, Range(0f, 1f)] private float escalationKillFraction = 0.1f;
-        [Tooltip("Time window in crossing-progress units (0-1) measured from when the swarm spawned. Testing value; production ~0.5.")]
-        [SerializeField, Range(0f, 1f)] private float escalationTimeWindow = 0.9f;
-        [SerializeField, Min(1f)] private float maxSwarmMultiplier = 8f;
 
         private readonly List<SimpleEnemy> aliveEnemies = new List<SimpleEnemy>();
         private Coroutine spawnRoutine;
@@ -108,15 +102,10 @@ namespace RollfaehrenFury.Prototype
         private bool isSpawning;
         private float augmentCountMultiplier = 1f;
         private float augmentHealthMultiplier = 1f;
+        private float augmentSpeedMultiplier = 1f;
+        private float augmentRewardMultiplier = 1f;
 
-        private float swarmSizeMultiplier = 1f;
-        private float swarmSpeedMultiplier = 1f;
         private int roundTargetCount = 1;
-        private readonly HashSet<SimpleEnemy> currentWaveMembers = new HashSet<SimpleEnemy>();
-        private int currentWaveCount;
-        private int currentWaveKills;
-        private float currentWaveStartProgress;
-        private bool currentWaveEscalated;
 
         public int AliveCount => aliveEnemies.Count;
         public EnemySpawnProfile[] EnemyProfiles => enemyProfiles;
@@ -148,7 +137,6 @@ namespace RollfaehrenFury.Prototype
             }
 
             StopRound(true);
-            ResetEscalation();
             isSpawning = true;
             spawnRoutine = StartCoroutine(SpawnRound());
         }
@@ -193,10 +181,22 @@ namespace RollfaehrenFury.Prototype
             augmentHealthMultiplier = Mathf.Max(0.1f, augmentHealthMultiplier * multiplier);
         }
 
+        public void AddSpeedMultiplier(float multiplier)
+        {
+            augmentSpeedMultiplier = Mathf.Max(0.1f, augmentSpeedMultiplier * multiplier);
+        }
+
+        public void AddRewardMultiplier(float multiplier)
+        {
+            augmentRewardMultiplier = Mathf.Max(0.1f, augmentRewardMultiplier * multiplier);
+        }
+
         public void ResetAugments()
         {
             augmentCountMultiplier = 1f;
             augmentHealthMultiplier = 1f;
+            augmentSpeedMultiplier = 1f;
+            augmentRewardMultiplier = 1f;
         }
 
         private IEnumerator SpawnRound()
@@ -206,47 +206,35 @@ namespace RollfaehrenFury.Prototype
                 : Mathf.Max(1, Mathf.RoundToInt((baseEnemiesPerRound + (activeRound - 1) * extraEnemiesPerRound) * augmentCountMultiplier));
             int aliveCap = floodForTesting ? Mathf.Max(1, floodAliveCap) : maxAliveEnemies;
             int spawned = 0;
+            Debug.Log($"[SpeedCheck] round {activeRound}: enemy speed = {enemyBaseSpeed + (activeRound - 1) * enemySpeedPerRound:0.0} m/s | ferry = {(ferryController != null ? ferryController.CurrentSpeed : 0f):0.0} m/s", this);
             float startProgress = Mathf.Clamp01(spawnStartProgress);
             float endProgress = Mathf.Clamp(spawnEndProgress, startProgress, 1f);
 
-            while (isSpawning && spawned < roundTargetCount)
+            while (isSpawning && (floodForTesting || spawned < roundTargetCount))
             {
                 float targetProgress = roundTargetCount <= 1
                     ? startProgress
                     : Mathf.Lerp(startProgress, endProgress, spawned / (float)(roundTargetCount - 1));
 
                 bool gateOpen = floodForTesting || GetCrossingProgress() >= targetProgress;
-                if (!gateOpen || aliveEnemies.Count >= aliveCap)
+                if (!gateOpen || (!floodForTesting && aliveEnemies.Count >= aliveCap))
                 {
                     yield return null;
                     continue;
                 }
 
                 // Drop a whole swarm around one procedurally chosen origin so it forms immediately.
-                // Size is randomized per wave, then scaled by the escalation multiplier.
                 Vector3 clusterCenter = GetClusterCenter();
                 int low = Mathf.Min(minSwarmSize, maxSwarmSize);
                 int high = Mathf.Max(minSwarmSize, maxSwarmSize);
-                int burst = Mathf.Max(1, Mathf.RoundToInt(Random.Range(low, high + 1) * swarmSizeMultiplier));
-                if (burst >= bigSwarmWarningThreshold)
+                int burst = Random.Range(low, high + 1);
+                for (int i = 0; i < burst && (floodForTesting || (spawned < roundTargetCount && aliveEnemies.Count < aliveCap)); i++)
                 {
-                    gameManager?.ShowSwarmWarning(burst);
-                }
-
-                BeginWave();
-                for (int i = 0; i < burst && spawned < roundTargetCount && aliveEnemies.Count < aliveCap; i++)
-                {
-                    SimpleEnemy spawnedEnemy = SpawnEnemy(clusterCenter);
-                    if (spawnedEnemy != null)
-                    {
-                        currentWaveMembers.Add(spawnedEnemy);
-                        currentWaveCount++;
-                    }
-
+                    SpawnEnemy(clusterCenter);
                     spawned++;
                 }
 
-                yield return new WaitForSeconds(floodForTesting ? 0.4f : GetSpawnDelay());
+                yield return new WaitForSeconds(floodForTesting ? swarmInterval : GetSpawnDelay());
             }
         }
 
@@ -277,11 +265,10 @@ namespace RollfaehrenFury.Prototype
             enemy.Removed += HandleEnemyRemoved;
             aliveEnemies.Add(enemy);
 
-            float speedMultiplier = (1f + (activeRound - 1) * speedScalePerRound) * swarmSpeedMultiplier * enemySpeedScale;
+            float speed = (enemyBaseSpeed + (activeRound - 1) * enemySpeedPerRound) * augmentSpeedMultiplier;
             float healthMultiplier = (1f + (activeRound - 1) * healthScalePerRound) * augmentHealthMultiplier;
-            int reward = Mathf.Max(baseKillReward, enemy.KillReward) + (activeRound - 1) * 2;
-            float speedBonus = ComputeCatchUpBonus(spawnPosition);
-            enemy.Initialize(ferryTarget, gameManager, reward, speedMultiplier, healthMultiplier, speedBonus);
+            int reward = Mathf.RoundToInt((Mathf.Max(baseKillReward, enemy.KillReward) + (activeRound - 1) * 2) * augmentRewardMultiplier);
+            enemy.Initialize(ferryTarget, gameManager, reward, speed, healthMultiplier);
             return enemy;
         }
 
@@ -400,96 +387,94 @@ namespace RollfaehrenFury.Prototype
         {
             if (spawnRelativeToFerry && ferryTarget != null)
             {
-                Vector3 ferryForward = Vector3.ProjectOnPlane(ferryTarget.transform.forward, Vector3.up).normalized;
-                float frontCos = Mathf.Cos(frontExclusionAngle * Mathf.Deg2Rad);
-                Vector3 direction = Vector3.forward;
-                for (int attempt = 0; attempt < 12; attempt++)
-                {
-                    float angle = Random.Range(0f, Mathf.PI * 2f);
-                    direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+                Vector3 ferryPosition = ferryTarget.transform.position;
 
-                    // Reject directions inside the forbidden cone right in front of the ferry.
-                    if (ferryForward.sqrMagnitude < 0.0001f || Vector3.Dot(direction, ferryForward) < frontCos)
+                // Travel direction from the ferry's velocity; fall back to its facing while docked.
+                Vector3 forward = ferryController != null ? ferryController.Velocity : Vector3.zero;
+                forward = Vector3.ProjectOnPlane(forward, Vector3.up);
+                float ferrySpeed = forward.magnitude;
+                if (ferrySpeed > 0.01f)
+                {
+                    forward /= ferrySpeed;
+                }
+                else
+                {
+                    forward = Vector3.ProjectOnPlane(ferryTarget.transform.forward, Vector3.up).normalized;
+                    if (forward.sqrMagnitude < 0.0001f)
                     {
-                        break;
+                        forward = Vector3.forward;
                     }
                 }
 
-                float radius = Mathf.Max(1f, spawnRadius + Random.Range(-spawnRadiusJitter, spawnRadiusJitter));
-                Vector3 center = ferryTarget.transform.position + direction * radius;
-                return ApplySpawnHeight(center, null);
+                Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+                float side = Random.value < 0.5f ? 1f : -1f;
+                float lateral = spawnRadius * Random.Range(0.5f, 1f);
+                // Lead: the ferry advances this far while an enemy (speed enemyBaseSpeed) crosses to
+                // its side, so spawning that far ahead makes them converge on the SIDE, not behind.
+                float lead = ferrySpeed * (lateral / Mathf.Max(0.1f, enemyBaseSpeed)) * spawnLeadFactor;
+
+                Vector3 offset = forward * lead + right * (side * lateral);
+                float distance = offset.magnitude;
+                Vector3 direction = distance > 0.001f ? offset / distance : right * side;
+
+                // Walk in along the spawn line until it sits on the water.
+                for (float r = distance; r >= 8f; r -= 10f)
+                {
+                    Vector3 candidate = ferryPosition + direction * r;
+                    if (IsOverWater(candidate))
+                    {
+                        return ApplySpawnHeight(candidate, null);
+                    }
+                }
+
+                return ApplySpawnHeight(ferryPosition, null);
             }
 
             return GetSpawnPosition(null);
         }
 
-        // Adds the ferry's velocity component along the enemy->ferry line so that, regardless
-        // of spawn angle, every enemy's closing speed is base + ferrySpeed -> the same catch-up
-        // time as one spawned directly ahead. Enemies behind the ferry get the biggest boost.
-        private float ComputeCatchUpBonus(Vector3 spawnPosition)
+        private Renderer GetWaterRenderer()
         {
-            if (!catchUpSpeedCompensation || ferryController == null || !ferryController.IsCrossing || ferryTarget == null)
+            if (waterRenderer == null && !string.IsNullOrEmpty(waterObjectName))
             {
-                return 0f;
+                GameObject waterObject = GameObject.Find(waterObjectName);
+                if (waterObject != null)
+                {
+                    waterRenderer = waterObject.GetComponent<Renderer>();
+                }
             }
 
-            Vector3 ferryVelocity = ferryController.Velocity;
-            float ferrySpeed = ferryVelocity.magnitude;
-            if (ferrySpeed < 0.01f)
-            {
-                return 0f;
-            }
-
-            Vector3 toFerry = ferryTarget.transform.position - spawnPosition;
-            toFerry.y = 0f;
-            if (toFerry.sqrMagnitude < 0.0001f)
-            {
-                return 0f;
-            }
-
-            Vector3 lineDirection = toFerry.normalized;
-            Vector3 ferryDirection = ferryVelocity / ferrySpeed;
-            return Mathf.Max(0f, catchUpStrength * ferrySpeed * (1f + Vector3.Dot(ferryDirection, lineDirection)));
+            return waterRenderer;
         }
 
-        private void BeginWave()
+        private bool IsOverWater(Vector3 position)
         {
-            currentWaveMembers.Clear();
-            currentWaveCount = 0;
-            currentWaveKills = 0;
-            currentWaveStartProgress = GetCrossingProgress();
-            currentWaveEscalated = false;
-        }
-
-        // If the player clears enough of the current swarm quickly, the next swarm doubles
-        // in size and speed (capped by maxSwarmMultiplier). Triggers once per wave.
-        private void TryEscalateNextWave()
-        {
-            if (currentWaveEscalated || currentWaveCount <= 0)
+            Renderer water = GetWaterRenderer();
+            if (water == null)
             {
-                return;
+                return true; // No water reference -> don't block spawning.
             }
 
-            float killedFraction = currentWaveKills / (float)currentWaveCount;
-            float elapsed = GetCrossingProgress() - currentWaveStartProgress;
-            if (killedFraction >= escalationKillFraction && elapsed <= escalationTimeWindow)
-            {
-                currentWaveEscalated = true;
-                swarmSizeMultiplier = Mathf.Min(maxSwarmMultiplier, swarmSizeMultiplier * 2f);
-                swarmSpeedMultiplier = Mathf.Min(maxSwarmMultiplier, swarmSpeedMultiplier * 2f);
-                roundTargetCount += Mathf.Max(1, Mathf.RoundToInt(maxSwarmSize * swarmSizeMultiplier));
-                Debug.Log($"[Swarm] Cleared fast - next swarm x{swarmSizeMultiplier:0} size / x{swarmSpeedMultiplier:0} speed.", this);
-            }
+            Bounds bounds = water.bounds;
+            const float margin = 12f; // keep spawns off the shoreline / dock edges
+            return position.x >= bounds.min.x + margin && position.x <= bounds.max.x - margin
+                && position.z >= bounds.min.z + margin && position.z <= bounds.max.z - margin;
         }
 
-        private void ResetEscalation()
+        private Vector3 ClampToWater(Vector3 position)
         {
-            swarmSizeMultiplier = 1f;
-            swarmSpeedMultiplier = 1f;
-            currentWaveMembers.Clear();
-            currentWaveCount = 0;
-            currentWaveKills = 0;
-            currentWaveEscalated = false;
+            Renderer water = GetWaterRenderer();
+            if (water == null)
+            {
+                return position;
+            }
+
+            Bounds bounds = water.bounds;
+            const float margin = 4f;
+            position.x = Mathf.Clamp(position.x, bounds.min.x + margin, bounds.max.x - margin);
+            position.z = Mathf.Clamp(position.z, bounds.min.z + margin, bounds.max.z - margin);
+            return position;
         }
 
         private float GetSpawnDelay()
@@ -508,12 +493,6 @@ namespace RollfaehrenFury.Prototype
         {
             enemy.Removed -= HandleEnemyRemoved;
             aliveEnemies.Remove(enemy);
-
-            if (currentWaveMembers.Remove(enemy) && enemy.WasKilledByDamage)
-            {
-                currentWaveKills++;
-                TryEscalateNextWave();
-            }
         }
     }
 }

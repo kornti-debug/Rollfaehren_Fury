@@ -18,11 +18,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float moveSpeed = 3f;
         [SerializeField] private bool useSwarmMovement = true;
 
-        [Header("Catch-up Ramp")]
-        [Tooltip("While behind the ferry's travel direction, this enemy keeps accelerating so it eventually reaches the boat.")]
-        [SerializeField] private bool behindRampEnabled = true;
-        [SerializeField] private float behindRampPerSecond = 0.5f;
-        [SerializeField] private float maxRampSpeed = 16f;
+        [Header("Rear Catch-up (small)")]
+        [Tooltip("Enemies behind the ferry slowly ramp their speed up so they don't fall behind forever. Kept gentle.")]
+        [SerializeField] private bool rearRampEnabled = true;
+        [SerializeField] private float rearRampPerSecond = 0.2f;
+        [SerializeField] private float rearRampMaxSpeed = 8f;
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;
@@ -51,10 +51,6 @@ namespace RollfaehrenFury.Prototype
         public float ActiveMoveSpeed => activeMoveSpeed;
         public bool FaceTarget => faceTarget;
 
-        // True when the player killed this enemy (vs. it reaching the ferry); used by the
-        // spawner's adaptive escalation to measure how fast a swarm gets cleared.
-        public bool WasKilledByDamage { get; private set; }
-
         private void Awake()
         {
             health = GetComponent<Health>();
@@ -75,7 +71,6 @@ namespace RollfaehrenFury.Prototype
         {
             rewardOnDeath = true;
             hasHitFerry = false;
-            WasKilledByDamage = false;
         }
 
         private void OnDestroy()
@@ -90,7 +85,7 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
-            RampSpeedIfBehind();
+            RampRearSpeed();
 
             if (swarmMovement != null && swarmMovement.enabled)
             {
@@ -123,11 +118,11 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        // While behind the ferry (relative to its travel direction), keep accelerating so the
-        // enemy is never left behind for good and eventually forces the player to deal with it.
-        private void RampSpeedIfBehind()
+        // Small catch-up: enemies behind the ferry slowly ramp up so they keep pace instead of
+        // falling behind forever. Deliberately gentle (low rate, cap just above ferry speed).
+        private void RampRearSpeed()
         {
-            if (!behindRampEnabled || ferryTarget == null || hasHitFerry)
+            if (!rearRampEnabled || ferryTarget == null || hasHitFerry || activeMoveSpeed >= rearRampMaxSpeed)
             {
                 return;
             }
@@ -142,16 +137,16 @@ namespace RollfaehrenFury.Prototype
 
             if (Vector3.Dot(forward, offset) < 0f)
             {
-                activeMoveSpeed = Mathf.Min(maxRampSpeed, activeMoveSpeed + behindRampPerSecond * Time.deltaTime);
+                activeMoveSpeed = Mathf.Min(rearRampMaxSpeed, activeMoveSpeed + rearRampPerSecond * Time.deltaTime);
             }
         }
 
-        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speedMultiplier, float healthMultiplier, float speedBonus = 0f)
+        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speed, float healthMultiplier)
         {
             ferryTarget = target;
             gameManager = manager;
             killReward = Mathf.Max(0, reward);
-            activeMoveSpeed = Mathf.Max(0.1f, moveSpeed * speedMultiplier + speedBonus);
+            activeMoveSpeed = Mathf.Max(0.1f, speed);
 
             if (health == null)
             {
@@ -203,8 +198,6 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleDied(Health deadHealth)
         {
-            WasKilledByDamage = true;
-
             if (rewardOnDeath)
             {
                 gameManager?.RegisterEnemyKilled(killReward);
