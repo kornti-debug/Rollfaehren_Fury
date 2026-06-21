@@ -127,9 +127,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
 - [x] Weapon-ammo upgrades in the shop: Bigger Magazine (+rounds), Extra Ammo (+reserve mags), Faster Reload (shorter reload), Resupply Ammo (refill mags + reserve). Added to the catalog at runtime with tunable cost/amount on `ShopManager` (~15–20 each, coherent with the base upgrades).
 - [x] Weapon Damage upgrade is now a **percentage** (+25%/buy) instead of flat +10, so it scales every weapon evenly (no more per-pellet blow-up on the shotgun). Harpoon base damage 120 → 140 (one-shots fish through ~round 6).
-- [ ] Verify Track B in Unity: shop purchases apply (damage, fire rate, ferry HP, ricochet, magazine, reserve, reload, resupply); buttons lay out for the full catalog.
-- [ ] Later: per-weapon base upgrades + more master upgrades (knockback, fuel); optionally turn the runtime ammo upgrades into tunable assets.
-- [x] Economy pass: per-purchase cost escalation (×1.7 per owned copy; Resupply stays flat), kill reward flattened to ~6/kill (was 10 +2/round), starting gold 40. Stops the shop being maxed by ~round 2; tunable via `costGrowthPerPurchase` / `killRewardScale` / GameManager `startingMoney`.
+- [x] Node-tree shop: `ShopManager` now builds a per-weapon upgrade tree at runtime (click a weapon node → lines branch to its upgrade nodes). Per weapon: Damage (+25%/level, escalating cost), Fire Rate; ammo weapons also Faster Reload + Refill Ammo (tops magazine + reserve to current cap); Harpoon gets Ricochet (wired into the projectile). Replaces the flat catalog shop; the old `UpgradeDefinition` assets are now dormant.
+- [x] Lower income to match the simpler shop: kill reward 6 → 3 (tunable via `killRewardScale`).
+- [ ] Verify the node-tree shop in Unity: weapon nodes + branching lines render; per-weapon purchases apply; Refill greys out when full; Harpoon ricochet chains. Tune node spacing/line constants in `ShopManager` if the layout looks off.
+- [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
 - [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
