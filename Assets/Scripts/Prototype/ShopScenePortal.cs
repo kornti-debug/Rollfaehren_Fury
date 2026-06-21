@@ -9,10 +9,18 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private string shopId = "SharedShop";
         [SerializeField] private GameObject promptObject;
 
+        private static ShopScenePortal promptOwner;
+
         private GameManager gameManager;
         private ShopSceneCoordinator coordinator;
         private SimpleFPSController playerInRange;
         private InputAction interactAction;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetPromptOwner()
+        {
+            promptOwner = null;
+        }
 
         private void Awake()
         {
@@ -37,7 +45,7 @@ namespace RollfaehrenFury.Prototype
                 interactAction.performed -= HandleInteract;
             }
 
-            SetPrompt(false);
+            ReleasePrompt();
         }
 
         private void Update()
@@ -47,7 +55,15 @@ namespace RollfaehrenFury.Prototype
                 && gameManager.AllowsShopSceneEntry
                 && coordinator != null
                 && !coordinator.IsTransitioning;
-            SetPrompt(canEnter);
+
+            if (canEnter)
+            {
+                ClaimPrompt();
+            }
+            else
+            {
+                ReleasePrompt();
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -65,7 +81,7 @@ namespace RollfaehrenFury.Prototype
             if (controller != null && controller == playerInRange)
             {
                 playerInRange = null;
-                SetPrompt(false);
+                ReleasePrompt();
             }
         }
 
@@ -82,11 +98,33 @@ namespace RollfaehrenFury.Prototype
             coordinator.EnterShop(sceneName, shopId);
         }
 
+        private void ClaimPrompt()
+        {
+            if (promptOwner != null && promptOwner != this)
+            {
+                promptOwner.SetPrompt(false);
+            }
+
+            promptOwner = this;
+            SetPrompt(true);
+        }
+
+        private void ReleasePrompt()
+        {
+            if (promptOwner != this)
+            {
+                return;
+            }
+
+            SetPrompt(false);
+            promptOwner = null;
+        }
+
         private void SetPrompt(bool active)
         {
             if (promptObject != null)
             {
-                promptObject.SetActive(active);
+                TextPrompt.Set(promptObject, "Press E - Enter shop", active);
             }
         }
     }

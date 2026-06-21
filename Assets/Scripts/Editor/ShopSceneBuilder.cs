@@ -15,6 +15,8 @@ namespace RollfaehrenFury.Editor
         private const string ShopScenePath = "Assets/Scenes/ShopInterior.unity";
         private const string ShopNpcPrefabPath = "Assets/Prefabs/NPC_Shop.prefab";
         private const string VendingMachinePrefabPath = "Assets/Models/VendingMachine.fbx";
+        private const string ShopInteriorRootName = "Shop Interior Root";
+        private static readonly Vector3 ShopInteriorWorldPosition = new Vector3(5000f, 500f, 5000f);
 
         [MenuItem("Rollfaehren Fury/Configure Shared Shop Portals")]
         public static void ConfigureSharedShopPortals()
@@ -50,6 +52,12 @@ namespace RollfaehrenFury.Editor
         [MenuItem("Rollfaehren Fury/Build Shared Shop Interior")]
         public static void BuildSharedShopInterior()
         {
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ShopScenePath) != null)
+            {
+                RepairSharedShopInterior();
+                return;
+            }
+
             Material wallMaterial = EnsureMaterial(
                 "Assets/Materials/ShopInteriorWall.mat",
                 new Color(0.38f, 0.34f, 0.28f));
@@ -63,22 +71,25 @@ namespace RollfaehrenFury.Editor
             Scene shopScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             shopScene.name = SceneFlow.ShopInteriorSceneName;
 
-            GameObject room = new GameObject("Shop Interior");
+            GameObject room = new GameObject(ShopInteriorRootName);
             CreateBlock(room.transform, "Floor", new Vector3(0f, -0.1f, 0f), new Vector3(8f, 0.2f, 10f), floorMaterial);
-            CreateBlock(room.transform, "Ceiling", new Vector3(0f, 3f, 0f), new Vector3(8f, 0.2f, 10f), wallMaterial);
-            CreateBlock(room.transform, "Back Wall", new Vector3(0f, 1.5f, -5f), new Vector3(8f, 3f, 0.2f), wallMaterial);
-            CreateBlock(room.transform, "Left Wall", new Vector3(-4f, 1.5f, 0f), new Vector3(0.2f, 3f, 10f), wallMaterial);
-            CreateBlock(room.transform, "Right Wall", new Vector3(4f, 1.5f, 0f), new Vector3(0.2f, 3f, 10f), wallMaterial);
-            CreateBlock(room.transform, "Front Wall Left", new Vector3(-2.5f, 1.5f, 5f), new Vector3(3f, 3f, 0.2f), wallMaterial);
-            CreateBlock(room.transform, "Front Wall Right", new Vector3(2.5f, 1.5f, 5f), new Vector3(3f, 3f, 0.2f), wallMaterial);
+            CreateBlock(room.transform, "Ceiling", new Vector3(0f, 4f, 0f), new Vector3(8f, 0.2f, 10f), wallMaterial);
+            CreateBlock(room.transform, "Back Wall", new Vector3(0f, 2f, -5f), new Vector3(8f, 4f, 0.2f), wallMaterial);
+            CreateBlock(room.transform, "Left Wall", new Vector3(-4f, 2f, 0f), new Vector3(0.2f, 4f, 10f), wallMaterial);
+            CreateBlock(room.transform, "Right Wall", new Vector3(4f, 2f, 0f), new Vector3(0.2f, 4f, 10f), wallMaterial);
+            CreateBlock(room.transform, "Front Wall Left", new Vector3(-2.5f, 2f, 5f), new Vector3(3f, 4f, 0.2f), wallMaterial);
+            CreateBlock(room.transform, "Front Wall Right", new Vector3(2.5f, 2f, 5f), new Vector3(3f, 4f, 0.2f), wallMaterial);
+            CreateBlock(room.transform, "Door", new Vector3(0f, 2f, 5f), new Vector3(2f, 4f, 0.2f), wallMaterial);
             CreateBlock(room.transform, "Counter", new Vector3(0f, 0.6f, -2f), new Vector3(4.5f, 1.2f, 1f), counterMaterial);
 
             Transform spawn = new GameObject("Shop Interior Spawn").transform;
-            spawn.position = new Vector3(0f, 0.05f, 2.6f);
-            spawn.rotation = Quaternion.Euler(0f, 180f, 0f);
+            spawn.SetParent(room.transform, false);
+            spawn.localPosition = new Vector3(0f, 0.05f, 2.6f);
+            spawn.localRotation = Quaternion.Euler(0f, 180f, 0f);
 
             GameObject exit = new GameObject("Shop Exit");
-            exit.transform.position = new Vector3(0f, 1f, 4.35f);
+            exit.transform.SetParent(room.transform, false);
+            exit.transform.localPosition = new Vector3(0f, 1f, 4.35f);
             BoxCollider exitCollider = exit.AddComponent<BoxCollider>();
             exitCollider.isTrigger = true;
             exitCollider.size = new Vector3(2f, 2f, 1.2f);
@@ -91,7 +102,8 @@ namespace RollfaehrenFury.Editor
                 if (npc != null)
                 {
                     npc.name = "NPC_Shop";
-                    npc.transform.SetPositionAndRotation(new Vector3(0f, 0f, -3f), Quaternion.identity);
+                    npc.transform.SetParent(room.transform, false);
+                    npc.transform.SetLocalPositionAndRotation(new Vector3(0f, 0f, -3f), Quaternion.identity);
                     npc.transform.localScale = Vector3.one;
                     ShopInteractable interactable = npc.GetComponent<ShopInteractable>();
                     if (interactable != null)
@@ -106,12 +118,15 @@ namespace RollfaehrenFury.Editor
             }
 
             GameObject lightObject = new GameObject("Shop Light");
+            lightObject.transform.SetParent(room.transform, false);
             Light shopLight = lightObject.AddComponent<Light>();
             shopLight.type = LightType.Point;
             shopLight.range = 15f;
             shopLight.intensity = 5f;
             shopLight.color = new Color(1f, 0.82f, 0.62f);
-            lightObject.transform.position = new Vector3(0f, 2.5f, 0f);
+            lightObject.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+
+            room.transform.position = ShopInteriorWorldPosition;
 
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(0.28f, 0.3f, 0.32f);
@@ -127,6 +142,53 @@ namespace RollfaehrenFury.Editor
         public static void BuildSharedShopInteriorFromCommandLine()
         {
             BuildSharedShopInterior();
+        }
+
+        [MenuItem("Rollfaehren Fury/Repair Shared Shop Interior")]
+        public static void RepairSharedShopInterior()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return;
+            }
+
+            Scene shopScene = EditorSceneManager.OpenScene(ShopScenePath, OpenSceneMode.Single);
+            GameObject root = FindSceneObjectInScene(shopScene, ShopInteriorRootName)
+                ?? FindSceneObjectInScene(shopScene, "Shop Interior");
+            if (root == null)
+            {
+                Debug.LogError("ShopInterior scene is missing its room root.");
+                return;
+            }
+
+            bool rootNeedsMoving = Vector3.Distance(root.transform.position, ShopInteriorWorldPosition) > 0.01f;
+            root.name = ShopInteriorRootName;
+
+            foreach (GameObject sceneRoot in shopScene.GetRootGameObjects())
+            {
+                if (sceneRoot == root)
+                {
+                    continue;
+                }
+
+                sceneRoot.transform.SetParent(root.transform, true);
+            }
+
+            if (rootNeedsMoving)
+            {
+                root.transform.position = ShopInteriorWorldPosition;
+            }
+
+            AddShopSceneToBuildSettings();
+            EditorSceneManager.MarkSceneDirty(shopScene);
+            EditorSceneManager.SaveScene(shopScene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Shared ShopInterior.unity repaired without rebuilding manual room content.");
+        }
+
+        public static void RepairSharedShopInteriorFromCommandLine()
+        {
+            RepairSharedShopInterior();
         }
 
         private static void ConfigurePortal(string objectName, string shopId, GameObject prompt)
@@ -252,17 +314,61 @@ namespace RollfaehrenFury.Editor
                 throw new System.InvalidOperationException($"Expected 2 shop portals, found {portals.Length}.");
             }
 
+            HashSet<string> shopIds = new HashSet<string>();
+            GameObject sharedPrompt = null;
+            foreach (ShopScenePortal portal in portals)
+            {
+                SerializedObject serializedPortal = new SerializedObject(portal);
+                SerializedProperty shopId = serializedPortal.FindProperty("shopId");
+                SerializedProperty promptObject = serializedPortal.FindProperty("promptObject");
+                GameObject portalPrompt = promptObject?.objectReferenceValue as GameObject;
+                if (shopId == null || string.IsNullOrWhiteSpace(shopId.stringValue))
+                {
+                    throw new System.InvalidOperationException($"Shop portal '{portal.name}' has no shop ID.");
+                }
+
+                if (portalPrompt == null)
+                {
+                    throw new System.InvalidOperationException($"Shop portal '{portal.name}' has no prompt reference.");
+                }
+
+                shopIds.Add(shopId.stringValue);
+                sharedPrompt ??= portalPrompt;
+                if (sharedPrompt != portalPrompt)
+                {
+                    throw new System.InvalidOperationException("Shop portals must reference the shared shop prompt.");
+                }
+            }
+
+            if (!shopIds.Contains("ShoreA") || !shopIds.Contains("ShoreB"))
+            {
+                throw new System.InvalidOperationException("Shop portals must include ShoreA and ShoreB.");
+            }
+
             if (FindSceneObjectIncludingInactive("Vending Machine Decoration") == null)
             {
-                throw new System.InvalidOperationException("Main scene is missing the vending-machine decoration.");
+                Debug.LogWarning("Optional ferry vending-machine decoration is not present in Main.unity.");
             }
 
             Scene shopScene = EditorSceneManager.OpenScene(ShopScenePath, OpenSceneMode.Additive);
-            if (FindSceneObjectInScene(shopScene, "Shop Interior Spawn") == null
-                || FindSceneObjectInScene(shopScene, "Shop Exit") == null
-                || FindSceneObjectInScene(shopScene, "NPC_Shop") == null)
+            GameObject shopRoot = FindSceneObjectInScene(shopScene, ShopInteriorRootName);
+            GameObject shopSpawn = FindSceneObjectInScene(shopScene, "Shop Interior Spawn");
+            GameObject shopExit = FindSceneObjectInScene(shopScene, "Shop Exit");
+            GameObject shopNpc = FindSceneObjectInScene(shopScene, "NPC_Shop");
+            GameObject shopLight = FindSceneObjectInScene(shopScene, "Shop Light");
+            if (shopRoot == null
+                || Vector3.Distance(shopRoot.transform.position, ShopInteriorWorldPosition) > 0.01f
+                || shopSpawn == null
+                || shopExit == null
+                || shopNpc == null
+                || shopLight == null
+                || !shopSpawn.transform.IsChildOf(shopRoot.transform)
+                || !shopExit.transform.IsChildOf(shopRoot.transform)
+                || !shopNpc.transform.IsChildOf(shopRoot.transform)
+                || !shopLight.transform.IsChildOf(shopRoot.transform))
             {
-                throw new System.InvalidOperationException("ShopInterior scene is missing its spawn, exit, or NPC.");
+                throw new System.InvalidOperationException(
+                    "ShopInterior scene is not isolated or its spawn, exit, NPC, and light are not below the room root.");
             }
 
             Debug.Log("Shared shop scene validation passed.");
