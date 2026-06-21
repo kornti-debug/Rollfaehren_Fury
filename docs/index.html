@@ -3,459 +3,1123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rollenfähren-Fury — Danube Rogue-lite</title>
+<meta name="description" content="Assignment 2 ePortfolio for Rollfaehren Fury, a Unity ferry-defense FPS prototype.">
+<title>Rollfähren Fury | Assignment 2 ePortfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;500;600;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Bungee&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --river:#0a3d4a;          /* deep danube */
-    --river-2:#0e5666;        /* shallower water */
-    --foam:#e8f4f2;           /* pale foam / paper */
-    --hull:#13202b;           /* dark hull / ink */
-    --warning:#ffb627;        /* hazard amber */
-    --warning-deep:#e8920c;
-    --siren:#ff4d2e;          /* alarm vermilion */
-    --rivet:#7d96a1;          /* steel grey */
-    --line: rgba(232,244,242,0.14);
-    --tape:#1a2f3a;
-    --ease:cubic-bezier(.2,.7,.2,1);
+  :root {
+    --river: #0a3d4a;
+    --river-light: #0f6573;
+    --hull: #111c25;
+    --hull-soft: #172833;
+    --foam: #edf7f5;
+    --muted: #a9c1bd;
+    --steel: #78949e;
+    --warning: #ffb627;
+    --warning-dark: #e48c08;
+    --siren: #f04d3a;
+    --success: #43c59e;
+    --progress: #5db7de;
+    --line: rgba(237, 247, 245, 0.16);
+    --content: 1160px;
   }
 
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--hull);
-    color:var(--foam);
-    font-family:'Archivo',system-ui,sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--hull);
+    color: var(--foam);
+    font-family: "Archivo", system-ui, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0;
+    overflow-x: hidden;
   }
-  a{color:inherit;}
+  a { color: inherit; }
+  img { display: block; max-width: 100%; }
+  button, a { -webkit-tap-highlight-color: transparent; }
 
-  /* ---------- hazard tape divider ---------- */
-  .tape{
-    height:14px;
-    background:repeating-linear-gradient(45deg,
-      var(--warning) 0 22px, var(--hull) 22px 44px);
-    border-top:2px solid var(--hull);
-    border-bottom:2px solid var(--hull);
+  .skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+    padding: 9px 12px;
+    background: var(--warning);
+    color: var(--hull);
+    transform: translateY(-160%);
+  }
+  .skip-link:focus { transform: none; }
+
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(17, 28, 37, 0.96);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+  }
+  .nav-inner {
+    width: min(var(--content), calc(100% - 32px));
+    min-height: 58px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+  }
+  .brand {
+    font-family: "Bungee", sans-serif;
+    font-size: 0.9rem;
+    color: var(--warning);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-links {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .nav-links a:hover,
+  .nav-links a:focus-visible { color: var(--warning); }
+
+  .hero {
+    position: relative;
+    min-height: min(820px, calc(100vh - 58px));
+    display: flex;
+    align-items: flex-end;
+    background-color: var(--river);
+    background-image: url("assets/assignment2/ferry-crossing.jpg");
+    background-position: center;
+    background-size: cover;
+    isolation: isolate;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(7, 24, 31, 0.64);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 36%;
+    z-index: -1;
+    background: rgba(17, 28, 37, 0.76);
+  }
+  .hero-content {
+    width: min(var(--content), calc(100% - 40px));
+    min-width: 0;
+    margin: 0 auto;
+    padding: 92px 0 70px;
+  }
+  .assignment-label,
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin: 0 0 14px;
+    color: var(--warning);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .assignment-label::before,
+  .eyebrow::before {
+    content: "";
+    width: 32px;
+    height: 2px;
+    background: currentColor;
+  }
+  h1 {
+    max-width: 900px;
+    margin: 0;
+    font-family: "Bungee", sans-serif;
+    font-size: clamp(3rem, 10vw, 7.6rem);
+    line-height: 0.92;
+    letter-spacing: 0;
+    text-shadow: 4px 4px 0 var(--siren);
+  }
+  .hero-copy {
+    width: 100%;
+    max-width: 720px;
+    margin: 24px 0 0;
+    color: #d8e9e6;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  }
+  .hero-actions {
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  .button {
+    max-width: 100%;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--warning);
+    background: var(--warning);
+    color: var(--hull);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: normal;
+  }
+  .button.secondary {
+    background: rgba(17, 28, 37, 0.76);
+    color: var(--foam);
+    border-color: var(--line);
+  }
+  .button:hover,
+  .button:focus-visible { border-color: var(--foam); }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+  .chip {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    background: rgba(17, 28, 37, 0.74);
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+  }
+  .chip strong { color: var(--foam); }
+
+  .tape {
+    height: 14px;
+    border-top: 2px solid var(--hull);
+    border-bottom: 2px solid var(--hull);
+    background: repeating-linear-gradient(
+      45deg,
+      var(--warning) 0 22px,
+      var(--hull) 22px 44px
+    );
   }
 
-  /* ---------- HERO ---------- */
-  .hero{
-    position:relative;
-    min-height:92vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    padding:80px 20px 60px;
-    overflow:hidden;
-    background:
-      radial-gradient(120% 80% at 50% -10%, var(--river-2) 0%, var(--river) 45%, var(--hull) 100%);
+  .band { padding: 86px 0; }
+  .band.alt { background: #0d333f; }
+  .band.light {
+    background: var(--foam);
+    color: var(--hull);
   }
-  /* layered water bands */
-  .wave{
-    position:absolute;left:-10%;right:-10%;
-    height:40px;opacity:.35;
-    background:radial-gradient(closest-side, var(--foam) 0%, transparent 70%);
-    filter:blur(1px);
-    animation:drift linear infinite;
+  .wrap {
+    width: min(var(--content), calc(100% - 40px));
+    margin: 0 auto;
   }
-  .wave.w1{bottom:18%;animation-duration:11s;}
-  .wave.w2{bottom:30%;opacity:.18;animation-duration:17s;animation-direction:reverse;}
-  .wave.w3{bottom:8%;opacity:.5;animation-duration:8s;}
-  @keyframes drift{from{transform:translateX(-6%);}to{transform:translateX(6%);}}
+  h2 {
+    max-width: 880px;
+    margin: 0 0 18px;
+    font-family: "Bungee", sans-serif;
+    font-size: clamp(1.8rem, 4.2vw, 3.3rem);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+  .section-intro {
+    max-width: 780px;
+    margin: 0 0 38px;
+    color: var(--muted);
+    font-size: 1.04rem;
+  }
+  .light .section-intro { color: #47616a; }
 
-  .ticket{
-    position:relative;
-    z-index:2;
-    border:2px solid var(--warning);
-    background:rgba(10,61,74,.55);
-    backdrop-filter:blur(3px);
-    padding:8px 18px;
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;
-    letter-spacing:.28em;
-    text-transform:uppercase;
-    color:var(--warning);
-    margin-bottom:30px;
+  .feature-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
-  .title{
-    position:relative;z-index:2;
-    font-family:'Bungee',sans-serif;
-    font-size:clamp(2.8rem,9vw,7rem);
-    line-height:.92;
-    margin:0;
-    color:var(--foam);
-    text-shadow:
-      4px 4px 0 var(--siren),
-      8px 8px 0 var(--river-2);
-    animation:rock 5s var(--ease) infinite;
+  .feature-step {
+    min-height: 210px;
+    padding: 22px 18px;
+    border-right: 1px solid var(--line);
   }
-  .title .hl{color:var(--warning);}
-  @keyframes rock{0%,100%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}}
-
-  .tagline{
-    position:relative;z-index:2;
-    font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(1rem,2.4vw,1.5rem);
-    color:var(--foam);
-    margin:26px 0 0;
-    max-width:620px;
+  .feature-step:last-child { border-right: 0; }
+  .step-number {
+    display: block;
+    margin-bottom: 30px;
+    color: var(--warning);
+    font-family: "Bungee", sans-serif;
+    font-size: 1.25rem;
   }
-  .tagline b{color:var(--warning);font-weight:700;}
-
-  .hero-meta{
-    position:relative;z-index:2;
-    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
-    margin-top:34px;
+  .feature-step h3,
+  .technical-copy h3,
+  .diagram-title,
+  .team-role h3 {
+    margin: 0 0 8px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.08rem;
+    line-height: 1.2;
   }
-  .chip{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
-    padding:7px 14px;
-    border:1px solid var(--line);
-    border-radius:100px;
-    color:var(--rivet);
-    background:rgba(255,255,255,.02);
-  }
-  .chip b{color:var(--foam);}
-
-  .scroll-cue{
-    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
-    z-index:2;
-    font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.3em;
-    color:var(--rivet);text-transform:uppercase;
-    animation:bob 2s ease-in-out infinite;
-  }
-  @keyframes bob{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
-
-  /* ---------- layout shell ---------- */
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
-  section.block{padding:84px 0;}
-
-  .eyebrow{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;
-    color:var(--warning);
-    display:flex;align-items:center;gap:12px;
-    margin:0 0 14px;
-  }
-  .eyebrow::before{content:"";width:34px;height:2px;background:var(--warning);}
-  h2{
-    font-family:'Bungee',sans-serif;
-    font-size:clamp(1.7rem,4vw,2.6rem);
-    margin:0 0 34px;
-    line-height:1;
-  }
-  h2 .sub{
-    display:block;
-    font-family:'Space Grotesk',sans-serif;
-    font-size:.95rem;font-weight:400;
-    color:var(--rivet);
-    letter-spacing:0;text-transform:none;
-    margin-top:14px;
+  .feature-step p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
   }
 
-  /* ---------- overview / story ---------- */
-  .story{
-    font-size:1.18rem;
-    max-width:760px;
-    color:#cfe2df;
+  .technical {
+    margin-top: 46px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+    gap: 40px;
+    align-items: center;
   }
-  .story b{color:var(--foam);}
-  .pullquote{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(1.3rem,3vw,2rem);
-    font-weight:700;
-    color:var(--warning);
-    border-left:4px solid var(--siren);
-    padding-left:22px;
-    margin:40px 0 0;
-    line-height:1.25;
+  .technical-copy p { color: var(--muted); }
+  .technical-list {
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .technical-list li {
+    padding: 11px 0 11px 25px;
+    border-top: 1px solid var(--line);
+    position: relative;
+  }
+  .technical-list li::before {
+    content: "+";
+    position: absolute;
+    left: 0;
+    color: var(--warning);
+    font-family: "JetBrains Mono", monospace;
+  }
+  code {
+    padding: 2px 5px;
+    border: 1px solid rgba(255, 182, 39, 0.24);
+    background: rgba(255, 182, 39, 0.09);
+    color: var(--warning);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.84em;
   }
 
-  /* ---------- loop / steps ---------- */
-  .loop{display:grid;gap:2px;background:var(--line);border:1px solid var(--line);}
-  .loop-row{
-    background:var(--hull);
-    display:grid;grid-template-columns:64px 1fr;
-    gap:0;
-    transition:background .25s var(--ease);
+  .route-visual {
+    min-height: 330px;
+    position: relative;
+    border: 1px solid var(--line);
+    background-color: var(--river);
+    overflow: hidden;
   }
-  .loop-row:hover{background:#16242f;}
-  .loop-num{
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Bungee',sans-serif;font-size:1.3rem;
-    color:var(--warning);
-    border-right:2px solid var(--line);
+  .route-visual::before,
+  .route-visual::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 23%;
+    background: #305e46;
   }
-  .loop-body{padding:22px 24px;}
-  .loop-body h3{
-    margin:0 0 6px;
-    font-family:'Space Grotesk',sans-serif;
-    font-size:1.15rem;font-weight:700;color:var(--foam);
+  .route-visual::before { left: 0; }
+  .route-visual::after { right: 0; }
+  .dock {
+    position: absolute;
+    top: 50%;
+    width: 28%;
+    height: 24px;
+    background: #9d7348;
+    transform: translateY(-50%);
+    z-index: 2;
   }
-  .loop-body p{margin:0;color:#a9c1bd;font-size:.98rem;}
+  .dock.a { left: 4%; }
+  .dock.b { right: 4%; }
+  .route-line {
+    position: absolute;
+    inset: 31% 22%;
+    border-top: 5px dashed var(--warning);
+    border-radius: 50%;
+    transform: rotate(-8deg);
+  }
+  .route-line::after {
+    content: "FERRY";
+    position: absolute;
+    top: -24px;
+    left: 47%;
+    padding: 7px 10px;
+    background: var(--hull);
+    color: var(--foam);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    transform: rotate(8deg);
+  }
+  .route-label {
+    position: absolute;
+    bottom: 18px;
+    color: #d9ebe8;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    z-index: 3;
+  }
+  .route-label.a { left: 18px; }
+  .route-label.b { right: 18px; }
 
-  /* ---------- characters ---------- */
-  .roster{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
-  .crew{
-    border:1px solid var(--line);
-    background:linear-gradient(180deg,#16242f 0%, var(--hull) 100%);
-    padding:26px 24px 24px;
-    position:relative;
-    overflow:hidden;
-    transition:transform .3s var(--ease), border-color .3s var(--ease);
+  .diagram-block + .diagram-block { margin-top: 42px; }
+  .diagram-title { color: var(--warning); }
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 11px;
+    margin-top: 18px;
+    overflow-x: auto;
+    padding-bottom: 8px;
   }
-  .crew:hover{transform:translateY(-6px);border-color:var(--warning);}
-  .crew .role{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
-    padding:4px 10px;border-radius:100px;display:inline-block;margin-bottom:16px;
+  .flow-node {
+    min-width: 146px;
+    min-height: 86px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: var(--hull-soft);
   }
-  .r-player{background:var(--warning);color:var(--hull);}
-  .r-sky{background:#2f6f86;color:var(--foam);}
-  .r-water{background:var(--siren);color:var(--foam);}
-  .crew h3{font-family:'Bungee',sans-serif;font-size:1.15rem;margin:0 0 10px;line-height:1.1;}
-  .crew p{margin:0;color:#a9c1bd;font-size:.95rem;}
-  .crew .emoji{position:absolute;top:14px;right:16px;font-size:2.4rem;opacity:.9;filter:grayscale(.1);}
+  .flow-node strong {
+    font-family: "Space Grotesk", sans-serif;
+    line-height: 1.2;
+  }
+  .flow-node span {
+    margin-top: 5px;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+  }
+  .flow-node.highlight { border-color: var(--warning); }
+  .flow-node.danger { border-color: var(--siren); }
+  .flow-arrow {
+    min-width: 24px;
+    display: grid;
+    place-items: center;
+    color: var(--warning);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.2rem;
+  }
+  .flow-branch {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .flow-branch .flow-node { min-width: 0; }
 
-  /* ---------- architecture ---------- */
-  .arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
-  .panel{
-    border:1px solid var(--line);
-    padding:28px 26px;
-    background:rgba(255,255,255,.015);
+  .interaction-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--line);
+    margin-top: 18px;
   }
-  .panel h3{
-    font-family:'Space Grotesk',sans-serif;font-weight:700;
-    font-size:1.2rem;margin:0 0 14px;color:var(--warning);
+  .interaction-column {
+    padding: 20px;
+    border-right: 1px solid var(--line);
   }
-  .panel p{margin:0;color:#bcd2ce;font-size:.98rem;}
-  code{
-    font-family:'JetBrains Mono',monospace;
-    font-size:.85em;
-    background:rgba(255,182,39,.12);
-    color:var(--warning);
-    padding:2px 6px;border-radius:4px;
+  .interaction-column:last-child { border-right: 0; }
+  .interaction-column h4 {
+    margin: 0 0 12px;
+    color: var(--warning);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
   }
-  .sysgrid{
-    margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;
+  .interaction-column ul {
+    margin: 0;
+    padding-left: 17px;
+    color: var(--muted);
+    font-size: 0.88rem;
   }
-  .node{
-    font-family:'JetBrains Mono',monospace;font-size:.78rem;
-    border:1px solid var(--line);padding:10px 12px;border-radius:6px;
-    color:#cfe2df;background:var(--hull);text-align:center;
-  }
-  .node.singleton{border-color:var(--warning);color:var(--warning);}
 
-  /* ---------- gallery placeholders ---------- */
-  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
-  .frame{
-    aspect-ratio:16/10;
-    border:1px solid var(--line);
-    background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 12px, transparent 12px 24px),
-      var(--river);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:8px;color:var(--rivet);
-    position:relative;overflow:hidden;
+  .infrastructure {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
   }
-  .frame::before{content:"⛴";font-size:2.2rem;opacity:.35;}
-  .frame span{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;}
-  .frame img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
-
-  /* ---------- footer ---------- */
-  footer{
-    border-top:2px solid var(--line);
-    padding:50px 24px;
-    text-align:center;
+  .system-group {
+    padding: 22px;
+    border-top: 4px solid var(--river-light);
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(17, 28, 37, 0.09);
   }
-  footer .logo{font-family:'Bungee',sans-serif;font-size:1.1rem;color:var(--warning);}
-  footer p{color:var(--rivet);font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.1em;margin:10px 0 0;}
+  .system-group:nth-child(2) { border-top-color: var(--warning-dark); }
+  .system-group:nth-child(3) { border-top-color: var(--siren); }
+  .system-group:nth-child(4) { border-top-color: var(--success); }
+  .system-group:nth-child(5) { border-top-color: var(--progress); }
+  .system-group:nth-child(6) { border-top-color: #7759a7; }
+  .system-group h3 {
+    margin: 0 0 14px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.05rem;
+  }
+  .system-list {
+    display: grid;
+    gap: 7px;
+  }
+  .system-list span {
+    padding: 7px 9px;
+    background: #edf3f2;
+    color: #29434c;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+  }
+  .relationship-note {
+    margin-top: 26px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--warning-dark);
+    background: #dfeae8;
+    color: #29434c;
+  }
 
-  /* reveal on scroll */
-  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
-  .reveal.in{opacity:1;transform:none;}
+  .requirements {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    color: var(--hull);
+  }
+  .requirements th,
+  .requirements td {
+    padding: 14px 15px;
+    border-bottom: 1px solid #d7e3e1;
+    text-align: left;
+    vertical-align: top;
+  }
+  .requirements th {
+    background: var(--hull);
+    color: var(--foam);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+  }
+  .requirements td:first-child {
+    width: 18%;
+    font-weight: 700;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .done { color: #126b50; background: #d9f2e8; }
+  .active { color: #145f83; background: #dceef7; }
+  .pending { color: #955900; background: #fff0ce; }
 
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;}
-    .reveal{opacity:1;transform:none;transition:none;}
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .shot {
+    min-height: 330px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background-color: var(--river);
+  }
+  .shot img {
+    width: 100%;
+    height: 100%;
+    min-height: 330px;
+    object-fit: cover;
+  }
+  .shot figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px 16px;
+    background: rgba(17, 28, 37, 0.9);
+    color: var(--foam);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+  }
+  .shot-fallback {
+    min-height: 330px;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .team-role {
+    padding: 24px 20px;
+    border-right: 1px solid var(--line);
+  }
+  .team-role:last-child { border-right: 0; }
+  .team-role span {
+    display: block;
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 38px;
+  }
+  .phase {
+    padding: 18px;
+    border-top: 4px solid var(--steel);
+    background: var(--hull-soft);
+  }
+  .phase.completed { border-color: var(--success); }
+  .phase.current { border-color: var(--warning); }
+  .phase h3 {
+    margin: 0 0 7px;
+    font-size: 0.94rem;
+  }
+  .phase p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  footer {
+    padding: 48px 20px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  footer strong {
+    color: var(--warning);
+    font-family: "Bungee", sans-serif;
+  }
+  footer p {
+    margin: 8px 0 0;
+    color: var(--steel);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .feature-strip,
+    .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .feature-step,
+    .team-role { border-bottom: 1px solid var(--line); }
+    .technical { grid-template-columns: 1fr; }
+    .interaction-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .interaction-column:nth-child(2) { border-right: 0; }
+    .interaction-column:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .infrastructure { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 620px) {
+    .nav-inner { align-items: flex-start; flex-direction: column; padding: 12px 0; }
+    .nav-links { width: 100%; }
+    .hero { min-height: 720px; }
+    .hero-content { padding-top: 70px; }
+    .hero-actions { align-items: stretch; flex-direction: column; }
+    .hero-actions .button { width: 100%; }
+    .band { padding: 68px 0; }
+    .feature-strip,
+    .flow-branch,
+    .interaction-grid,
+    .infrastructure,
+    .gallery,
+    .team-grid,
+    .timeline { grid-template-columns: 1fr; }
+    .feature-step,
+    .team-role,
+    .interaction-column { border-right: 0; }
+    .interaction-column { border-bottom: 1px solid var(--line); }
+    .requirements { min-width: 760px; }
+    .table-scroll { overflow-x: auto; }
+    .route-visual { min-height: 260px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
   }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="wave w1"></div>
-    <div class="wave w2"></div>
-    <div class="wave w3"></div>
-
-    <div class="ticket">Boarding now · Danube line · No refunds</div>
-    <h1 class="title">Rollenfähren<span class="hl">-</span>Fury</h1>
-    <p class="tagline">A chaotic <b>Danube rogue-lite</b>. Defend the ferry, bank to bank, against endless waves of mutated wildlife.</p>
-
-    <div class="hero-meta">
-      <span class="chip"><b>Genre</b> · Wave rogue-lite</span>
-      <span class="chip"><b>Engine</b> · Unity</span>
-      <span class="chip"><b>Captain</b> · Fraunz</span>
-      <span class="chip"><b>Setting</b> · River Danube</span>
+<nav class="site-nav" aria-label="Primary navigation">
+  <div class="nav-inner">
+    <a class="brand" href="#top">Rollfähren Fury</a>
+    <div class="nav-links">
+      <a href="#feature">Feature</a>
+      <a href="#design">System design</a>
+      <a href="#infrastructure">Infrastructure</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#team">Team</a>
     </div>
+  </div>
+</nav>
 
-    <div class="scroll-cue">scroll to board ↓</div>
-  </header>
+<header class="hero" id="top">
+  <div class="hero-content">
+    <p class="assignment-label">Assignment 2 ePortfolio · June 2026</p>
+    <h1>Rollfähren Fury</h1>
+    <p class="hero-copy">
+      A first-person ferry-defense prototype. Prepare at the dock, start the crossing,
+      protect the ferry from mutated river wildlife, and build a stronger run on the opposite shore.
+    </p>
+    <div class="hero-actions">
+      <a class="button" href="#feature">View implemented feature</a>
+      <a class="button secondary" href="downloads/Rollfaehren_Fury_TimePlan_TaskDistribution.xlsx" download>Download time plan</a>
+      <a class="button secondary" href="https://github.com/kornti-debug/Rollfaehren_Fury">View repository</a>
+    </div>
+    <div class="hero-meta" aria-label="Project metadata">
+      <span class="chip"><strong>Engine</strong> Unity 6 URP</span>
+      <span class="chip"><strong>Audio</strong> Wwise</span>
+      <span class="chip"><strong>Team</strong> 4 members</span>
+      <span class="chip"><strong>Status</strong> Playable vertical slice</span>
+    </div>
+  </div>
+</header>
 
-  <div class="tape"></div>
+<div class="tape" aria-hidden="true"></div>
 
-  <!-- OVERVIEW -->
-  <section class="block">
+<main id="main-content">
+  <section class="band" id="feature">
     <div class="wrap">
-      <p class="eyebrow reveal">The pitch</p>
-      <h2 class="reveal">Tea party? No. Total mayhem.<span class="sub">Project overview</span></h2>
-      <p class="story reveal">
-        Meet <b>Captain Fraunz</b> — the grumpiest, most stubbornly dedicated ferry operator on the river.
-        When the local Danube wildlife mutates into relentless waves of adversaries, there's only one job left:
-        keep the ferry afloat and get it to the other bank. Shoot, shout, and survive.
+      <p class="eyebrow reveal">New feature description</p>
+      <h2 class="reveal">One connected round, from shore to shore</h2>
+      <p class="section-intro reveal">
+        Assignment 2 moves the project beyond the original shooting test. The current build connects
+        preparation, shopping, ferry movement, combat, rewards, and run progression into one repeatable loop.
       </p>
-      <p class="pullquote reveal">Defend the ferry from bank to bank — or sink trying.</p>
+
+      <div class="feature-strip reveal">
+        <article class="feature-step">
+          <span class="step-number">01</span>
+          <h3>Prepare at the dock</h3>
+          <p>The ferry waits at either shore. No enemies spawn until the player deliberately starts the round.</p>
+        </article>
+        <article class="feature-step">
+          <span class="step-number">02</span>
+          <h3>Visit the shore shop</h3>
+          <p>Both shop houses load one shared additive interior. Purchases and run statistics remain in the main scene.</p>
+        </article>
+        <article class="feature-step">
+          <span class="step-number">03</span>
+          <h3>Start the crossing</h3>
+          <p>An interactable console inside the ferry house starts the physical trip to the opposite jetty.</p>
+        </article>
+        <article class="feature-step">
+          <span class="step-number">04</span>
+          <h3>Defend the ferry</h3>
+          <p>Fish and pigeon swarms intercept the crossing ferry. Weapons, ferry health, money, and the compact HUD provide feedback.</p>
+        </article>
+        <article class="feature-step">
+          <span class="step-number">05</span>
+          <h3>Choose and repeat</h3>
+          <p>Arrival ends combat, opens a three-choice augment draft, and prepares the next crossing in reverse.</p>
+        </article>
+      </div>
+
+      <div class="technical reveal">
+        <div class="technical-copy">
+          <p class="eyebrow">Technical spotlight</p>
+          <h3>Self-implemented ferry movement procedure</h3>
+          <p>
+            <code>FerryController</code> builds a cubic Bézier route from the ferry's current dock transform
+            to the opposite dock. This avoids a sideways linear slide while keeping movement deterministic and tunable.
+          </p>
+          <ul class="technical-list">
+            <li>Two dock transforms define route position and orientation.</li>
+            <li>Sampled route length keeps speed approximately constant along the curve.</li>
+            <li>The route tangent rotates the ferry bow-first during travel.</li>
+            <li>Platform displacement keeps the FPS controller aboard.</li>
+            <li>Arrival toggles the active shore and completes the gameplay round.</li>
+          </ul>
+        </div>
+        <div class="route-visual" role="img" aria-label="Diagram of the curved ferry route between Dock A and Dock B">
+          <div class="dock a"></div>
+          <div class="dock b"></div>
+          <div class="route-line"></div>
+          <span class="route-label a">Dock A</span>
+          <span class="route-label b">Dock B</span>
+        </div>
+      </div>
     </div>
   </section>
 
-  <div class="tape"></div>
+  <div class="tape" aria-hidden="true"></div>
 
-  <!-- GAMEPLAY LOOP -->
-  <section class="block">
+  <section class="band alt" id="design">
     <div class="wrap">
-      <p class="eyebrow reveal">How it plays</p>
-      <h2 class="reveal">The core loop<span class="sub">Survive · loot · upgrade · repeat</span></h2>
+      <p class="eyebrow reveal">System design</p>
+      <h2 class="reveal">Functional flow between scenes and states</h2>
+      <p class="section-intro reveal">
+        The game keeps the main run inside <code>Main</code>. Menus use normal scene loading,
+        while the shop loads additively so money, upgrades, ferry health, the player, HUD, and audio remain available.
+      </p>
 
-      <div class="loop reveal">
-        <div class="loop-row">
-          <div class="loop-num">01</div>
-          <div class="loop-body">
-            <h3>Survive the waves</h3>
-            <p>Endless, escalating rounds of increasingly ridiculous enemies. Shoot your way through and collect the cash and items they drop.</p>
-          </div>
+      <div class="diagram-block reveal">
+        <h3 class="diagram-title">Scene flow</h3>
+        <div class="flow" aria-label="Scene flow diagram">
+          <div class="flow-node"><strong>Bootstrap</strong><span>Build entry</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-node"><strong>Menu</strong><span>New Game · Settings · Quit</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-node highlight"><strong>Main</strong><span>Authoritative run state</span></div>
+          <div class="flow-arrow" aria-hidden="true">⇄</div>
+          <div class="flow-node"><strong>ShopInterior</strong><span>Additive scene</span></div>
         </div>
-        <div class="loop-row">
-          <div class="loop-num">02</div>
-          <div class="loop-body">
-            <h3>Spend at the vending machine</h3>
-            <p>Between rounds, blow your cash on absurd augments at the onboard vending machine — like <code>Greased Deck</code> for faster movement.</p>
-          </div>
+      </div>
+
+      <div class="diagram-block reveal">
+        <h3 class="diagram-title">Gameplay state flow</h3>
+        <div class="flow" aria-label="Gameplay state flow diagram">
+          <div class="flow-node highlight"><strong>Preparation</strong><span>Shop · console · loadout</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-node"><strong>Playing</strong><span>Crossing · spawning · combat</span></div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
+          <div class="flow-node"><strong>Augment Draft</strong><span>Choose 1 of 3</span></div>
+          <div class="flow-arrow" aria-hidden="true">↺</div>
         </div>
-        <div class="loop-row">
-          <div class="loop-num">03</div>
-          <div class="loop-body">
-            <h3>Protect the hull and cargo</h3>
-            <p>Fast, non-serious action with over-the-top physics. Watch for enemies that go straight for the boat — or your vital cargo.</p>
+        <div class="flow-branch">
+          <div class="flow-node"><strong>Pause</strong><span>Overlay from gameplay</span></div>
+          <div class="flow-node danger"><strong>Game Over</strong><span>Ferry health reaches zero</span></div>
+          <div class="flow-node"><strong>Main Menu</strong><span>Return through SceneFlow</span></div>
+        </div>
+      </div>
+
+      <div class="diagram-block reveal">
+        <h3 class="diagram-title">Character and world interactions</h3>
+        <div class="interaction-grid">
+          <div class="interaction-column">
+            <h4>Player</h4>
+            <ul>
+              <li>Moves and looks through Input Actions</li>
+              <li>Fires and switches weapons</li>
+              <li>Uses shops and the ferry console with E</li>
+            </ul>
+          </div>
+          <div class="interaction-column">
+            <h4>Enemies</h4>
+            <ul>
+              <li>Spawn throughout crossing progress</li>
+              <li>Fish use surface movement</li>
+              <li>Pigeons use full 3D movement</li>
+            </ul>
+          </div>
+          <div class="interaction-column">
+            <h4>Ferry and economy</h4>
+            <ul>
+              <li>Contact damage reduces ferry health</li>
+              <li>Kills and arrival grant money</li>
+              <li>Shop upgrades modify later rounds</li>
+            </ul>
+          </div>
+          <div class="interaction-column">
+            <h4>Feedback</h4>
+            <ul>
+              <li>HUD shows health, progress, money, and weapon</li>
+              <li>Animations communicate enemy movement</li>
+              <li>Wwise posts authored action events</li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="tape"></div>
+  <div class="tape" aria-hidden="true"></div>
 
-  <!-- CHARACTERS -->
-  <section class="block">
+  <section class="band light" id="infrastructure">
     <div class="wrap">
-      <p class="eyebrow reveal">Who's on board</p>
-      <h2 class="reveal">Cast &amp; threats<span class="sub">One captain, a river full of problems</span></h2>
+      <p class="eyebrow reveal">System infrastructure</p>
+      <h2 class="reveal">Implemented components and dependencies</h2>
+      <p class="section-intro reveal">
+        The prototype uses focused MonoBehaviours coordinated by <code>GameManager</code>.
+        Weapons, upgrades, and augments use ScriptableObjects so content values remain data-driven and Inspector-tunable.
+      </p>
 
-      <div class="roster">
-        <div class="crew reveal">
-          <span class="emoji">⛴️</span>
-          <span class="role r-player">Player</span>
-          <h3>Captain Fraunz</h3>
-          <p>A grumpy but dedicated ferry captain. His tools are simple: he can shoot, and he can shout. Keep the ferry alive.</p>
-        </div>
-        <div class="crew reveal">
-          <span class="emoji">🕊️</span>
-          <span class="role r-sky">Threat · Sky</span>
-          <h3>Cursed Pöltener Pigeon</h3>
-          <p>Wild, corrupted pigeons from St. Pölten that circle above the ferry and spread chaos with their filthy presence.</p>
-        </div>
-        <div class="crew reveal">
-          <span class="emoji">🐟</span>
-          <span class="role r-water">Threat · Water</span>
-          <h3>Radioactive Tullner Tuna</h3>
-          <p>Glowing fish from near Tulln, mutated by pollution and absolutely ready to ruin Captain Fraunz's day.</p>
-        </div>
+      <div class="infrastructure reveal">
+        <article class="system-group">
+          <h3>Coordination</h3>
+          <div class="system-list">
+            <span>GameManager</span>
+            <span>SceneFlow</span>
+            <span>ShopSceneCoordinator</span>
+          </div>
+        </article>
+        <article class="system-group">
+          <h3>Player and input</h3>
+          <div class="system-list">
+            <span>SimpleFPSController</span>
+            <span>PrototypeInputActions</span>
+            <span>WeaponSystem → Weapon[]</span>
+          </div>
+        </article>
+        <article class="system-group">
+          <h3>World and enemies</h3>
+          <div class="system-list">
+            <span>FerryController</span>
+            <span>EnemySpawner → SimpleEnemy</span>
+            <span>SwarmMovement (flocking)</span>
+            <span>Health</span>
+          </div>
+        </article>
+        <article class="system-group">
+          <h3>Progression</h3>
+          <div class="system-list">
+            <span>ShopManager</span>
+            <span>UpgradeDefinition</span>
+            <span>AugmentSystem</span>
+          </div>
+        </article>
+        <article class="system-group">
+          <h3>Presentation</h3>
+          <div class="system-list">
+            <span>SimpleHUD</span>
+            <span>GameplayMenuInput</span>
+            <span>MainMenuController</span>
+          </div>
+        </article>
+        <article class="system-group">
+          <h3>Audio</h3>
+          <div class="system-list">
+            <span>PrototypeAudioEvents</span>
+            <span>PlayerFootsteps</span>
+            <span>Wwise Event references</span>
+          </div>
+        </article>
+      </div>
+
+      <p class="relationship-note reveal">
+        <strong>Key relationships:</strong>
+        <code>GameManager</code> coordinates run state.
+        <code>WeaponSystem</code> owns active <code>Weapon</code> instances configured by
+        <code>WeaponDefinition</code>. Concrete upgrades inherit from <code>UpgradeDefinition</code>;
+        concrete round modifiers inherit from <code>AugmentDefinition</code>.
+        <code>EnemySpawner</code> creates configured enemies that share <code>SimpleEnemy</code>,
+        <code>SwarmMovement</code>, and <code>Health</code>.
+      </p>
+    </div>
+  </section>
+
+  <div class="tape" aria-hidden="true"></div>
+
+  <section class="band" id="requirements">
+    <div class="wrap">
+      <p class="eyebrow reveal">Course requirements</p>
+      <h2 class="reveal">Progress against the final project brief</h2>
+      <p class="section-intro reveal">
+        This matrix separates implemented work from the remaining finishing tasks.
+        It is a progress report, not a claim that the final submission is already complete.
+      </p>
+      <div class="table-scroll reveal">
+        <table class="requirements">
+          <thead>
+            <tr>
+              <th>Track</th>
+              <th>Implemented evidence</th>
+              <th>Status</th>
+              <th>Next step</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Humanoid character</td>
+              <td>Captain Fraunz is self-made, rigged, textured, and integrated with idle/walk animation control.</td>
+              <td><span class="status active">In progress</span></td>
+              <td>Complete and verify the required action animation.</td>
+            </tr>
+            <tr>
+              <td>Other characters</td>
+              <td>Self-made fish and pigeon models include rigs, textures, and looping gameplay animation.</td>
+              <td><span class="status done">Implemented</span></td>
+              <td>Final animation and import-quality check.</td>
+            </tr>
+            <tr>
+              <td>Scene props</td>
+              <td>Ferry, jetty, shop house, and vending machine provide more than the three required textured props.</td>
+              <td><span class="status active">In progress</span></td>
+              <td>Verify final textures and document individual authorship.</td>
+            </tr>
+            <tr>
+              <td>Wwise audio</td>
+              <td>Wwise is integrated; authored footsteps, event references, soundbank workflow, and gameplay hooks exist.</td>
+              <td><span class="status active">In progress</span></td>
+              <td>Add spatialized world sounds and complete expected action feedback.</td>
+            </tr>
+            <tr>
+              <td>Unity coding</td>
+              <td>Main menu, multiple scenes, Input System controls, interactables, pause, shop, progression, and game over work.</td>
+              <td><span class="status done">Implemented</span></td>
+              <td>Create and test the executable application build.</td>
+            </tr>
+            <tr>
+              <td>C# and graphics theory</td>
+              <td>The sampled cubic Bézier ferry route is a self-implemented movement procedure.</td>
+              <td><span class="status active">In progress</span></td>
+              <td>Explain formulation, sampling, and tangent rotation in the markdown report.</td>
+            </tr>
+            <tr>
+              <td>Final media</td>
+              <td>ePortfolio and project documentation are maintained in the repository.</td>
+              <td><span class="status pending">Pending</span></td>
+              <td>Executable, presentation, 2400×1800 promotion image, and five-minute video.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
 
-  <div class="tape"></div>
+  <div class="tape" aria-hidden="true"></div>
 
-  <!-- ARCHITECTURE -->
-  <section class="block">
+  <section class="band alt" id="gallery">
     <div class="wrap">
-      <p class="eyebrow reveal">Under the hood</p>
-      <h2 class="reveal">System architecture<span class="sub">A modular, manager-driven design</span></h2>
-
-      <div class="arch">
-        <div class="panel reveal">
-          <h3>Management layer</h3>
-          <p>A centralized, singleton <code>GameManager</code> oversees the core gameplay flow and coordinates every structural system.</p>
-          <div class="sysgrid">
-            <div class="node singleton">GameManager</div>
-            <div class="node">RoundManager</div>
-            <div class="node">ScoreManager</div>
-            <div class="node">UIManager</div>
-            <div class="node">SpawnManager</div>
-            <div class="node">ShopManager</div>
-          </div>
-        </div>
-        <div class="panel reveal">
-          <h3>Core game systems</h3>
-          <p>Entities interact through a modular architecture. Characters carry a <code>HealthSystem</code>; the player owns a <code>WeaponSystem</code> aggregating weapons and shout abilities; a robust <code>UpgradeSystem</code> modifies key attributes on the fly.</p>
-          <div class="sysgrid">
-            <div class="node">HealthSystem</div>
-            <div class="node">WeaponSystem</div>
-            <div class="node">UpgradeSystem</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="tape"></div>
-
-  <!-- GALLERY -->
-  <section class="block">
-    <div class="wrap">
-      <p class="eyebrow reveal">Look &amp; feel</p>
-      <h2 class="reveal">Gallery &amp; mockups<span class="sub">Screens from the deck</span></h2>
-
+      <p class="eyebrow reveal">Current prototype</p>
+      <h2 class="reveal">Gameplay evidence</h2>
+      <p class="section-intro reveal">
+        Current screenshots will replace the fallback panels below. The page layout and captions are already prepared
+        so the evidence can be updated without changing the site structure.
+      </p>
       <div class="gallery">
-        <div class="frame reveal"><img src="gameplay-mockup.png" alt="Arena deck view" onerror="this.style.display='none'"><span>Arena · deck view</span></div>
-        <div class="frame reveal"><img src="augment-shop.jpg" alt="Augment shop UI" onerror="this.style.display='none'"><span>Augment shop UI</span></div>
-        <div class="frame reveal"><img src="system-architecture.png" alt="Class diagram" onerror="this.style.display='none'"><span>Class diagram</span></div>
+        <figure class="shot reveal">
+          <img src="assets/assignment2/ferry-crossing.jpg" alt="Ferry crossing during combat with HUD visible" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+          <div class="shot-fallback" hidden>Screenshot pending: ferry crossing and combat</div>
+          <figcaption>Physical crossing · ferry defense · HUD</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <img src="assets/assignment2/shop-interior.jpg" alt="Player inside the shared shore shop" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+          <div class="shot-fallback" hidden>Screenshot pending: shared shop interior</div>
+          <figcaption>Additive scene · shop NPC · upgrades</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <img src="assets/assignment2/augment-draft.jpg" alt="Three-choice augment draft after completing a crossing" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+          <div class="shot-fallback" hidden>Screenshot pending: augment draft</div>
+          <figcaption>Round reward · three-choice augment draft</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <img src="assets/assignment2/main-menu.jpg" alt="Rollfaehren Fury main menu" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+          <div class="shot-fallback" hidden>Screenshot pending: main menu</div>
+          <figcaption>Bootstrap · main menu · scene flow</figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <div class="tape"></div>
+  <div class="tape" aria-hidden="true"></div>
 
-  <footer>
-    <div class="logo">Rollenfähren-Fury</div>
-    <p>© 2026 Rollenfähren-Fury Dev Team · Built for GitHub Pages</p>
-  </footer>
+  <section class="band" id="team">
+    <div class="wrap">
+      <p class="eyebrow reveal">Team and timeline</p>
+      <h2 class="reveal">Balanced responsibilities, shared integration</h2>
+      <p class="section-intro reveal">
+        The detailed, editable time plan and task distribution are available as an Excel workbook.
+        The overview below summarizes the primary ownership areas.
+      </p>
+      <div class="team-grid reveal">
+        <article class="team-role">
+          <h3>Lukas</h3>
+          <span>Unity · coding · integration · environment · documentation</span>
+        </article>
+        <article class="team-role">
+          <h3>Philip</h3>
+          <span>3D modelling · rigging · texturing · animation · Unity assets</span>
+        </article>
+        <article class="team-role">
+          <h3>Max</h3>
+          <span>Unity coding · weapons · upgrades · augments · HUD</span>
+        </article>
+        <article class="team-role">
+          <h3>Istvan</h3>
+          <span>Wwise · sound design · source audio · audio integration</span>
+        </article>
+      </div>
 
-  <script>
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
-    },{threshold:0.12});
-    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-  </script>
+      <div class="timeline reveal" aria-label="High-level project timeline">
+        <article class="phase completed">
+          <h3>1 · Foundation</h3>
+          <p>Unity, Git, Wwise, documentation, and the first ferry-defense prototype.</p>
+        </article>
+        <article class="phase completed">
+          <h3>2 · Gameplay systems</h3>
+          <p>Weapons, enemies, ferry crossing, shop, augments, menu, pause, and HUD.</p>
+        </article>
+        <article class="phase completed">
+          <h3>3 · Asset integration</h3>
+          <p>Characters, animations, ferry, terrain, river, skybox, props, and authored footsteps.</p>
+        </article>
+        <article class="phase current">
+          <h3>4 · Polish and delivery</h3>
+          <p>Audio coverage, final animation, balancing, build, presentation, report, and promotion media.</p>
+        </article>
+      </div>
 
+      <div class="hero-actions reveal">
+        <a class="button" href="downloads/Rollfaehren_Fury_TimePlan_TaskDistribution.xlsx" download>Download Excel workbook</a>
+        <a class="button secondary" href="https://github.com/kornti-debug/Rollfaehren_Fury/blob/main/docs/ARCHITECTURE.md">Read architecture notes</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>Rollfähren Fury</strong>
+  <p>Assignment 2 ePortfolio · Creative Computing · 2026</p>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+</script>
 </body>
 </html>
