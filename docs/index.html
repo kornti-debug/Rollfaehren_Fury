@@ -752,7 +752,7 @@
         <article class="feature-step">
           <span class="step-number">04</span>
           <h3>Defend the ferry</h3>
-          <p>Fish and pigeons approach during the crossing. Weapons, ferry health, money, and Wwise hooks provide feedback.</p>
+          <p>Fish and pigeon swarms intercept the crossing ferry. Weapons, ferry health, money, and the compact HUD provide feedback.</p>
         </article>
         <article class="feature-step">
           <span class="step-number">05</span>
@@ -902,6 +902,7 @@
           <div class="system-list">
             <span>FerryController</span>
             <span>EnemySpawner → SimpleEnemy</span>
+            <span>SwarmMovement (flocking)</span>
             <span>Health</span>
           </div>
         </article>
@@ -937,7 +938,8 @@
         <code>WeaponSystem</code> owns active <code>Weapon</code> instances configured by
         <code>WeaponDefinition</code>. Concrete upgrades inherit from <code>UpgradeDefinition</code>;
         concrete round modifiers inherit from <code>AugmentDefinition</code>.
-        <code>EnemySpawner</code> creates configured enemies that share <code>SimpleEnemy</code> and <code>Health</code>.
+        <code>EnemySpawner</code> creates configured enemies that share <code>SimpleEnemy</code>,
+        <code>SwarmMovement</code>, and <code>Health</code>.
       </p>
     </div>
   </section>
