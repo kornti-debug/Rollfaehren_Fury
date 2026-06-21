@@ -161,7 +161,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.SimpleEnemy
   movementMode: 1
   moveSpeed: 7
-  contactDamage: 8
+  contactDamage: 1
   killReward: 12
   faceTarget: 1
   reachedFerry:

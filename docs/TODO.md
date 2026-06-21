@@ -55,6 +55,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add HUD active-weapon indicator (name + slot `[i/n]`, updates on switch).
 - [x] Add placeholder shot tracer (`WeaponTracer`, pooled LineRenderer) so hitscan/spread shots are visible.
 - [x] Verify Track A + HUD + tracer in Unity: scene built, weapons fire/switch, tracers show.
+- [x] Replace Flamethrower with an Assault Rifle (hitscan, ~600 RPM, tracer); widen weapon ranges.
+- [x] HUD rework: compact top-left status, money top-right, weapon panel bottom-right, fire rate in RPM, animated HP/crossing bars, swarm warning banner, floating "Start Crossing" billboard.
 - [x] Tracer originates from the crosshair; widen Shotgun spread; add Flamethrower (spread).
 - [x] Add `Projectile` fire mode + `Projectile` (gravity parabola, raycast hit, trail); Harpoon throws an arcing projectile.
 - [x] Weapon switching: mouse scroll + keys `1`–`4` (1 Harpoon, 2 Pistol, 3 Shotgun, 4 Flamethrower).
@@ -95,6 +97,12 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
 - [x] Attach the looping flight Animator to the pigeon prefab.
 - [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
+- [x] Swarm flocking (`SwarmMovement`, boids) auto-attached to enemies; cluster spawns with varied size.
+- [x] Intercept-lead spawn: swarms spawn ahead + to the side of the moving ferry (computed lead) so they reach its flank instead of trailing behind; spawns constrained to the water-surface bounds.
+- [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream on a tunable `swarmInterval` is now the normal spawn behavior (crossing-paced/flood-test path removed).
+- [x] Removed the adaptive-escalation / big-swarm-warning mechanic; swarms are plain random-size waves.
+- [x] More round-end augments: Sluggish Tide (slower enemies), Bounty (+kill reward), War Chest (instant cash), Reinforced Hull (+ferry max HP).
+- [ ] Verify swarm feel in Unity. (`testFerryMaxHealth` in GameManager still forces 100 ferry HP — drop if undesired.)
 - [ ] Later: add boss fish or boss pigeon variants.
 
 ## Score, Money, and Upgrades

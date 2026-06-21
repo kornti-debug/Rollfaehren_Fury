@@ -16,6 +16,13 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private EnemyMovementMode movementMode = EnemyMovementMode.Surface;
         [SerializeField] private float moveSpeed = 3f;
+        [SerializeField] private bool useSwarmMovement = true;
+
+        [Header("Rear Catch-up (small)")]
+        [Tooltip("Enemies behind the ferry slowly ramp their speed up so they don't fall behind forever. Kept gentle.")]
+        [SerializeField] private bool rearRampEnabled = true;
+        [SerializeField] private float rearRampPerSecond = 0.2f;
+        [SerializeField] private float rearRampMaxSpeed = 8f;
         [SerializeField] private float contactDamage = 10f;
         [SerializeField] private int killReward = 10;
         [SerializeField] private bool faceTarget = true;
@@ -27,6 +34,7 @@ namespace RollfaehrenFury.Prototype
         private FerryDamageTarget ferryTarget;
         private GameManager gameManager;
         private Health health;
+        private SwarmMovement swarmMovement;
         private bool rewardOnDeath = true;
         private bool hasHitFerry;
         private float activeMoveSpeed;
@@ -36,11 +44,27 @@ namespace RollfaehrenFury.Prototype
         public int KillReward => killReward;
         public EnemyMovementMode MovementMode => movementMode;
 
+        // Exposed so an attached SwarmMovement can drive locomotion while this
+        // component keeps owning health, contact damage and rewards.
+        public bool CanMove => ferryTarget != null && !hasHitFerry;
+        public Vector3 TargetPosition => ferryTarget != null ? ferryTarget.AimPoint.position : transform.position;
+        public float ActiveMoveSpeed => activeMoveSpeed;
+        public bool FaceTarget => faceTarget;
+
         private void Awake()
         {
             health = GetComponent<Health>();
             activeMoveSpeed = moveSpeed;
             health.Died += HandleDied;
+
+            if (useSwarmMovement)
+            {
+                swarmMovement = GetComponent<SwarmMovement>();
+                if (swarmMovement == null)
+                {
+                    swarmMovement = gameObject.AddComponent<SwarmMovement>();
+                }
+            }
         }
 
         private void OnEnable()
@@ -61,6 +85,13 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
+            RampRearSpeed();
+
+            if (swarmMovement != null && swarmMovement.enabled)
+            {
+                return; // SwarmMovement owns locomotion when present.
+            }
+
             if (ferryTarget == null || hasHitFerry)
             {
                 return;
@@ -87,12 +118,35 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speedMultiplier, float healthMultiplier)
+        // Small catch-up: enemies behind the ferry slowly ramp up so they keep pace instead of
+        // falling behind forever. Deliberately gentle (low rate, cap just above ferry speed).
+        private void RampRearSpeed()
+        {
+            if (!rearRampEnabled || ferryTarget == null || hasHitFerry || activeMoveSpeed >= rearRampMaxSpeed)
+            {
+                return;
+            }
+
+            Transform ferry = ferryTarget.transform;
+            Vector3 forward = Vector3.ProjectOnPlane(ferry.forward, Vector3.up);
+            Vector3 offset = Vector3.ProjectOnPlane(transform.position - ferry.position, Vector3.up);
+            if (forward.sqrMagnitude < 0.0001f)
+            {
+                return;
+            }
+
+            if (Vector3.Dot(forward, offset) < 0f)
+            {
+                activeMoveSpeed = Mathf.Min(rearRampMaxSpeed, activeMoveSpeed + rearRampPerSecond * Time.deltaTime);
+            }
+        }
+
+        public void Initialize(FerryDamageTarget target, GameManager manager, int reward, float speed, float healthMultiplier)
         {
             ferryTarget = target;
             gameManager = manager;
             killReward = Mathf.Max(0, reward);
-            activeMoveSpeed = Mathf.Max(0.1f, moveSpeed * speedMultiplier);
+            activeMoveSpeed = Mathf.Max(0.1f, speed);
 
             if (health == null)
             {
