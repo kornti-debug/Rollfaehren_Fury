@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Pistol
   fireMode: 0
   damage: 25
-  range: 250
+  range: 300
   fireCooldown: 0.2
   aimAssistRadius: 0.45
   pelletsPerShot: 1

@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fead251d7ec8228409942f5070f057d9, type: 3}
   m_Name: Flamethrower
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDefinition
-  displayName: Flamethrower
-  fireMode: 1
-  damage: 5
-  range: 11
-  fireCooldown: 0.04
-  aimAssistRadius: 0
-  pelletsPerShot: 8
-  spreadAngle: 14
+  displayName: Assault Rifle
+  fireMode: 0
+  damage: 18
+  range: 280
+  fireCooldown: 0.1
+  aimAssistRadius: 0.5
+  pelletsPerShot: 1
+  spreadAngle: 1
   projectileSpeed: 40
   projectileGravity: 18
   projectileLifetime: 4

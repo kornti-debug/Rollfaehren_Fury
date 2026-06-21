@@ -684,17 +684,17 @@ namespace RollfaehrenFury.Editor
 
             WeaponDefinition pistol = EnsureWeaponDefinition(
                 "Assets/Weapons/Pistol.asset", "Pistol", WeaponFireMode.Hitscan,
-                25f, 250f, 0.2f, 0.45f, 1, 0f);
+                25f, 300f, 0.2f, 0.45f, 1, 0f);
             WeaponDefinition shotgun = EnsureWeaponDefinition(
                 "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
-                11f, 55f, 0.75f, 0f, 8, 12f);
+                11f, 85f, 0.75f, 0f, 8, 12f);
             WeaponDefinition harpoon = EnsureWeaponDefinition(
                 "Assets/Weapons/Harpoon.asset", "Harpoon", WeaponFireMode.Projectile,
                 120f, 300f, 1.4f, 0f, 1, 0f,
                 45f, 18f, 4f);
-            WeaponDefinition flamethrower = EnsureWeaponDefinition(
-                "Assets/Weapons/Flamethrower.asset", "Flamethrower", WeaponFireMode.Spread,
-                5f, 11f, 0.04f, 0f, 8, 14f);
+            WeaponDefinition assaultRifle = EnsureWeaponDefinition(
+                "Assets/Weapons/Flamethrower.asset", "Assault Rifle", WeaponFireMode.Hitscan,
+                18f, 280f, 0.1f, 0.5f, 1, 1f);
 
             GameObject weaponsParent = FindChild(camera.transform, "Weapons");
             if (weaponsParent != null)
@@ -708,18 +708,18 @@ namespace RollfaehrenFury.Editor
             Weapon pistolWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Pistol", pistol);
             Weapon shotgunWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Shotgun", shotgun);
             Weapon harpoonWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Harpoon", harpoon);
-            Weapon flamethrowerWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Flamethrower", flamethrower);
+            Weapon assaultRifleWeapon = CreateWeaponObject(weaponsParent.transform, "Weapon - Assault Rifle", assaultRifle);
 
             WeaponTracer tracer = EnsureWeaponTracer(camera.transform);
             SetObject(pistolWeapon, "tracer", tracer);
             SetObject(shotgunWeapon, "tracer", tracer);
             SetObject(harpoonWeapon, "tracer", tracer);
-            SetObject(flamethrowerWeapon, "tracer", tracer);
+            SetObject(assaultRifleWeapon, "tracer", tracer);
 
             WeaponSystem weaponSystem = EnsureComponent<WeaponSystem>(camera.gameObject);
             SetObject(weaponSystem, "fireCamera", camera);
             SetObject(weaponSystem, "ignoredRoot", playerController.transform);
-            SetObjectList(weaponSystem, "weapons", new Object[] { harpoonWeapon, pistolWeapon, shotgunWeapon, flamethrowerWeapon });
+            SetObjectList(weaponSystem, "weapons", new Object[] { harpoonWeapon, pistolWeapon, shotgunWeapon, assaultRifleWeapon });
             SetInt(weaponSystem, "startWeaponIndex", 1);
             return weaponSystem;
         }
@@ -1347,7 +1347,7 @@ namespace RollfaehrenFury.Editor
                 "Assets/Materials/PrototypeRoundConsoleLever.mat",
                 new Color(0.9f, 0.22f, 0.12f));
 
-            GameObject prompt = EnsureHudPrompt(hud.transform, "Round Start Prompt", "Press E - Start crossing", new Vector2(0f, 95f));
+            GameObject prompt = EnsureHudPrompt(hud.transform, "Round Start Prompt", "Press E", new Vector2(0f, 95f));
             RoundStartConsole interaction = EnsureComponent<RoundStartConsole>(console);
             SetObject(interaction, "gameManager", gameManager);
             SetFloat(interaction, "interactRange", 3.5f);
@@ -1452,6 +1452,14 @@ namespace RollfaehrenFury.Editor
                     augment => { SetFloat(augment, "countMultiplier", 2f); SetFloat(augment, "healthMultiplier", 0.5f); }),
                 EnsureAugment<BruisersAugment>("Assets/Augments/Bruisers.asset", "Bruisers", "Half enemies, 2x HP.",
                     augment => { SetFloat(augment, "countMultiplier", 0.5f); SetFloat(augment, "healthMultiplier", 2f); }),
+                EnsureAugment<SluggishTideAugment>("Assets/Augments/SluggishTide.asset", "Sluggish Tide", "Enemies move 20% slower.",
+                    augment => SetFloat(augment, "speedMultiplier", 0.8f)),
+                EnsureAugment<BountyAugment>("Assets/Augments/Bounty.asset", "Bounty", "+50% money per kill.",
+                    augment => SetFloat(augment, "rewardMultiplier", 1.5f)),
+                EnsureAugment<WarChestAugment>("Assets/Augments/WarChest.asset", "War Chest", "Instant $75.",
+                    augment => SetInt(augment, "money", 75)),
+                EnsureAugment<ReinforcedHullAugment>("Assets/Augments/ReinforcedHull.asset", "Reinforced Hull", "+50 ferry max HP.",
+                    augment => SetFloat(augment, "bonusHealth", 50f)),
             };
 
             AugmentSystem augmentSystem = EnsureComponent<AugmentSystem>(gameManager.gameObject);
@@ -1676,8 +1684,10 @@ namespace RollfaehrenFury.Editor
             fillObject.transform.SetParent(backgroundObject.transform, false);
             Image fill = EnsureComponent<Image>(fillObject);
             fill.color = fillColor;
+            fill.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
             fill.type = Image.Type.Filled;
             fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
             fill.fillAmount = 1f;
 
             RectTransform fillRect = fill.rectTransform;

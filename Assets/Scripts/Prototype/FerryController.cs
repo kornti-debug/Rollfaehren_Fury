@@ -31,6 +31,10 @@ namespace RollfaehrenFury.Prototype
         public bool AtDockA => atDockA;
         public float Progress { get; private set; }
 
+        // Current travel speed / velocity while crossing (forward is the route tangent).
+        public float CurrentSpeed => IsCrossing ? crossingSpeed * speedMultiplier : 0f;
+        public Vector3 Velocity => IsCrossing ? transform.forward * CurrentSpeed : Vector3.zero;
+
         private void Awake()
         {
             ferryBody = GetComponent<Rigidbody>();

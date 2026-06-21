@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Shotgun
   fireMode: 1
   damage: 11
-  range: 55
+  range: 85
   fireCooldown: 0.75
   aimAssistRadius: 0
   pelletsPerShot: 8
