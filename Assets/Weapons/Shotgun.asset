@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDefinition
   displayName: Shotgun
   fireMode: 1
-  damage: 11
-  range: 150
+  damage: 13
+  range: 190
   fireCooldown: 0.75
   aimAssistRadius: 0
-  pelletsPerShot: 8
-  spreadAngle: 12
+  pelletsPerShot: 10
+  spreadAngle: 20
   automatic: 0
   magazineSize: 4
   reloadTime: 2.2

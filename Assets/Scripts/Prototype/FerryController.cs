@@ -24,6 +24,9 @@ namespace RollfaehrenFury.Prototype
         private float traveledDistance;
         private float speedMultiplier = 1f;
         private bool atDockA = true;
+        private bool capturedDeckOffset;
+        private Vector3 playerDeckLocalOffset;
+        private Quaternion playerDeckLocalRotation = Quaternion.identity;
 
         public event Action Arrived;
 
@@ -46,6 +49,26 @@ namespace RollfaehrenFury.Prototype
             {
                 playerController = FindFirstObjectByType<SimpleFPSController>();
             }
+        }
+
+        private void Start()
+        {
+            CapturePlayerDeckOffset();
+        }
+
+        // Remembers where the player stands on the deck relative to the ferry, so a restart can
+        // teleport them back onto the boat instead of leaving them where the ferry was destroyed.
+        private void CapturePlayerDeckOffset()
+        {
+            if (playerController == null || capturedDeckOffset)
+            {
+                return;
+            }
+
+            Quaternion inverse = Quaternion.Inverse(transform.rotation);
+            playerDeckLocalOffset = inverse * (playerController.transform.position - transform.position);
+            playerDeckLocalRotation = inverse * playerController.transform.rotation;
+            capturedDeckOffset = true;
         }
 
         private void LateUpdate()
@@ -122,15 +145,19 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            Vector3 previousPosition = transform.position;
-            Quaternion previousRotation = transform.rotation;
+            CapturePlayerDeckOffset(); // first reset captures the offset relative to the current pose
+
             transform.SetPositionAndRotation(dockA.position, dockA.rotation);
             Physics.SyncTransforms();
-            playerController?.MoveWithPlatform(
-                previousPosition,
-                previousRotation,
-                dockA.position,
-                dockA.rotation);
+
+            // Teleport (collision-free) the player back onto the deck. MoveWithPlatform here would
+            // run a CharacterController.Move across the whole reset distance and snag on geometry.
+            if (playerController != null && capturedDeckOffset)
+            {
+                Vector3 deckPosition = dockA.position + dockA.rotation * playerDeckLocalOffset;
+                Quaternion deckRotation = dockA.rotation * playerDeckLocalRotation;
+                playerController.Teleport(deckPosition, deckRotation);
+            }
         }
 
         public void Stop()

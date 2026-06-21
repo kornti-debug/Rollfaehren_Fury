@@ -5,45 +5,42 @@ using UnityEngine.UI;
 namespace RollfaehrenFury.Prototype
 {
     /// <summary>
-    /// Drives the shop. Holds a catalog of <see cref="UpgradeDefinition"/> assets and builds
-    /// one UI button per catalog entry at runtime (cloning the first serialized button as a
-    /// template), so the catalog is the single source of truth and upgrades can be added without
-    /// touching the scene. Purchases go through <see cref="GameManager.TryPurchase"/>; each upgrade
-    /// can be bought up to <see cref="UpgradeDefinition.MaxPurchases"/> times per run.
+    /// Node-tree weapon shop. The player clicks a weapon node and connecting lines branch out to its
+    /// purchasable nodes. Every weapon has power upgrades (Damage, Fire Rate) that level up with an
+    /// escalating cost; weapons with ammo also get Faster Reload + Refill Ammo (tops the magazine and
+    /// reserve back to the current cap), and the Harpoon gets Ricochet. Built entirely at runtime
+    /// under the existing Shop Panel, so no scene/builder work is needed.
     /// </summary>
     public sealed class ShopManager : MonoBehaviour
     {
+        private enum UpgradeKind { Damage, FireRate, Reload, Refill, Ricochet }
+
         [SerializeField] private GameManager gameManager;
-        [SerializeField] private List<UpgradeDefinition> catalog = new List<UpgradeDefinition>();
+        [SerializeField] private WeaponSystem weaponSystem;
+        [Tooltip("Existing shop buttons; the first is reused as a style template and its parent as the node container.")]
         [SerializeField] private List<Button> buttons = new List<Button>();
-
-        [Header("Weapon Upgrades (added to the catalog at runtime)")]
-        [Tooltip("Append the ammo/reload weapon upgrades to the catalog at startup so they appear in the shop.")]
-        [SerializeField] private bool addWeaponUpgrades = true;
-        [SerializeField] private int magazineUpgradeCost = 20;
-        [SerializeField] private int magazineUpgradeRounds = 2;
-        [SerializeField] private int reserveUpgradeCost = 15;
-        [SerializeField] private int reserveUpgradeMagazines = 2;
-        [SerializeField] private int reloadUpgradeCost = 20;
-        [SerializeField] private float reloadUpgradeMultiplier = 0.82f;
-        [SerializeField] private int resupplyCost = 15;
-        [Tooltip("How often Resupply Ammo can be bought per run (it refills magazines + reserve).")]
-        [SerializeField] private int resupplyMaxPerRun = 20;
-
-        [Header("Cost Escalation")]
-        [Tooltip("Each repeat purchase of the same upgrade multiplies its cost by this (1.7 = +70% per owned copy).")]
+        [Tooltip("Each owned copy of a leveled upgrade multiplies its next cost by this.")]
         [SerializeField, Min(1f)] private float costGrowthPerPurchase = 1.7f;
-        [Tooltip("Only upgrades at or below this max-purchase count escalate. Consumables like Resupply (high max) stay a flat price.")]
-        [SerializeField] private int escalatingMaxPurchases = 5;
+        [SerializeField] private int refillCost = 20;
 
-        // Vertical band (anchored Y) inside the Shop Panel that the generated buttons fill.
-        private const float ButtonTopY = 78f;
-        private const float ButtonBottomY = -120f;
-        private const float ButtonMaxStep = 52f;
+        private const int MaxUpgradeSlots = 4;
 
-        private readonly Dictionary<UpgradeDefinition, int> purchaseCounts = new Dictionary<UpgradeDefinition, int>();
-        private bool buttonsBuilt;
-        private bool weaponUpgradesAdded;
+        // Layout (anchored positions inside the Shop Panel) — tune if the spacing feels off.
+        private const float WeaponColumnX = -200f;
+        private const float UpgradeColumnX = 140f;
+        private const float ColumnCenterY = -10f;
+        private const float WeaponNodeSpacing = 48f;
+        private const float UpgradeNodeSpacing = 46f;
+        private static readonly Vector2 WeaponNodeSize = new Vector2(155f, 40f);
+        private static readonly Vector2 UpgradeNodeSize = new Vector2(176f, 38f);
+
+        private readonly Dictionary<(int target, UpgradeKind kind), int> levels = new Dictionary<(int, UpgradeKind), int>();
+        private readonly List<Button> weaponNodes = new List<Button>();
+        private readonly List<Button> upgradeSlots = new List<Button>();
+        private readonly List<Image> lines = new List<Image>();
+        private readonly List<UpgradeKind> currentKinds = new List<UpgradeKind>();
+        private bool built;
+        private int selectedTarget;
 
         private void Awake()
         {
@@ -52,189 +49,354 @@ namespace RollfaehrenFury.Prototype
                 gameManager = FindFirstObjectByType<GameManager>();
             }
 
-            AddWeaponUpgrades();
+            if (weaponSystem == null)
+            {
+                weaponSystem = FindFirstObjectByType<WeaponSystem>();
+            }
         }
 
         public void OpenShop()
         {
-            EnsureButtons();
-            RefreshButtons();
-        }
-
-        public void Buy(int index)
-        {
-            if (index < 0 || index >= catalog.Count)
-            {
-                return;
-            }
-
-            UpgradeDefinition definition = catalog[index];
-            if (definition == null || GetCount(definition) >= definition.MaxPurchases)
-            {
-                return;
-            }
-
-            if (gameManager != null && gameManager.TryPurchase(definition, GetEffectiveCost(definition)))
-            {
-                purchaseCounts[definition] = GetCount(definition) + 1;
-                RefreshButtons();
-            }
-        }
-
-        // Cost grows with each copy already owned, so maxing an upgrade costs far more than the
-        // first buy. Consumables (high max purchases, e.g. Resupply) keep their flat base price.
-        private int GetEffectiveCost(UpgradeDefinition definition)
-        {
-            int bought = GetCount(definition);
-            if (bought <= 0 || definition.MaxPurchases > escalatingMaxPurchases)
-            {
-                return definition.Cost;
-            }
-
-            return Mathf.RoundToInt(definition.Cost * Mathf.Pow(costGrowthPerPurchase, bought));
+            EnsureBuilt();
+            RefreshTree();
         }
 
         public void ResetPurchases()
         {
-            purchaseCounts.Clear();
+            levels.Clear();
+            RefreshTree();
         }
 
-        private int GetCount(UpgradeDefinition definition)
+        // The old flat-list buttons (now hidden) still reference this through their serialized
+        // onClick, and the editor scene builder wires it. Kept as a no-op.
+        public void Buy(int index)
         {
-            return purchaseCounts.TryGetValue(definition, out int count) ? count : 0;
         }
 
-        // Appends the ammo/reload weapon upgrades to the catalog as runtime instances, so they
-        // show up in the shop without needing separate assets or scene wiring.
-        private void AddWeaponUpgrades()
+        private void EnsureBuilt()
         {
-            if (!addWeaponUpgrades || weaponUpgradesAdded)
+            if (built)
             {
                 return;
             }
 
-            weaponUpgradesAdded = true;
-
-            MagazineUpgrade magazine = ScriptableObject.CreateInstance<MagazineUpgrade>();
-            magazine.InitRuntime("Bigger Magazine", "+rounds per magazine (active weapon)", magazineUpgradeCost, 3);
-            magazine.SetAmount(magazineUpgradeRounds);
-            catalog.Add(magazine);
-
-            ReserveAmmoUpgrade reserve = ScriptableObject.CreateInstance<ReserveAmmoUpgrade>();
-            reserve.InitRuntime("Extra Ammo", "+spare magazines / max ammo (active weapon)", reserveUpgradeCost, 3);
-            reserve.SetMagazines(reserveUpgradeMagazines);
-            catalog.Add(reserve);
-
-            ReloadSpeedUpgrade reload = ScriptableObject.CreateInstance<ReloadSpeedUpgrade>();
-            reload.InitRuntime("Faster Reload", "shorter reload time (active weapon)", reloadUpgradeCost, 3);
-            reload.SetMultiplier(reloadUpgradeMultiplier);
-            catalog.Add(reload);
-
-            ResupplyUpgrade resupply = ScriptableObject.CreateInstance<ResupplyUpgrade>();
-            resupply.InitRuntime("Resupply Ammo", "refill all magazines + reserve", resupplyCost, resupplyMaxPerRun);
-            catalog.Add(resupply);
-        }
-
-        // Builds/lays out one button per catalog entry once, cloning the first serialized button
-        // as a visual template and re-wiring each button's click to its own catalog index.
-        private void EnsureButtons()
-        {
-            if (buttonsBuilt)
-            {
-                return;
-            }
-
-            buttonsBuilt = true;
+            built = true;
 
             Button template = buttons.Count > 0 ? buttons[0] : null;
-            if (template == null || catalog.Count == 0)
+            if (template == null)
             {
                 return;
             }
 
             Transform parent = template.transform.parent;
-            for (int i = buttons.Count; i < catalog.Count; i++)
+
+            // One node per weapon down the left side.
+            int weaponCount = weaponSystem != null ? weaponSystem.WeaponCount : 0;
+            for (int i = 0; i < weaponCount; i++)
             {
-                Button clone = Instantiate(template, parent);
-                clone.name = $"Shop Upgrade Button {i}";
-                buttons.Add(clone);
+                string label = weaponSystem.WeaponAt(i)?.DisplayName ?? $"Weapon {i + 1}";
+                Vector2 pos = new Vector2(WeaponColumnX, ColumnY(i, weaponCount, WeaponNodeSpacing));
+                Button node = CreateNode(template, parent, $"Weapon Node {i}", label, pos, WeaponNodeSize);
+                int captured = i;
+                node.onClick.AddListener(() => SelectTarget(captured));
+                weaponNodes.Add(node);
             }
 
-            float step = catalog.Count <= 1
-                ? ButtonMaxStep
-                : Mathf.Min(ButtonMaxStep, (ButtonTopY - ButtonBottomY) / (catalog.Count - 1));
-            float height = Mathf.Clamp(step - 4f, 24f, 48f);
+            // Reused pool of upgrade nodes + connecting lines (shown per selection).
+            for (int i = 0; i < MaxUpgradeSlots; i++)
+            {
+                lines.Add(CreateLine(parent));
 
+                Button slot = CreateNode(template, parent, $"Upgrade Node {i}", string.Empty,
+                    new Vector2(UpgradeColumnX, 0f), UpgradeNodeSize);
+                int captured = i;
+                slot.onClick.AddListener(() => BuyUpgradeSlot(captured));
+                slot.gameObject.SetActive(false);
+                upgradeSlots.Add(slot);
+            }
+
+            // Hide the old flat-list buttons (kept only as a style template).
             for (int i = 0; i < buttons.Count; i++)
             {
-                Button button = buttons[i];
-                if (button == null)
+                if (buttons[i] != null)
                 {
-                    continue;
+                    buttons[i].gameObject.SetActive(false);
                 }
+            }
 
-                bool used = i < catalog.Count;
-                button.gameObject.SetActive(used);
+            if (weaponCount > 0)
+            {
+                SelectTarget(0);
+            }
+        }
+
+        private void SelectTarget(int target)
+        {
+            selectedTarget = target;
+
+            currentKinds.Clear();
+            currentKinds.AddRange(GetKindsFor(target));
+
+            Vector2 fromEdge = SelectedNodeRightEdge();
+            int count = currentKinds.Count;
+            for (int i = 0; i < upgradeSlots.Count; i++)
+            {
+                bool used = i < count;
+                upgradeSlots[i].gameObject.SetActive(used);
+                lines[i].gameObject.SetActive(used);
                 if (!used)
                 {
                     continue;
                 }
 
-                if (button.transform is RectTransform rect)
+                Vector2 pos = new Vector2(UpgradeColumnX, ColumnY(i, count, UpgradeNodeSpacing));
+                ((RectTransform)upgradeSlots[i].transform).anchoredPosition = pos;
+                SetLine(lines[i], fromEdge, new Vector2(pos.x - UpgradeNodeSize.x * 0.5f, pos.y));
+            }
+
+            HighlightSelectedNode();
+            RefreshTree();
+        }
+
+        private void RefreshTree()
+        {
+            int money = gameManager != null ? gameManager.Money : 0;
+            Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(selectedTarget) : null;
+
+            for (int i = 0; i < currentKinds.Count && i < upgradeSlots.Count; i++)
+            {
+                UpgradeKind kind = currentKinds[i];
+                Button slot = upgradeSlots[i];
+                Text label = slot.GetComponentInChildren<Text>();
+
+                if (kind == UpgradeKind.Refill)
                 {
-                    rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-                    rect.anchoredPosition = new Vector2(0f, ButtonTopY - i * step);
-                    rect.sizeDelta = new Vector2(rect.sizeDelta.x, height);
+                    bool full = weapon == null || weapon.IsAmmoFull;
+                    slot.interactable = !full && money >= refillCost;
+                    if (label != null)
+                    {
+                        label.text = full ? "Refill Ammo\nfull" : $"Refill Ammo\n${refillCost}";
+                    }
+
+                    continue;
                 }
 
-                Text label = button.GetComponentInChildren<Text>();
+                int level = GetLevel(selectedTarget, kind);
+                int max = KindMaxLevel(kind);
+                int cost = EffectiveCost(kind, level);
+                bool maxed = level >= max;
+
+                slot.interactable = !maxed && money >= cost;
                 if (label != null)
                 {
-                    label.resizeTextForBestFit = true;
-                    label.resizeTextMinSize = 10;
-                    label.resizeTextMaxSize = 26;
+                    label.text = maxed
+                        ? $"{KindLabel(kind)}\nmax {level}/{max}"
+                        : $"{KindLabel(kind)}\n{level}/{max}   ${cost}";
                 }
-
-                int index = i;
-                button.onClick = new Button.ButtonClickedEvent();
-                button.onClick.AddListener(() => Buy(index));
             }
         }
 
-        private void RefreshButtons()
+        private void BuyUpgradeSlot(int slot)
         {
-            int money = gameManager != null ? gameManager.Money : 0;
-
-            for (int i = 0; i < buttons.Count; i++)
+            if (slot < 0 || slot >= currentKinds.Count)
             {
-                Button button = buttons[i];
-                if (button == null)
+                return;
+            }
+
+            Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(selectedTarget) : null;
+            if (weapon == null || gameManager == null)
+            {
+                return;
+            }
+
+            UpgradeKind kind = currentKinds[slot];
+            if (kind == UpgradeKind.Refill)
+            {
+                if (weapon.IsAmmoFull || !gameManager.TrySpendMoney(refillCost))
                 {
-                    continue;
+                    return;
                 }
 
-                if (i >= catalog.Count || catalog[i] == null)
+                weapon.RefillAmmo();
+                RefreshTree();
+                return;
+            }
+
+            int level = GetLevel(selectedTarget, kind);
+            if (level >= KindMaxLevel(kind))
+            {
+                return;
+            }
+
+            int cost = EffectiveCost(kind, level);
+            if (!gameManager.TrySpendMoney(cost))
+            {
+                return;
+            }
+
+            ApplyUpgrade(weapon, kind);
+            levels[(selectedTarget, kind)] = level + 1;
+            RefreshTree();
+        }
+
+        private static void ApplyUpgrade(Weapon weapon, UpgradeKind kind)
+        {
+            switch (kind)
+            {
+                case UpgradeKind.Damage: weapon.MultiplyDamage(1.25f); break;
+                case UpgradeKind.FireRate: weapon.MultiplyCooldown(0.82f); break;
+                case UpgradeKind.Reload: weapon.MultiplyReloadDuration(0.82f); break;
+                case UpgradeKind.Ricochet: weapon.AddRicochet(1); break;
+            }
+        }
+
+        private IEnumerable<UpgradeKind> GetKindsFor(int target)
+        {
+            Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(target) : null;
+            if (weapon == null)
+            {
+                yield break;
+            }
+
+            yield return UpgradeKind.Damage;
+            yield return UpgradeKind.FireRate;
+
+            if (weapon.MagazineSize > 0)
+            {
+                yield return UpgradeKind.Reload;
+                yield return UpgradeKind.Refill;
+            }
+
+            if (weapon.DisplayName == "Harpoon")
+            {
+                yield return UpgradeKind.Ricochet;
+            }
+        }
+
+        private static string KindLabel(UpgradeKind kind)
+        {
+            switch (kind)
+            {
+                case UpgradeKind.Damage: return "Damage +25%";
+                case UpgradeKind.FireRate: return "Fire Rate";
+                case UpgradeKind.Reload: return "Faster Reload";
+                case UpgradeKind.Ricochet: return "Ricochet";
+                default: return kind.ToString();
+            }
+        }
+
+        private static int KindBaseCost(UpgradeKind kind)
+        {
+            switch (kind)
+            {
+                case UpgradeKind.Damage: return 15;
+                case UpgradeKind.FireRate: return 10;
+                case UpgradeKind.Reload: return 20;
+                case UpgradeKind.Ricochet: return 30;
+                default: return 20;
+            }
+        }
+
+        private static int KindMaxLevel(UpgradeKind kind)
+        {
+            return kind == UpgradeKind.Ricochet ? 1 : 3;
+        }
+
+        private int EffectiveCost(UpgradeKind kind, int level)
+        {
+            int baseCost = KindBaseCost(kind);
+            if (level <= 0)
+            {
+                return baseCost;
+            }
+
+            return Mathf.RoundToInt(baseCost * Mathf.Pow(costGrowthPerPurchase, level));
+        }
+
+        private int GetLevel(int target, UpgradeKind kind)
+        {
+            return levels.TryGetValue((target, kind), out int level) ? level : 0;
+        }
+
+        // --- UI helpers -----------------------------------------------------
+
+        private static float ColumnY(int index, int count, float spacing)
+        {
+            float top = (count - 1) * 0.5f * spacing;
+            return ColumnCenterY + top - index * spacing;
+        }
+
+        private Vector2 SelectedNodeRightEdge()
+        {
+            if (selectedTarget >= 0 && selectedTarget < weaponNodes.Count)
+            {
+                Vector2 center = ((RectTransform)weaponNodes[selectedTarget].transform).anchoredPosition;
+                return new Vector2(center.x + WeaponNodeSize.x * 0.5f, center.y);
+            }
+
+            return new Vector2(WeaponColumnX + WeaponNodeSize.x * 0.5f, ColumnCenterY);
+        }
+
+        private void HighlightSelectedNode()
+        {
+            for (int i = 0; i < weaponNodes.Count; i++)
+            {
+                Image image = weaponNodes[i].GetComponent<Image>();
+                if (image != null)
                 {
-                    button.gameObject.SetActive(false);
-                    continue;
-                }
-
-                UpgradeDefinition definition = catalog[i];
-                button.gameObject.SetActive(true);
-
-                int count = GetCount(definition);
-                int cost = GetEffectiveCost(definition);
-                bool soldOut = count >= definition.MaxPurchases;
-                button.interactable = !soldOut && money >= cost;
-
-                Text label = button.GetComponentInChildren<Text>();
-                if (label != null)
-                {
-                    label.text = soldOut
-                        ? $"{definition.DisplayName} — maxed ({count}/{definition.MaxPurchases})"
-                        : $"{definition.DisplayName} (${cost})  {count}/{definition.MaxPurchases}";
+                    image.color = i == selectedTarget
+                        ? new Color(0.18f, 0.42f, 0.70f, 0.95f)
+                        : new Color(0.10f, 0.14f, 0.20f, 0.90f);
                 }
             }
+        }
+
+        private Button CreateNode(Button template, Transform parent, string objectName, string label, Vector2 pos, Vector2 size)
+        {
+            Button node = Instantiate(template, parent);
+            node.name = objectName;
+            node.gameObject.SetActive(true);
+            node.onClick = new Button.ButtonClickedEvent();
+
+            RectTransform rect = (RectTransform)node.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = pos;
+            rect.sizeDelta = size;
+
+            Text text = node.GetComponentInChildren<Text>();
+            if (text != null)
+            {
+                text.text = label;
+                text.resizeTextForBestFit = true;
+                text.resizeTextMinSize = 8;
+                text.resizeTextMaxSize = 18;
+            }
+
+            return node;
+        }
+
+        private static Image CreateLine(Transform parent)
+        {
+            GameObject lineObject = new GameObject("Upgrade Line", typeof(RectTransform), typeof(Image));
+            lineObject.transform.SetParent(parent, false);
+            lineObject.transform.SetAsFirstSibling(); // draw behind the node buttons
+
+            Image image = lineObject.GetComponent<Image>();
+            image.color = new Color(0.45f, 0.65f, 1f, 0.45f);
+            image.raycastTarget = false;
+
+            RectTransform rect = image.rectTransform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            return image;
+        }
+
+        private static void SetLine(Image line, Vector2 from, Vector2 to)
+        {
+            Vector2 delta = to - from;
+            RectTransform rect = line.rectTransform;
+            rect.anchoredPosition = from + delta * 0.5f;
+            rect.sizeDelta = new Vector2(delta.magnitude, 3f);
+            rect.localEulerAngles = new Vector3(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
         }
     }
 }

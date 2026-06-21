@@ -53,8 +53,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
         [SerializeField] private int baseKillReward = 10;
-        [Tooltip("Scales the per-kill reward. Flat (no per-round growth) so income grows with how many you kill, not exponentially. 0.6 x base 10 = 6 gold/kill.")]
-        [SerializeField, Min(0f)] private float killRewardScale = 0.6f;
+        [Tooltip("Scales the per-kill reward. Flat (no per-round growth) so income grows with how many you kill, not exponentially. 0.3 x base 10 = 3 gold/kill.")]
+        [SerializeField, Min(0f)] private float killRewardScale = 0.3f;
         [SerializeField] private float healthScalePerRound = 0.35f;
         [SerializeField] private float fallbackSpawnRadius = 65f;
         [SerializeField] private bool useFixedSpawnHeight = true;
