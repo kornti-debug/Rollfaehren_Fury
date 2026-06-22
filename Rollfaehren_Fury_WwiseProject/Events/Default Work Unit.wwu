@@ -69,6 +69,122 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Play_BirdFlap" ID="{E756A537-D351-4065-95CD-25BCDB938778}">
+					<ChildrenList>
+						<Action Name="" ID="{9CE3A640-DFC2-46E3-AC8D-EA2E1AB59BCA}" ShortID="623524973">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BirdFlap" ID="{63DEC4DA-A1D3-48FD-9111-66B3E6D0D3B5}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}">
+					<ChildrenList>
+						<Action Name="" ID="{C4D1487E-1EFB-4A47-B3A3-1E529D93271D}" ShortID="32673332">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BirdFlap" ID="{63DEC4DA-A1D3-48FD-9111-66B3E6D0D3B5}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyBirdHit" ID="{A73456CB-82EB-4303-BC19-31788599EE48}">
+					<ChildrenList>
+						<Action Name="" ID="{25DC9E16-57EB-4443-B24B-47AE4A885A16}" ShortID="278413082">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyBirdHit" ID="{B4F00A08-5F16-4160-B969-2FC49F4EE676}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyFishHit" ID="{B8B055E1-94CD-4170-A7B0-541AFF47F163}">
+					<ChildrenList>
+						<Action Name="" ID="{596A6696-1535-401D-8E31-F8FFCEDA50A1}" ShortID="935616617">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyFishHit" ID="{F509D88C-FBF6-4FEA-960E-ED3053F2EAD0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_FallingOffWilhelmScream" ID="{D3CEB409-D22B-4C9A-B71E-28EEEC77E3FD}">
+					<ChildrenList>
+						<Action Name="" ID="{6E22699E-8019-4AE0-A580-8B82A471CE53}" ShortID="1047748901">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FallingOffWilhelmScream" ID="{4256C188-F216-407A-AA27-65899E545022}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_FishSwimming" ID="{3DE10C02-82C0-4281-A91C-0C641C532A27}">
+					<ChildrenList>
+						<Action Name="" ID="{8906AFD8-A54B-4090-B2FB-0D548781B1AC}" ShortID="17788632">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FishSwimming" ID="{53C05E75-9EFF-4EE4-8AC6-0231532067A0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_FishSwimming" ID="{6A9C86E0-4BBE-4453-B892-F64570756D2E}">
+					<ChildrenList>
+						<Action Name="" ID="{8751F56B-67CD-46F5-8499-F6FADF38258B}" ShortID="373338689">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FishSwimming" ID="{53C05E75-9EFF-4EE4-8AC6-0231532067A0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}">
+					<ChildrenList>
+						<Action Name="" ID="{586F6303-88FE-4CEC-B247-048829D80C1C}" ShortID="483031973">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="HarpoonFired" ID="{A618A354-3EFA-496C-981B-FD2E0593FE7A}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_PistolFired" ID="{E612A721-A6BA-4370-BE66-7B1EB683C671}">
+					<ChildrenList>
+						<Action Name="" ID="{30C7E5D5-2C4F-4615-9144-618CA7DC2C58}" ShortID="221288702">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="PistolFired" ID="{64BCA600-B6CF-49F9-948F-9104D123818F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_ShotgunFiredAndReload" ID="{056AB1FC-8197-42E2-AC36-B12EEBA58029}">
+					<ChildrenList>
+						<Action Name="" ID="{CA49617D-6D8C-409A-8E41-2E7A09B2C257}" ShortID="162787849">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ShotgunFiredAndReload" ID="{A16DB7D4-E761-46D2-84AA-A08620B52171}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>
