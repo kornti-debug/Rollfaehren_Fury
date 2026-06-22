@@ -7,7 +7,7 @@ namespace RollfaehrenFury.Prototype
     public sealed class EnemyMovementAudio : MonoBehaviour
     {
         private SimpleEnemy enemy;
-        private bool movementPlaying;
+        private uint movementPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
 
         private void Awake()
         {
@@ -16,24 +16,19 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
-            if (movementPlaying || enemy == null || !WwiseAudioRuntime.IsReady)
+            if (movementPlayingId != AkUnitySoundEngine.AK_INVALID_PLAYING_ID
+                || enemy == null
+                || !WwiseAudioRuntime.IsReady)
             {
                 return;
             }
 
-            WwiseAudioRuntime.Post(GetPlayEvent(), gameObject);
-            movementPlaying = true;
+            movementPlayingId = WwiseAudioRuntime.Post(GetPlayEvent(), gameObject);
         }
 
         private void OnDisable()
         {
-            if (!movementPlaying)
-            {
-                return;
-            }
-
-            WwiseAudioRuntime.Post(GetStopEvent(), gameObject);
-            movementPlaying = false;
+            WwiseAudioRuntime.StopPlaying(ref movementPlayingId);
         }
 
         private string GetPlayEvent()
@@ -43,11 +38,5 @@ namespace RollfaehrenFury.Prototype
                 : WwiseAudioNames.PlayFishMovement;
         }
 
-        private string GetStopEvent()
-        {
-            return enemy.MovementMode == EnemyMovementMode.Flying
-                ? WwiseAudioNames.StopPigeonMovement
-                : WwiseAudioNames.StopFishMovement;
-        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace RollfaehrenFury.Prototype
 {
@@ -12,8 +13,8 @@ namespace RollfaehrenFury.Prototype
 
         private bool mainBankLoaded;
         private bool outdoorBankLoaded;
-        private bool backgroundMusicPlaying;
-        private bool defeatMusicPlaying;
+        private uint backgroundMusicPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+        private uint defeatMusicPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
         private string activeGameState;
         private string activeCombatIntensity;
 
@@ -32,6 +33,14 @@ namespace RollfaehrenFury.Prototype
 
             Instance = this;
             gameManager ??= GameManager.Instance ?? FindFirstObjectByType<GameManager>();
+        }
+
+        private void OnEnable()
+        {
+            if (Instance == this)
+            {
+                SceneManager.sceneLoaded += HandleSceneLoaded;
+            }
         }
 
         private IEnumerator Start()
@@ -53,9 +62,7 @@ namespace RollfaehrenFury.Prototype
                 yield break;
             }
 
-            SetMusicSwitch("GameState", "Docked");
-            SetMusicSwitch("CombatIntensity", "Mid");
-            StartBackgroundMusic();
+            RefreshSceneContext();
         }
 
         private void Update()
@@ -68,6 +75,7 @@ namespace RollfaehrenFury.Prototype
             gameManager ??= GameManager.Instance ?? FindFirstObjectByType<GameManager>();
             if (gameManager == null)
             {
+                StopMusicPlayback();
                 return;
             }
 
@@ -77,10 +85,9 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            if (defeatMusicPlaying)
+            if (IsPlaying(defeatMusicPlayingId))
             {
-                PostEvent(WwiseAudioNames.StopDefeatMusic, gameObject);
-                defeatMusicPlaying = false;
+                StopPlaying(ref defeatMusicPlayingId, 150);
                 StartBackgroundMusic();
             }
 
@@ -89,36 +96,43 @@ namespace RollfaehrenFury.Prototype
                 : gameManager.State == PrototypeGameState.Playing
                     ? "Moving"
                     : "Docked";
-            SetMusicSwitch("GameState", gameState);
+            bool gameStateChanged = SetMusicSwitch("GameState", gameState);
 
             string intensity = gameManager.State == PrototypeGameState.Playing
                                && gameManager.CrossingProgress >= 0.5f
                 ? "Intense"
                 : "Mid";
-            SetMusicSwitch("CombatIntensity", intensity);
+            bool intensityChanged = SetMusicSwitch("CombatIntensity", intensity);
+            if ((gameStateChanged || intensityChanged) && IsPlaying(backgroundMusicPlayingId))
+            {
+                RestartBackgroundMusic();
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (Instance == this)
+            {
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+            }
         }
 
         private void OnDestroy()
         {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-
-            if (!AkUnitySoundEngine.IsInitialized())
+            if (Instance != this)
             {
                 return;
             }
 
-            PostEvent(WwiseAudioNames.StopBackgroundMusic, gameObject);
-            PostEvent(WwiseAudioNames.StopDefeatMusic, gameObject);
+            Instance = null;
+            StopMusicPlayback();
 
-            if (outdoorBankLoaded)
+            if (AkUnitySoundEngine.IsInitialized() && outdoorBankLoaded)
             {
                 AkBankManager.UnloadBank(outdoorBankName);
             }
 
-            if (mainBankLoaded)
+            if (AkUnitySoundEngine.IsInitialized() && mainBankLoaded)
             {
                 AkBankManager.UnloadBank(mainBankName);
             }
@@ -157,6 +171,18 @@ namespace RollfaehrenFury.Prototype
             return AkUnitySoundEngine.SetRTPCValue(rtpcName, value, emitter) == AKRESULT.AK_Success;
         }
 
+        public static void StopPlaying(ref uint playingId, int fadeMilliseconds = 100)
+        {
+            if (!IsPlaying(playingId))
+            {
+                playingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+                return;
+            }
+
+            AkUnitySoundEngine.StopPlayingID(playingId, Mathf.Max(0, fadeMilliseconds));
+            playingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+        }
+
         private static bool LoadBank(string bankName)
         {
             if (string.IsNullOrWhiteSpace(bankName))
@@ -182,14 +208,14 @@ namespace RollfaehrenFury.Prototype
             return AkUnitySoundEngine.PostEvent(eventName, emitter);
         }
 
-        private void SetMusicSwitch(string groupName, string valueName)
+        private bool SetMusicSwitch(string groupName, string valueName)
         {
             string cachedValue = groupName == "GameState"
                 ? activeGameState
                 : activeCombatIntensity;
             if (cachedValue == valueName)
             {
-                return;
+                return false;
             }
 
             if (SetSwitch(groupName, valueName, gameObject))
@@ -202,37 +228,73 @@ namespace RollfaehrenFury.Prototype
                 {
                     activeCombatIntensity = valueName;
                 }
+
+                return true;
             }
+
+            return false;
         }
 
         private void StartBackgroundMusic()
         {
-            if (backgroundMusicPlaying)
+            if (IsPlaying(backgroundMusicPlayingId))
             {
                 return;
             }
 
-            backgroundMusicPlaying =
-                PostEvent(WwiseAudioNames.PlayBackgroundMusic, gameObject)
-                != AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+            backgroundMusicPlayingId = PostEvent(WwiseAudioNames.PlayBackgroundMusic, gameObject);
+        }
+
+        private void RestartBackgroundMusic()
+        {
+            StopPlaying(ref backgroundMusicPlayingId, 150);
+            StartBackgroundMusic();
         }
 
         private void EnterGameOverAudio()
         {
-            if (defeatMusicPlaying)
+            if (IsPlaying(defeatMusicPlayingId))
             {
                 return;
             }
 
-            if (backgroundMusicPlaying)
+            StopPlaying(ref backgroundMusicPlayingId, 200);
+            defeatMusicPlayingId = PostEvent(WwiseAudioNames.PlayDefeatMusic, gameObject);
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            RefreshSceneContext();
+        }
+
+        private void RefreshSceneContext()
+        {
+            gameManager = GameManager.Instance ?? FindFirstObjectByType<GameManager>();
+            activeGameState = null;
+            activeCombatIntensity = null;
+
+            if (!isReady || gameManager == null)
             {
-                PostEvent(WwiseAudioNames.StopBackgroundMusic, gameObject);
-                backgroundMusicPlaying = false;
+                StopMusicPlayback();
+                return;
             }
 
-            defeatMusicPlaying =
-                PostEvent(WwiseAudioNames.PlayDefeatMusic, gameObject)
-                != AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+            SetMusicSwitch("GameState", "Docked");
+            SetMusicSwitch("CombatIntensity", "Mid");
+            StopPlaying(ref defeatMusicPlayingId, 100);
+            StartBackgroundMusic();
+        }
+
+        private void StopMusicPlayback()
+        {
+            StopPlaying(ref backgroundMusicPlayingId, 100);
+            StopPlaying(ref defeatMusicPlayingId, 100);
+        }
+
+        private static bool IsPlaying(uint playingId)
+        {
+            return AkUnitySoundEngine.IsInitialized()
+                   && playingId != AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
         }
     }
 

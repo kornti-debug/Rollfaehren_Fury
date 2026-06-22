@@ -105,7 +105,9 @@ Planned systems and responsibilities:
 - `WwiseAudioRuntime`: owns gameplay audio-bank loading and the music emitter
   in `Main`. It loads `MainSoundBank` and `OutdoorSoundBank`, drives
   `GameState` and `CombatIntensity`, starts/stops background and defeat music,
-  and exposes guarded Event, Switch, and RTPC helpers.
+  survives scene changes with `WwiseGlobal`, refreshes its `GameManager`
+  reference after each scene load, and exposes guarded Event, Switch, RTPC,
+  and playing-ID stop helpers.
 - `FerryAudio`: owns ferry standing-water, moving-wake, engine, and steering
   playback. It follows `FerryController.IsCrossing` and drives the
   `BoatSpeed` RTPC from `0` to `100`.
@@ -116,7 +118,9 @@ Planned systems and responsibilities:
   posts fish/pigeon hit Events on the enemy emitter, posts enemy/ferry contact
   Events on the ferry emitter, and plays Harald after a completed crossing.
 - `EnemyMovementAudio`: is attached to spawned enemies by `EnemySpawner` and
-  owns the fish-swimming or pigeon-flapping Play/Stop loop for that enemy.
+  owns the fish-swimming or pigeon-flapping loop for that enemy. Runtime loops
+  stop by playing ID during teardown, so destroyed emitters are never used for
+  a final Stop Event.
 - `WwiseUIButtonAudio`: reusable EventSystem feedback for selectable gameplay
   UI. Pointer hover and controller selection share one guarded hover post;
   pointer click and submit share one guarded click post. Runtime shop nodes

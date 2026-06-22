@@ -12,6 +12,9 @@ namespace RollfaehrenFury.Prototype
         private float currentSpeed;
         private bool initializedLoops;
         private bool wasCrossing;
+        private uint enginePlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+        private uint movingWaterPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
+        private uint standingWaterPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
 
         private void Awake()
         {
@@ -70,9 +73,9 @@ namespace RollfaehrenFury.Prototype
 
         private void EnterMovingAudio(bool playSteering)
         {
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatStanding, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.PlayBoatEngine, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.PlayBoatMoving, gameObject);
+            WwiseAudioRuntime.StopPlaying(ref standingWaterPlayingId);
+            enginePlayingId = StartLoop(WwiseAudioNames.PlayBoatEngine, enginePlayingId);
+            movingWaterPlayingId = StartLoop(WwiseAudioNames.PlayBoatMoving, movingWaterPlayingId);
             if (playSteering)
             {
                 WwiseAudioRuntime.Post(WwiseAudioNames.PlayBoatSteering, gameObject);
@@ -81,9 +84,9 @@ namespace RollfaehrenFury.Prototype
 
         private void EnterDockedAudio(bool playSteering)
         {
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatEngine, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatMoving, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.PlayBoatStanding, gameObject);
+            WwiseAudioRuntime.StopPlaying(ref enginePlayingId);
+            WwiseAudioRuntime.StopPlaying(ref movingWaterPlayingId);
+            standingWaterPlayingId = StartLoop(WwiseAudioNames.PlayBoatStanding, standingWaterPlayingId);
             WwiseAudioRuntime.SetRtpc("BoatSpeed", 0f, gameObject);
             if (playSteering)
             {
@@ -93,14 +96,16 @@ namespace RollfaehrenFury.Prototype
 
         private void StopAllLoops()
         {
-            if (!WwiseAudioRuntime.IsReady)
-            {
-                return;
-            }
+            WwiseAudioRuntime.StopPlaying(ref enginePlayingId);
+            WwiseAudioRuntime.StopPlaying(ref movingWaterPlayingId);
+            WwiseAudioRuntime.StopPlaying(ref standingWaterPlayingId);
+        }
 
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatEngine, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatMoving, gameObject);
-            WwiseAudioRuntime.Post(WwiseAudioNames.StopBoatStanding, gameObject);
+        private uint StartLoop(string eventName, uint currentPlayingId)
+        {
+            return currentPlayingId != AkUnitySoundEngine.AK_INVALID_PLAYING_ID
+                ? currentPlayingId
+                : WwiseAudioRuntime.Post(eventName, gameObject);
         }
     }
 }

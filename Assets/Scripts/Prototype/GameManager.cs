@@ -120,6 +120,14 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
+
         private void Update()
         {
             RefreshHud();

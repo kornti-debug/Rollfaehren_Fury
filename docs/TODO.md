@@ -217,6 +217,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Play a Harald voice line after completing a crossing.
 - [x] Add builder-repairable Wwise UI and shop-door components to Main and the
   additive shop scene.
+- [x] Stop ferry, enemy, background, and defeat loops by playing ID during
+  teardown and refresh persistent audio state across Menu/Main scene loads.
 - [ ] Run the complete first functional audio Play Mode checklist and tune
   volume, attenuation, loop transitions, and voice limits.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
