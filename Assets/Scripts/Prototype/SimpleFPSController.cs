@@ -355,11 +355,13 @@ namespace RollfaehrenFury.Prototype
             if (animatorHasIsWalking)
             {
                 animator.SetBool(IsWalkingId, isMoving);
+               // animator.SetBool(IsIdleId, false);
             }
 
             if (animatorHasIsIdle)
             {
                 animator.SetBool(IsIdleId, !isMoving);
+               // animator.SetBool(IsWalkingId, false);
             }
 
             int targetStateId = isMoving ? WalkingStateId : IdleStateId;
@@ -370,7 +372,7 @@ namespace RollfaehrenFury.Prototype
                 lastLoggedTargetStateId = targetStateId;
             }
 
-            PlayAnimationState(targetStateId, !isMoving);
+//            PlayAnimationState(targetStateId, !isMoving);
             animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
         }
 
