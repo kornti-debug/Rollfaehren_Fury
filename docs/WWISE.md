@@ -72,11 +72,20 @@ remaining general gameplay events exist.
 
 Authored content currently tracked in the repository:
 
-- Random/sequence containers: `Steps`, `HaraldKrullSpeaking`
-- Events: `Play_Steps`, `Play_HaraldKrullSpeaking`
-- User-defined SoundBank: `MainSoundBank`
+- Random/sequence containers for wood footsteps, ferry, fish, pigeons, and
+  weapon sounds
+- Events for footsteps, voice, ferry loops, fish/pigeon movement and hits,
+  harpoon, pistol, and shotgun
+- `BoatSpeed` game parameter for ferry engine pitch
+- Shared distance-volume/low-pass attenuation
+- User-defined SoundBanks: `MainSoundBank` and `IndoorSoundBank`
 - Original footstep and voice WAV files under `Rollfaehren_Fury_WwiseProject/Originals/`
 - Unity Event and SoundBank reference assets under `Assets/Wwise/ScriptableObjects/`
+
+The detailed collection list, final event naming, container configuration, and
+two-bank layout are documented in
+[AUDIO_COLLECTION.md](AUDIO_COLLECTION.md). Track source licenses and edits in
+[AUDIO_SOURCES.csv](AUDIO_SOURCES.csv).
 
 Local footsteps test:
 
@@ -96,21 +105,30 @@ posting, but missing local banks will still produce Wwise initialization errors.
 Do not commit locally generated banks unless the team changes the current
 ignore policy.
 
-## Starter Event Ideas
+## Existing Authored Events
 
-- `Play_Weapon_Shoot`
-- `Play_Enemy_Hit`
-- `Play_Enemy_Death`
-- `Play_Ferry_Damage`
-- `Play_Round_Complete`
-- `Play_Game_Over`
-- `Play_UI_Upgrade`
-- `Play_UI_Select`
-- `Play_UI_Confirm`
+- `Play_Steps`
+- `Play_HaraldKrullSpeaking`
+- `Play_BoatEngine`
+- `Play_BoatSteeringScreech`
+- `Play_BoatWaveMoving`
+- `Play_BoatWaveStanding`
+- `Play_BirdFlap` / `Stop_BirdFlap`
+- `Play_FishSwimming` / `Stop_FishSwimming`
+- `Play_EnemyBirdHit`
+- `Play_EnemyFishHit`
+- `Play_HarpoonFired`
+- `Play_PistolFired`
+- `Play_ShotgunFiredAndReload`
+- `Play_FallingOffWilhelmScream`
 
-The playable MVP branch has a `PrototypeAudioEvents` component that can post the first seven event names above. Missing events and missing banks must not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.
+These names remain available while authoring. Before Unity wiring, split
+combined actions such as `Play_ShotgunFiredAndReload` and adopt the final event
+names in `AUDIO_COLLECTION.md`.
 
-For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by default so missing Wwise events do not spam the Unity Console. Enable it in the Inspector after the matching Wwise events exist and the soundbanks have been regenerated.
+For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
+default so missing Wwise events do not spam the Unity Console. Enable it only
+after the final events exist and SoundBanks have been regenerated.
 
 The ferry crossing and enemy-type work does not enable Wwise automatically.
 Generate banks locally and verify authored events only after the gameplay scene

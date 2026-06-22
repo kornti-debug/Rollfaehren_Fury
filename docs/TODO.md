@@ -168,6 +168,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 - [x] Confirm Wwise project opens.
 - [x] Import the authored Wwise containers, events, SoundBank definition, and source audio.
+- [x] Import Istvan's `wwise_2` ferry, enemy, weapon, and expanded wood-footstep work into the current audio branch.
+- [x] Add the sound collection, Wwise hierarchy, event naming, and attribution checklist.
 - [x] Add guarded `Play_Steps` footsteps to the current player.
 - [x] Generate and test the initial Windows SoundBanks locally.
 - [x] Enable `WwiseGlobal` in the shared gameplay scene.
@@ -177,6 +179,16 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Hook ferry damage event.
 - [ ] Hook UI confirm/cancel events.
 - [ ] Add ambience for river/ferry.
+- [ ] Complete creator, source URL, license, and edit fields in `docs/AUDIO_SOURCES.csv`.
+- [ ] Collect and import gravel and grass footsteps.
+- [ ] Collect and import UI hover, click, purchase, back, and error sounds.
+- [ ] Collect and import missing assault-rifle, pistol-reload, ferry-impact, enemy-death, ambience, and music audio.
+- [ ] Split Wwise authoring into category Work Units and child SFX busses.
+- [ ] Build the `SurfaceType` footstep Switch Container.
+- [ ] Build the `Ferry_Loop` Blend Container driven by `BoatSpeed`.
+- [ ] Add enemy playback limits and final weapon/UI/ambience event names.
+- [ ] Create the `MusicState` state-driven music system.
+- [ ] Finalize `MainSoundBank` and `IndoorSoundBank`, then generate both locally.
 
 ## Presentation
 
