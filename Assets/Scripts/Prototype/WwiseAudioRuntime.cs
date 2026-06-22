@@ -10,9 +10,11 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameManager gameManager;
         [SerializeField] private string mainBankName = "MainSoundBank";
         [SerializeField] private string outdoorBankName = "OutdoorSoundBank";
+        [SerializeField] private string indoorBankName = "IndoorSoundBank";
 
         private bool mainBankLoaded;
         private bool outdoorBankLoaded;
+        private bool indoorBankLoaded;
         private uint backgroundMusicPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
         private uint defeatMusicPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
         private string activeGameState;
@@ -75,9 +77,12 @@ namespace RollfaehrenFury.Prototype
             gameManager ??= GameManager.Instance ?? FindFirstObjectByType<GameManager>();
             if (gameManager == null)
             {
+                SetIndoorBankLoaded(false);
                 StopMusicPlayback();
                 return;
             }
+
+            SetIndoorBankLoaded(gameManager.IsInsideShop);
 
             if (gameManager.State == PrototypeGameState.GameOver)
             {
@@ -130,6 +135,11 @@ namespace RollfaehrenFury.Prototype
             if (AkUnitySoundEngine.IsInitialized() && outdoorBankLoaded)
             {
                 AkBankManager.UnloadBank(outdoorBankName);
+            }
+
+            if (AkUnitySoundEngine.IsInitialized() && indoorBankLoaded)
+            {
+                AkBankManager.UnloadBank(indoorBankName);
             }
 
             if (AkUnitySoundEngine.IsInitialized() && mainBankLoaded)
@@ -275,10 +285,12 @@ namespace RollfaehrenFury.Prototype
 
             if (!isReady || gameManager == null)
             {
+                SetIndoorBankLoaded(false);
                 StopMusicPlayback();
                 return;
             }
 
+            SetIndoorBankLoaded(gameManager.IsInsideShop);
             SetMusicSwitch("GameState", "Docked");
             SetMusicSwitch("CombatIntensity", "Mid");
             StopPlaying(ref defeatMusicPlayingId, 100);
@@ -289,6 +301,24 @@ namespace RollfaehrenFury.Prototype
         {
             StopPlaying(ref backgroundMusicPlayingId, 100);
             StopPlaying(ref defeatMusicPlayingId, 100);
+        }
+
+        private void SetIndoorBankLoaded(bool shouldBeLoaded)
+        {
+            if (!isReady || string.IsNullOrWhiteSpace(indoorBankName))
+            {
+                return;
+            }
+
+            if (shouldBeLoaded && !indoorBankLoaded)
+            {
+                indoorBankLoaded = LoadBank(indoorBankName);
+            }
+            else if (!shouldBeLoaded && indoorBankLoaded)
+            {
+                AkBankManager.UnloadBank(indoorBankName);
+                indoorBankLoaded = false;
+            }
         }
 
         private static bool IsPlaying(uint playingId)

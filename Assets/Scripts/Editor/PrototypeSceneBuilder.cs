@@ -1080,6 +1080,7 @@ namespace RollfaehrenFury.Editor
             SetObject(runtime, "gameManager", gameManager);
             SetString(runtime, "mainBankName", "MainSoundBank");
             SetString(runtime, "outdoorBankName", "OutdoorSoundBank");
+            SetString(runtime, "indoorBankName", "IndoorSoundBank");
             wwiseGlobal.SetActive(true);
             EditorUtility.SetDirty(wwiseGlobal);
 

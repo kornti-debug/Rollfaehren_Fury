@@ -107,7 +107,9 @@ Planned systems and responsibilities:
   `GameState` and `CombatIntensity`, starts/stops background and defeat music,
   survives scene changes with `WwiseGlobal`, refreshes its `GameManager`
   reference after each scene load, and exposes guarded Event, Switch, RTPC,
-  and playing-ID stop helpers.
+  and playing-ID stop helpers. `IndoorSoundBank` loads only while
+  `GameManager.IsInsideShop`; music switch changes restart the current music
+  playing ID with a short fade so long source segments change immediately.
 - `FerryAudio`: owns ferry standing-water, moving-wake, engine, and steering
   playback. It follows `FerryController.IsCrossing` and drives the
   `BoatSpeed` RTPC from `0` to `100`.

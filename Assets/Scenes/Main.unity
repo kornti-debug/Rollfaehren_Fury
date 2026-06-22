@@ -4058,6 +4058,7 @@ MonoBehaviour:
   gameManager: {fileID: 1557749295}
   mainBankName: MainSoundBank
   outdoorBankName: OutdoorSoundBank
+  indoorBankName: IndoorSoundBank
 --- !u!114 &855206647
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -69,7 +69,8 @@ Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
 `Main.unity`, so each teammate must generate `MainSoundBank`,
 `OutdoorSoundBank`, and `IndoorSoundBank` locally before testing the complete
 audio setup. `WwiseAudioRuntime` loads Main and Outdoor after Wwise
-initialization; Indoor remains generated but unloaded while it is empty.
+initialization. Indoor loads only while the additive shop visit is active and
+unloads after returning outside.
 `PrototypeAudioEvents.postEvents` is enabled.
 
 Authored content currently tracked in the repository:
@@ -189,7 +190,8 @@ Runtime ownership:
   nodes inherit it from their button template.
 - `ShopScenePortal` and `ShopInteriorExit` post `Play_RC_Door_Open` only when
   their additive transition is accepted. Door-close audio remains unwired.
-- `IndoorSoundBank` remains empty and unloaded during this pass.
+- `IndoorSoundBank` remains empty, but its shop-entry load and shop-exit unload
+  lifecycle is wired for later room tone, dialogue, and reverb content.
 
 `PrototypeAudioEvents.postEvents` is enabled in `Main.unity`. All posts are
 guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
@@ -199,6 +201,10 @@ The footstep Switch Container explicitly maps `Wood`, `Gravel`, and `Grass`
 to their matching Random Containers. Unity currently uses the `Wood` tag or
 the ferry/jetty/shop hierarchy names for Wood and falls back to Gravel for all
 other walkable surfaces. Grass remains authored for possible later use.
+
+Music switch changes use a short restart of the active background-music
+playing ID. This makes Docked, Moving, Shop, Mid, and Intense changes audible
+immediately instead of waiting for the end cue of a multi-minute music segment.
 
 ## First Functional Play Mode Check
 
