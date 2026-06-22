@@ -18,6 +18,7 @@ namespace RollfaehrenFury.Prototype
 
         private static readonly int IsWalkingId = Animator.StringToHash("IsWalking");
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
+        private static readonly int IsJumpingId = Animator.StringToHash("IsJumping"); // Already defined here!
         private static readonly int WalkingStateId = Animator.StringToHash("Base Layer.Armature|WalkCycle");
         private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|Idle");
         private static readonly string WalkingStateName = "Base Layer.Armature|WalkCycle";
@@ -29,6 +30,7 @@ namespace RollfaehrenFury.Prototype
         private Animator animator;
         private bool animatorHasIsWalking;
         private bool animatorHasIsIdle;
+        private bool animatorHasIsJumping; // Added: Cache variable for the jump parameter
         private int activeAnimationStateId;
         private bool lastLoggedIsMoving;
         private int lastLoggedTargetStateId;
@@ -65,7 +67,7 @@ namespace RollfaehrenFury.Prototype
                     ConfigureAnimator();
                     CacheAnimatorParameters();
                     Debug.Log($"[{name}] Character animation is enabled with controller '{animator.runtimeAnimatorController?.name ?? "<none>"}'. " +
-                              $"States: idle='{IdleStateName}', walk='{WalkingStateName}'. Parameters: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}.", this);
+                              $"States: idle='{IdleStateName}', walk='{WalkingStateName}'. Parameters: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}, IsJumping={animatorHasIsJumping}.", this);
                 }
             }
             else if (animator != null)
@@ -122,7 +124,8 @@ namespace RollfaehrenFury.Prototype
                 pendingLookDelta = Vector2.zero;
                 jumpQueued = false;
                 isSprinting = false;
-                UpdateAnimator(Vector2.zero, false);
+                // Pass false for the jump parameter when input is disabled
+                UpdateAnimator(Vector2.zero, false, false); 
             }
 
             SetCursorLocked(isEnabled && lockCursorOnPlay);
@@ -325,8 +328,6 @@ namespace RollfaehrenFury.Prototype
             float speed = (isSprinting ? moveSpeed * sprintMultiplier : moveSpeed) * ActiveSpeedMultiplier;
             Vector3 movement = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
 
-            UpdateAnimator(moveInput, isSprinting);
-
             if (controller.isGrounded && verticalVelocity < 0f)
             {
                 verticalVelocity = -2f;
@@ -342,9 +343,17 @@ namespace RollfaehrenFury.Prototype
             movement.y = verticalVelocity;
 
             controller.Move(movement * Time.deltaTime);
+
+            // Added: Determine if the character is in the air. We check !controller.isGrounded.
+            // You can also add a small buffer (e.g., verticalVelocity > 0) if you don't want
+            // the jump animation playing while walking down steep slopes.
+            bool isJumping = !controller.isGrounded; 
+            
+            UpdateAnimator(moveInput, isSprinting, isJumping);
         }
 
-        private void UpdateAnimator(Vector2 moveInput, bool isSprinting)
+        // Updated: Added isJumping parameter to the method signature
+        private void UpdateAnimator(Vector2 moveInput, bool isSprinting, bool isJumping) 
         {
             if (animator == null)
             {
@@ -352,16 +361,21 @@ namespace RollfaehrenFury.Prototype
             }
 
             bool isMoving = moveInput.sqrMagnitude > 0.001f;
+
             if (animatorHasIsWalking)
             {
                 animator.SetBool(IsWalkingId, isMoving);
-               // animator.SetBool(IsIdleId, false);
             }
 
             if (animatorHasIsIdle)
             {
                 animator.SetBool(IsIdleId, !isMoving);
-               // animator.SetBool(IsWalkingId, false);
+            }
+
+            // Added: Update the IsJumping parameter on the Animator
+            if (animatorHasIsJumping)
+            {
+                animator.SetBool(IsJumpingId, isJumping);
             }
 
             int targetStateId = isMoving ? WalkingStateId : IdleStateId;
@@ -388,7 +402,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             animator.enabled = true;
-            animator.applyRootMotion = false;
+            animator.applyRootMotion = true;
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             animator.updateMode = AnimatorUpdateMode.Normal;
             animator.Rebind();
@@ -399,6 +413,7 @@ namespace RollfaehrenFury.Prototype
         {
             animatorHasIsWalking = false;
             animatorHasIsIdle = false;
+            animatorHasIsJumping = false; // Added: initialize the flag
 
             if (animator == null)
             {
@@ -415,9 +430,14 @@ namespace RollfaehrenFury.Prototype
                 {
                     animatorHasIsIdle = true;
                 }
+                // Added: Check for the IsJumping parameter
+                else if (parameter.nameHash == IsJumpingId && parameter.type == AnimatorControllerParameterType.Bool) 
+                {
+                    animatorHasIsJumping = true;
+                }
             }
 
-            Debug.Log($"[{name}] Animator parameters cached: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}.", this);
+            Debug.Log($"[{name}] Animator parameters cached: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}, IsJumping={animatorHasIsJumping}.", this);
         }
 
         private void PlayAnimationState(int stateId, bool forceRestart)
@@ -473,6 +493,5 @@ namespace RollfaehrenFury.Prototype
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;
         }
-
     }
 }
