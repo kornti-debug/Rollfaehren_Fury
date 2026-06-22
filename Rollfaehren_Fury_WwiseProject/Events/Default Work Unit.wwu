@@ -185,6 +185,114 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Play_AK47Fired" ID="{6F39F4C3-D32B-43EF-9484-20517631B0D0}">
+					<ChildrenList>
+						<Action Name="" ID="{8FF17EAF-E04D-4D6F-8AF1-82555E64AD2A}" ShortID="771797121">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="AK47Fired" ID="{28A1F493-7CD8-4C81-A332-30AA23BAEE59}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BackgroundMusic" ID="{C67152F4-52FD-4555-B1F9-CC2D60BBE5D1}">
+					<ChildrenList>
+						<Action Name="" ID="{8D4BAD80-EF98-4884-AA91-E101F62A6083}" ShortID="408155871">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BackgroundMusic" ID="{C8021598-55EB-4EB4-BC16-9E480C507E7E}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_DefeatMusic" ID="{9F947384-5AD5-4E28-A7EE-D871C9BFB913}">
+					<ChildrenList>
+						<Action Name="" ID="{7941B51A-3483-4276-96C1-A98E3E0B29AD}" ShortID="165635646">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="DefeatMusic" ID="{A6B14A73-9925-4158-864F-406928251924}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_VictoryMusic" ID="{9C6A7577-A766-485D-9155-18E941076A55}">
+					<ChildrenList>
+						<Action Name="" ID="{888EF0D6-E546-4B06-86DA-C16DA48412BD}" ShortID="135694689">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="VictoryMusic" ID="{C1C0FC01-6595-4CA9-BE59-2356F7E4E6A4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_DefeatMusic" ID="{D17FCD23-77B5-4CD9-9EDD-DF71856FD710}">
+					<ChildrenList>
+						<Action Name="" ID="{051394F5-B36B-4C53-B974-327F2BF84CC2}" ShortID="96221195">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="DefeatMusic" ID="{A6B14A73-9925-4158-864F-406928251924}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_VictoryMusic" ID="{8A477C0A-0EE8-4CA2-8166-AEB154BCE058}">
+					<ChildrenList>
+						<Action Name="" ID="{B69CCD56-84FD-4BC5-BEEC-1638FE2D06E5}" ShortID="990185371">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="VictoryMusic" ID="{C1C0FC01-6595-4CA9-BE59-2356F7E4E6A4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BackgroundMusic" ID="{E0B27749-73A4-45BC-BBAF-1E2E136B7C68}">
+					<ChildrenList>
+						<Action Name="" ID="{E8E681F4-426C-49D0-86E6-9E04E14FB7E6}" ShortID="1011271582">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BackgroundMusic" ID="{C8021598-55EB-4EB4-BC16-9E480C507E7E}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}">
+					<ChildrenList>
+						<Action Name="" ID="{AC57045C-3D20-4513-8E15-A1682A74E4CF}" ShortID="955883333">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyBirdReachFerry" ID="{86F3E1C1-955D-4C40-B4D7-383E0C73C182}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyFishReachFerry" ID="{5C9650CC-6F39-44CE-ACE1-10B154069800}">
+					<ChildrenList>
+						<Action Name="" ID="{875FB64E-C14F-470A-9CC7-50769070BAAB}" ShortID="804868348">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyFishReachFerry" ID="{64CE25AE-F686-4505-B8C2-5298183041CE}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>

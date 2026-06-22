@@ -13,12 +13,21 @@
 						<ObjectRef Name="Play_ShotgunFiredAndReload" ID="{056AB1FC-8197-42E2-AC36-B12EEBA58029}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_EnemyBirdHit" ID="{A73456CB-82EB-4303-BC19-31788599EE48}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_PistolFired" ID="{E612A721-A6BA-4370-BE66-7B1EB683C671}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_AK47Fired" ID="{6F39F4C3-D32B-43EF-9484-20517631B0D0}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_FishSwimming" ID="{6A9C86E0-4BBE-4453-B892-F64570756D2E}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyFishReachFerry" ID="{5C9650CC-6F39-44CE-ACE1-10B154069800}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_BackgroundMusic" ID="{C67152F4-52FD-4555-B1F9-CC2D60BBE5D1}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_BackgroundMusic" ID="{E0B27749-73A4-45BC-BBAF-1E2E136B7C68}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatWaveStanding" ID="{89378F7A-5BFD-479E-968C-F7431DED50CF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HaraldKrullSpeaking" ID="{A0D38CC8-CA2E-47D3-B0E1-3EDCCAB2533C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_VictoryMusic" ID="{9C6A7577-A766-485D-9155-18E941076A55}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatSteeringScreech" ID="{C0A79341-6BCE-48E6-AD6F-3ED57B873C96}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatWaveMoving" ID="{FD260B79-C915-4B84-BD0A-A4B99CDF51FF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_FallingOffWilhelmScream" ID="{D3CEB409-D22B-4C9A-B71E-28EEEC77E3FD}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_VictoryMusic" ID="{8A477C0A-0EE8-4CA2-8166-AEB154BCE058}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_DefeatMusic" ID="{D17FCD23-77B5-4CD9-9EDD-DF71856FD710}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_DefeatMusic" ID="{9F947384-5AD5-4E28-A7EE-D871C9BFB913}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 					</ObjectInclusionList>
@@ -26,7 +35,11 @@
 					<GameSyncExclusionList/>
 				</SoundBank>
 				<SoundBank Name="IndoorSoundBank" ID="{06DA5BEA-0A97-44A6-9E9B-2E3F99F28CC6}">
-					<ObjectInclusionList/>
+					<ObjectInclusionList>
+						<ObjectRef Name="Play_BackgroundMusic" ID="{C67152F4-52FD-4555-B1F9-CC2D60BBE5D1}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_BackgroundMusic" ID="{E0B27749-73A4-45BC-BBAF-1E2E136B7C68}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_HaraldKrullSpeaking" ID="{A0D38CC8-CA2E-47D3-B0E1-3EDCCAB2533C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>
 				</SoundBank>
