@@ -25,6 +25,17 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Play_BoatEngine" ID="{25D6FAD2-B8C1-40EA-BFB7-872BB55F2047}">
+					<ChildrenList>
+						<Action Name="" ID="{FB5DD26A-E370-468F-9374-73C33597C409}" ShortID="779015470">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatEngine" ID="{67A5C376-0AA8-42E2-B777-6E5BC3C6D5BC}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>
