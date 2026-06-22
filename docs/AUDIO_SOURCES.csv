@@ -61,3 +61,17 @@ SFX_Door_Open.wav,TODO,TODO,TODO,TODO,Shop door open,Attribution required
 SFX_Door_Close.wav,TODO,TODO,TODO,TODO,Shop door close,Attribution required
 UI_Menu_Click_01.wav,TODO,TODO,TODO,TODO,UI click,Attribution required
 UI_Menu_Hover_01.wav,TODO,TODO,TODO,TODO,UI hover,Attribution required
+AK47SingleShot.wav,TODO,TODO,TODO,TODO,Assault-rifle fire,Attribution required
+BoatStandingMusic.wav,TODO,TODO,TODO,TODO,Docked/preparation music,Attribution required
+MovingMusic_Mid.wav,TODO,TODO,TODO,TODO,Moving-ferry music source,Review usage
+MovingMusic_Mid_2.wav,TODO,TODO,TODO,TODO,Moving-ferry mid-intensity music,Attribution required
+MovingMusic_Intense.wav,TODO,TODO,TODO,TODO,Moving-ferry intense music,Attribution required
+ShopMusic1.wav,TODO,TODO,TODO,TODO,Shop music,Attribution required
+VictoryMusic.wav,TODO,TODO,TODO,TODO,Victory music,Attribution required
+DefeatMusic.wav,TODO,TODO,TODO,TODO,Defeat music,Attribution required
+FishExplosion.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+FishExplosion2.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+FishExplosion3.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+Squish1.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required
+Squish2.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required
+Squish3.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required

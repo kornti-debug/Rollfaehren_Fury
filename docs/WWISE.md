@@ -66,9 +66,10 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 ## Soundbank Workflow
 
 Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
-`Main.unity`, so each teammate must generate `MainSoundBank` locally before
-entering Play Mode. `PrototypeAudioEvents.postEvents` stays disabled until the
-remaining general gameplay events exist.
+`Main.unity`, so each teammate must generate `MainSoundBank`,
+`OutdoorSoundBank`, and `IndoorSoundBank` locally before testing the complete
+audio setup. `PrototypeAudioEvents.postEvents` stays disabled until the
+remaining gameplay Events are wired.
 
 Authored content currently tracked in the repository:
 
@@ -77,7 +78,11 @@ Authored content currently tracked in the repository:
   footstep containers
 - Random/sequence containers for ferry, fish, pigeons, weapons, doors, and UI
 - Events for footsteps, voice, ferry loops, fish/pigeon movement and hits,
-  harpoon, pistol, shotgun, doors, and UI
+  harpoon, pistol, shotgun, assault rifle, doors, and UI
+- Ferry-contact effects for fish and pigeons
+- A `BackgroundMusic` Music Switch Container driven by `GameState`, with
+  `CombatIntensity` selecting the moving-ferry music
+- Dedicated victory and defeat Music Segments
 - `BoatSpeed` game parameter for ferry engine pitch
 - Shared distance-volume/low-pass attenuation
 - User-defined SoundBanks: `MainSoundBank`, `OutdoorSoundBank`, and
@@ -86,7 +91,7 @@ Authored content currently tracked in the repository:
 - Unity Event and SoundBank reference assets under `Assets/Wwise/ScriptableObjects/`
 
 The detailed collection list, final event naming, container configuration, and
-two-bank layout are documented in
+three-bank layout are documented in
 [AUDIO_COLLECTION.md](AUDIO_COLLECTION.md). Track source licenses and edits in
 [AUDIO_SOURCES.csv](AUDIO_SOURCES.csv).
 
@@ -128,15 +133,26 @@ ignore policy.
 - `Play_RC_UI_Click`
 - `Play_RC_Door_Open`
 - `Play_RC_Door_Close`
+- `Play_AK47Fired`
+- `Play_EnemyFishReachFerry`
+- `Play_EnemyBirdReachFerry`
+- `Play_BackgroundMusic` / `Stop_BackgroundMusic`
+- `Play_VictoryMusic` / `Stop_VictoryMusic`
+- `Play_DefeatMusic` / `Stop_DefeatMusic`
 
 These names remain available while authoring. Before Unity wiring, split
 combined actions such as `Play_ShotgunFiredAndReload` and adopt the final event
 names in `AUDIO_COLLECTION.md`.
 
-`Play_SC_Footsteps` is a temporary authoring event used while the footstep
-switch was assembled. The stable Unity-facing event remains `Play_Steps`; it
-will be retargeted to `SC_Footsteps` and the temporary duplicate removed during
-the next Wwise integration pass.
+The stable Unity-facing footstep event is `Play_Steps`, which targets
+`SC_Footsteps`. Unity must set `SurfaceType` before posting it.
+
+Current bank ownership:
+
+- `MainSoundBank`: footsteps, UI, doors, dialogue, background music, victory,
+  and defeat
+- `OutdoorSoundBank`: weapons, ferry, enemies, and enemy/ferry contact
+- `IndoorSoundBank`: reserved for shop ambience and indoor-only dialogue
 
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
 default so missing Wwise events do not spam the Unity Console. Enable it only

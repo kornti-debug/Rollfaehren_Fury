@@ -183,14 +183,21 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Collect and import gravel and grass footsteps.
 - [x] Import initial UI hover/click and shop-door sounds.
 - [ ] Collect and import UI purchase, back, and error sounds.
-- [ ] Collect and import missing assault-rifle, pistol-reload, ferry-impact, enemy-death, ambience, and music audio.
+- [x] Import assault-rifle fire, enemy/ferry contact, background, shop,
+  victory, and defeat audio.
+- [ ] Collect and import missing pistol-reload, ferry-damage/docking,
+  enemy-death, and ambience audio.
 - [ ] Split Wwise authoring into category Work Units and child SFX busses.
 - [x] Build the `SurfaceType` footstep Switch Container.
 - [ ] Build the `Ferry_Loop` Blend Container driven by `BoatSpeed`.
 - [ ] Add enemy playback limits and final weapon/UI/ambience event names.
-- [ ] Create the `MusicState` state-driven music system.
+- [x] Create the initial `GameState`/`CombatIntensity` switch-driven music
+  system.
+- [ ] Tune music transitions and connect game-state changes from Unity.
 - [x] Create the initial three-bank layout: `MainSoundBank`,
   `OutdoorSoundBank`, and `IndoorSoundBank`.
+- [x] Generate and validate all three Windows SoundBanks after integrating the
+  latest music and combat audio.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation

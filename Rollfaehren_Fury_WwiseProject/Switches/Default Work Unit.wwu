@@ -10,6 +10,19 @@
 						<Switch Name="Grass" ID="{A75EE18D-67B4-4598-8D37-01743EFDBA47}"/>
 					</ChildrenList>
 				</SwitchGroup>
+				<SwitchGroup Name="CombatIntensity" ID="{8BD726D1-F658-4D0F-81CD-CCC66FDA9F19}">
+					<ChildrenList>
+						<Switch Name="Mid" ID="{AFFC2649-851F-4B89-820F-508295FAC800}"/>
+						<Switch Name="Intense" ID="{04E180D4-A779-4ED8-975C-9B85F80707B4}"/>
+					</ChildrenList>
+				</SwitchGroup>
+				<SwitchGroup Name="GameState" ID="{A4EBFA64-1F72-43DA-B2C5-ACF6898389A0}">
+					<ChildrenList>
+						<Switch Name="Docked" ID="{FC7FE080-0BE0-48B0-AC7D-E92E41E4DDB3}"/>
+						<Switch Name="Shop" ID="{DC608E27-79E4-444F-A39A-A5089967B565}"/>
+						<Switch Name="Moving" ID="{881AC0E9-FD37-4146-93E2-8B3DBAFDBD3E}"/>
+					</ChildrenList>
+				</SwitchGroup>
 			</ChildrenList>
 		</WorkUnit>
 	</Switches>

@@ -8,10 +8,15 @@
 						<ObjectRef Name="Play_RC_UI_Click" ID="{6F0BDB75-B255-4130-A641-00EC4DAF7A38}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_RC_Door_Open" ID="{BAB7CC0C-8558-4158-9BA3-2688A31514DF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_Steps" ID="{FD99B580-42F1-422A-9C48-DE59AC07F1D6}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
-						<ObjectRef Name="Play_SC_Footsteps" ID="{9A1DB3BB-73E5-4623-A40A-91F0986F1982}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HaraldKrullSpeaking" ID="{A0D38CC8-CA2E-47D3-B0E1-3EDCCAB2533C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_RC_UI_Hover" ID="{ACA815EF-315C-4D5A-AE7A-E2DEE0BE5ED9}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_RC_Door_Close" ID="{5511903C-5D00-4E50-B18A-ECF7402FA2AF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_BackgroundMusic" ID="{C67152F4-52FD-4555-B1F9-CC2D60BBE5D1}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_BackgroundMusic" ID="{E0B27749-73A4-45BC-BBAF-1E2E136B7C68}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_VictoryMusic" ID="{9C6A7577-A766-485D-9155-18E941076A55}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_VictoryMusic" ID="{8A477C0A-0EE8-4CA2-8166-AEB154BCE058}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_DefeatMusic" ID="{9F947384-5AD5-4E28-A7EE-D871C9BFB913}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Stop_DefeatMusic" ID="{D17FCD23-77B5-4CD9-9EDD-DF71856FD710}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>
@@ -37,6 +42,9 @@
 						<ObjectRef Name="Play_FallingOffWilhelmScream" ID="{D3CEB409-D22B-4C9A-B71E-28EEEC77E3FD}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_AK47Fired" ID="{6F39F4C3-D32B-43EF-9484-20517631B0D0}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyFishReachFerry" ID="{5C9650CC-6F39-44CE-ACE1-10B154069800}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>
