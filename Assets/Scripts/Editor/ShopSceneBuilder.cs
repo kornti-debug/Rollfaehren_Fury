@@ -94,6 +94,7 @@ namespace RollfaehrenFury.Editor
             exitCollider.isTrigger = true;
             exitCollider.size = new Vector3(2f, 2f, 1.2f);
             exit.AddComponent<ShopInteriorExit>();
+            EnsureComponent<AkGameObj>(exit);
 
             GameObject npcPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ShopNpcPrefabPath);
             if (npcPrefab != null)
@@ -179,6 +180,11 @@ namespace RollfaehrenFury.Editor
                 root.transform.position = ShopInteriorWorldPosition;
             }
 
+            foreach (ShopInteriorExit exit in root.GetComponentsInChildren<ShopInteriorExit>(true))
+            {
+                EnsureComponent<AkGameObj>(exit.gameObject);
+            }
+
             AddShopSceneToBuildSettings();
             EditorSceneManager.MarkSceneDirty(shopScene);
             EditorSceneManager.SaveScene(shopScene);
@@ -201,6 +207,7 @@ namespace RollfaehrenFury.Editor
             }
 
             ShopScenePortal portal = EnsureComponent<ShopScenePortal>(house);
+            EnsureComponent<AkGameObj>(house);
             SetString(portal, "sceneName", SceneFlow.ShopInteriorSceneName);
             SetString(portal, "shopId", shopId);
             SetObject(portal, "promptObject", prompt);

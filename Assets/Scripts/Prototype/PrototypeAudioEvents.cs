@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace RollfaehrenFury.Prototype
@@ -7,14 +6,9 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private GameManager gameManager;
         [SerializeField] private WeaponSystem weaponSystem;
-        [SerializeField] private bool postEvents;
-        [SerializeField] private string weaponShootEvent = "Play_Weapon_Shoot";
-        [SerializeField] private string enemyHitEvent = "Play_Enemy_Hit";
-        [SerializeField] private string enemyDeathEvent = "Play_Enemy_Death";
-        [SerializeField] private string ferryDamageEvent = "Play_Ferry_Damage";
-        [SerializeField] private string roundCompleteEvent = "Play_Round_Complete";
-        [SerializeField] private string gameOverEvent = "Play_Game_Over";
-        [SerializeField] private string upgradeBoughtEvent = "Play_UI_Upgrade";
+        [SerializeField] private FerryController ferryController;
+        [SerializeField] private SimpleFPSController playerController;
+        [SerializeField] private bool postEvents = true;
 
         private void OnEnable()
         {
@@ -38,6 +32,9 @@ namespace RollfaehrenFury.Prototype
             {
                 weaponSystem = FindFirstObjectByType<WeaponSystem>();
             }
+
+            ferryController ??= FindFirstObjectByType<FerryController>();
+            playerController ??= FindFirstObjectByType<SimpleFPSController>();
         }
 
         private void Subscribe()
@@ -50,11 +47,8 @@ namespace RollfaehrenFury.Prototype
 
             if (gameManager != null)
             {
-                gameManager.EnemyKilled += HandleEnemyKilled;
-                gameManager.FerryDamaged += HandleFerryDamaged;
+                gameManager.EnemyReachedFerry += HandleEnemyReachedFerry;
                 gameManager.RoundCompleted += HandleRoundCompleted;
-                gameManager.GameOverReached += HandleGameOverReached;
-                gameManager.UpgradeBought += HandleUpgradeBought;
             }
         }
 
@@ -68,47 +62,42 @@ namespace RollfaehrenFury.Prototype
 
             if (gameManager != null)
             {
-                gameManager.EnemyKilled -= HandleEnemyKilled;
-                gameManager.FerryDamaged -= HandleFerryDamaged;
+                gameManager.EnemyReachedFerry -= HandleEnemyReachedFerry;
                 gameManager.RoundCompleted -= HandleRoundCompleted;
-                gameManager.GameOverReached -= HandleGameOverReached;
-                gameManager.UpgradeBought -= HandleUpgradeBought;
             }
         }
 
         private void HandleWeaponFired()
         {
-            Post(weaponShootEvent, weaponSystem != null ? weaponSystem.gameObject : gameObject);
+            string eventName = WeaponEvent(weaponSystem != null ? weaponSystem.ActiveWeaponName : string.Empty);
+            Post(eventName, playerController != null ? playerController.gameObject : gameObject);
         }
 
         private void HandleWeaponHitHealth(Health health)
         {
-            Post(enemyHitEvent, health != null ? health.gameObject : gameObject);
+            SimpleEnemy enemy = health != null ? health.GetComponentInParent<SimpleEnemy>() : null;
+            if (enemy == null)
+            {
+                return;
+            }
+
+            string eventName = enemy.MovementMode == EnemyMovementMode.Flying
+                ? WwiseAudioNames.PlayPigeonHit
+                : WwiseAudioNames.PlayFishHit;
+            Post(eventName, enemy.gameObject);
         }
 
-        private void HandleEnemyKilled()
+        private void HandleEnemyReachedFerry(SimpleEnemy enemy)
         {
-            Post(enemyDeathEvent, gameObject);
-        }
-
-        private void HandleFerryDamaged()
-        {
-            Post(ferryDamageEvent, gameObject);
+            string eventName = enemy != null && enemy.MovementMode == EnemyMovementMode.Flying
+                ? WwiseAudioNames.PlayPigeonContact
+                : WwiseAudioNames.PlayFishContact;
+            Post(eventName, ferryController != null ? ferryController.gameObject : gameObject);
         }
 
         private void HandleRoundCompleted()
         {
-            Post(roundCompleteEvent, gameObject);
-        }
-
-        private void HandleGameOverReached()
-        {
-            Post(gameOverEvent, gameObject);
-        }
-
-        private void HandleUpgradeBought()
-        {
-            Post(upgradeBoughtEvent, gameObject);
+            Post(WwiseAudioNames.PlayHarald, playerController != null ? playerController.gameObject : gameObject);
         }
 
         public void SetPostingEnabled(bool isEnabled)
@@ -128,14 +117,33 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            try
+            WwiseAudioRuntime.Post(eventName, emitter);
+        }
+
+        private static string WeaponEvent(string weaponName)
+        {
+            if (weaponName.IndexOf("Harpoon", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                AkUnitySoundEngine.PostEvent(eventName, emitter);
+                return WwiseAudioNames.PlayHarpoon;
             }
-            catch (Exception exception)
+
+            if (weaponName.IndexOf("Pistol", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                Debug.LogWarning($"Wwise event '{eventName}' could not be posted yet: {exception.Message}", emitter);
+                return WwiseAudioNames.PlayPistol;
             }
+
+            if (weaponName.IndexOf("Shotgun", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return WwiseAudioNames.PlayShotgun;
+            }
+
+            if (weaponName.IndexOf("Assault", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || weaponName.IndexOf("Rifle", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return WwiseAudioNames.PlayAssaultRifle;
+            }
+
+            return string.Empty;
         }
     }
 }

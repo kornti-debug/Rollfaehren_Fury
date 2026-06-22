@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 2644159}
   - component: {fileID: 2644158}
   - component: {fileID: 2644157}
+  - component: {fileID: 2644160}
   m_Layer: 0
   m_Name: Pause Settings Back Button
   m_TagString: Untagged
@@ -331,6 +332,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2644155}
   m_CullTransparentMesh: 1
+--- !u!114 &2644160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2644155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &6257037
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,6 +927,30 @@ MonoBehaviour:
   sceneName: ShopInterior
   shopId: ShoreA
   promptObject: {fileID: 1096950671}
+--- !u!114 &191296962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191296957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &217455383
 GameObject:
   m_ObjectHideFlags: 0
@@ -1090,12 +1129,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8bda0675781441f29bc6c528a09e1eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.PlayerFootsteps
-  stepsEvent:
-    idInternal: 0
-    valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 57b620bdcc3fa410fae913c12cd00ee4, type: 2}
+  stepsEventName: Play_Steps
   walkInterval: 0.45
   sprintInterval: 0.3
+  surfaceProbeDistance: 3.5
+  surfaceProbeRadius: 0.18
+  surfaceMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  defaultSurface: Gravel
+  woodTag: Wood
+  woodObjectTokens:
+  - Ferry
+  - Jetty
+  - Shop Interior
 --- !u!114 &217455391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1467,6 +1514,7 @@ GameObject:
   - component: {fileID: 344586898}
   - component: {fileID: 344586897}
   - component: {fileID: 344586896}
+  - component: {fileID: 344586899}
   m_Layer: 0
   m_Name: Pause Main Menu Button
   m_TagString: Untagged
@@ -1588,6 +1636,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 344586894}
   m_CullTransparentMesh: 1
+--- !u!114 &344586899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344586894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &353048521
 GameObject:
   m_ObjectHideFlags: 0
@@ -1600,6 +1662,7 @@ GameObject:
   - component: {fileID: 353048525}
   - component: {fileID: 353048524}
   - component: {fileID: 353048523}
+  - component: {fileID: 353048526}
   m_Layer: 0
   m_Name: Pause Settings Button
   m_TagString: Untagged
@@ -1721,6 +1784,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 353048521}
   m_CullTransparentMesh: 1
+--- !u!114 &353048526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 353048521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!4 &366078040 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 898424531818492673, guid: 4510b20c1452f3a49a839466ee3456a5, type: 3}
@@ -3253,6 +3330,7 @@ GameObject:
   - component: {fileID: 714349306}
   - component: {fileID: 714349305}
   - component: {fileID: 714349304}
+  - component: {fileID: 714349307}
   m_Layer: 0
   m_Name: Next Round Button
   m_TagString: Untagged
@@ -3374,6 +3452,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 714349302}
   m_CullTransparentMesh: 1
+--- !u!114 &714349307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714349302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &747623228
 GameObject:
   m_ObjectHideFlags: 0
@@ -3481,9 +3573,11 @@ GameObject:
   - component: {fileID: 797040558}
   - component: {fileID: 797040557}
   - component: {fileID: 797040556}
+  - component: {fileID: 797040563}
+  - component: {fileID: 797040562}
   m_Layer: 0
   m_Name: Ferry_Root
-  m_TagString: Untagged
+  m_TagString: Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3609,6 +3703,45 @@ Transform:
   - {fileID: 968904646}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 177.139, z: 0}
+--- !u!114 &797040562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797040555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ce9f4df61064e34ba9cad68a4d1a340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.FerryAudio
+  ferry: {fileID: 797040556}
+  rampUpDuration: 2
+  rampDownDuration: 1.5
+--- !u!114 &797040563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797040555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!4 &806342584 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3453323984105259701, guid: 4510b20c1452f3a49a839466ee3456a5, type: 3}
@@ -3631,6 +3764,7 @@ GameObject:
   - component: {fileID: 816807420}
   - component: {fileID: 816807419}
   - component: {fileID: 816807421}
+  - component: {fileID: 816807422}
   m_Layer: 0
   m_Name: Augment Draft Button 1
   m_TagString: Untagged
@@ -3752,6 +3886,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &816807422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 816807417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!4 &820438997 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3802639651100006069, guid: 4510b20c1452f3a49a839466ee3456a5, type: 3}
@@ -3846,6 +3994,7 @@ GameObject:
   m_Component:
   - component: {fileID: 855206645}
   - component: {fileID: 855206644}
+  - component: {fileID: 855206647}
   - component: {fileID: 855206646}
   m_Layer: 0
   m_Name: WwiseGlobal
@@ -3853,7 +4002,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &855206644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3903,22 +4052,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 855206643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c12ce6c8e583ee64eaf2b4d430d46e36, type: 3}
+  m_Script: {fileID: 11500000, guid: b9df2907e92f29447952730a6f3f996c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkBank
-  triggerList: f7e1664c
-  useOtherObject: 0
-  data:
-    idInternal: 0
-    valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: e9d243cfbdfc44209a32f76ef8e57cfa, type: 2}
-  decodeBank: 0
-  overrideLoadSetting: 0
-  loadAsynchronous: 0
-  saveDecodedBank: 0
-  unloadTriggerList: 958ca0ea
-  bankNameInternal: 
-  valueGuidInternal: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseAudioRuntime
+  gameManager: {fileID: 1557749295}
+  mainBankName: MainSoundBank
+  outdoorBankName: OutdoorSoundBank
+  indoorBankName: IndoorSoundBank
+--- !u!114 &855206647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855206643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &855494139
 GameObject:
   m_ObjectHideFlags: 0
@@ -4149,6 +4313,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: jetty
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: m_TagString
+      value: Wood
+      objectReference: {fileID: 0}
     - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -4212,6 +4380,7 @@ GameObject:
   - component: {fileID: 901511720}
   - component: {fileID: 901511719}
   - component: {fileID: 901511718}
+  - component: {fileID: 901511721}
   m_Layer: 0
   m_Name: Close Shop Button
   m_TagString: Untagged
@@ -4333,6 +4502,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 901511716}
   m_CullTransparentMesh: 1
+--- !u!114 &901511721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901511716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &941403866
 GameObject:
   m_ObjectHideFlags: 0
@@ -5076,6 +5259,7 @@ GameObject:
   - component: {fileID: 1138775102}
   - component: {fileID: 1138775101}
   - component: {fileID: 1138775100}
+  - component: {fileID: 1138775103}
   m_Layer: 0
   m_Name: Pause New Game Button
   m_TagString: Untagged
@@ -5197,6 +5381,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1138775098}
   m_CullTransparentMesh: 1
+--- !u!114 &1138775103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138775098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1143488618
 GameObject:
   m_ObjectHideFlags: 0
@@ -5438,6 +5636,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: m_Name
       value: jetty 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: m_TagString
+      value: Wood
       objectReference: {fileID: 0}
     - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -6220,6 +6422,7 @@ GameObject:
   - component: {fileID: 1407555497}
   - component: {fileID: 1407555496}
   - component: {fileID: 1407555495}
+  - component: {fileID: 1407555499}
   m_Layer: 0
   m_Name: Augment Draft Button 2
   m_TagString: Untagged
@@ -6341,6 +6544,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -132}
   m_SizeDelta: {x: 640, y: 108}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1407555499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407555494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1408616340
 GameObject:
   m_ObjectHideFlags: 0
@@ -6429,6 +6646,7 @@ GameObject:
   - component: {fileID: 1418426564}
   - component: {fileID: 1418426563}
   - component: {fileID: 1418426562}
+  - component: {fileID: 1418426565}
   m_Layer: 0
   m_Name: Pause Resume Button
   m_TagString: Untagged
@@ -6550,6 +6768,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1418426560}
   m_CullTransparentMesh: 1
+--- !u!114 &1418426565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418426560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!4 &1442279819 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1706501020311216605, guid: 4510b20c1452f3a49a839466ee3456a5, type: 3}
@@ -6764,6 +6996,30 @@ MonoBehaviour:
   sceneName: ShopInterior
   shopId: ShoreB
   promptObject: {fileID: 1096950671}
+--- !u!114 &1513335306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513335301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &1523465909
 GameObject:
   m_ObjectHideFlags: 0
@@ -7352,14 +7608,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.PrototypeAudioEvents
   gameManager: {fileID: 1557749295}
   weaponSystem: {fileID: 654526154}
-  postEvents: 0
-  weaponShootEvent: Play_Weapon_Shoot
-  enemyHitEvent: Play_Enemy_Hit
-  enemyDeathEvent: Play_Enemy_Death
-  ferryDamageEvent: Play_Ferry_Damage
-  roundCompleteEvent: Play_Round_Complete
-  gameOverEvent: Play_Game_Over
-  upgradeBoughtEvent: Play_UI_Upgrade
+  ferryController: {fileID: 797040556}
+  playerController: {fileID: 217455385}
+  postEvents: 1
 --- !u!114 &1557749298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7515,6 +7766,7 @@ GameObject:
   - component: {fileID: 1620650728}
   - component: {fileID: 1620650727}
   - component: {fileID: 1620650726}
+  - component: {fileID: 1620650729}
   m_Layer: 0
   m_Name: Pause Quit Button
   m_TagString: Untagged
@@ -7636,6 +7888,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1620650724}
   m_CullTransparentMesh: 1
+--- !u!114 &1620650729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620650724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1636993325
 GameObject:
   m_ObjectHideFlags: 0
@@ -7909,6 +8175,7 @@ GameObject:
   - component: {fileID: 1696897679}
   - component: {fileID: 1696897678}
   - component: {fileID: 1696897680}
+  - component: {fileID: 1696897681}
   m_Layer: 0
   m_Name: Augment Draft Button 0
   m_TagString: Untagged
@@ -8030,6 +8297,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1696897681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696897676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1709271572
 GameObject:
   m_ObjectHideFlags: 0
@@ -8158,6 +8439,7 @@ GameObject:
   - component: {fileID: 1786919458}
   - component: {fileID: 1786919457}
   - component: {fileID: 1786919459}
+  - component: {fileID: 1786919460}
   m_Layer: 0
   m_Name: Shop Upgrade Button 2
   m_TagString: Untagged
@@ -8279,6 +8561,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1786919460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786919455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1788928188
 GameObject:
   m_ObjectHideFlags: 0
@@ -8622,6 +8918,7 @@ GameObject:
   - component: {fileID: 1875139330}
   - component: {fileID: 1875139329}
   - component: {fileID: 1875139331}
+  - component: {fileID: 1875139332}
   m_Layer: 0
   m_Name: Shop Upgrade Button 1
   m_TagString: Untagged
@@ -8743,6 +9040,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1875139332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875139327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1001 &1882890407
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8939,6 +9250,7 @@ GameObject:
   - component: {fileID: 1889005169}
   - component: {fileID: 1889005168}
   - component: {fileID: 1889005167}
+  - component: {fileID: 1889005171}
   m_Layer: 0
   m_Name: Shop Upgrade Button 3
   m_TagString: Untagged
@@ -9060,6 +9372,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -78}
   m_SizeDelta: {x: 420, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1889005171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889005166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1893419962
 GameObject:
   m_ObjectHideFlags: 0
@@ -9072,6 +9398,7 @@ GameObject:
   - component: {fileID: 1893419966}
   - component: {fileID: 1893419965}
   - component: {fileID: 1893419964}
+  - component: {fileID: 1893419967}
   m_Layer: 0
   m_Name: Restart Button
   m_TagString: Untagged
@@ -9193,6 +9520,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893419962}
   m_CullTransparentMesh: 1
+--- !u!114 &1893419967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1893419962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1 &1901311169
 GameObject:
   m_ObjectHideFlags: 0
@@ -9431,6 +9772,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
       insertIndex: -1
       addedObject: {fileID: 191296961}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 191296962}
   m_SourcePrefab: {fileID: 100100000, guid: 82d9d9a38ce81f149b27d96f0526a812, type: 3}
 --- !u!1 &1947480985
 GameObject:
@@ -10081,6 +10425,7 @@ GameObject:
   - component: {fileID: 2072631315}
   - component: {fileID: 2072631314}
   - component: {fileID: 2072631316}
+  - component: {fileID: 2072631317}
   m_Layer: 0
   m_Name: Shop Upgrade Button 0
   m_TagString: Untagged
@@ -10202,6 +10547,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2072631317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072631312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e6326ceb417a348b0c504b4a99ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseUIButtonAudio
+  hoverEvent: Play_RC_UI_Hover
+  clickEvent: Play_RC_UI_Click
 --- !u!1001 &2079619919
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10319,6 +10678,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1513335305}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1513335306}
   m_SourcePrefab: {fileID: 100100000, guid: 168a49a913c805d48b3f63108fa0205f, type: 3}
 --- !u!1 &2084479374
 GameObject:

@@ -168,6 +168,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 - [x] Confirm Wwise project opens.
 - [x] Import the authored Wwise containers, events, SoundBank definition, and source audio.
+- [x] Import Istvan's `wwise_2` ferry, enemy, weapon, and expanded wood-footstep work into the current audio branch.
+- [x] Add the sound collection, Wwise hierarchy, event naming, and attribution checklist.
 - [x] Add guarded `Play_Steps` footsteps to the current player.
 - [x] Generate and test the initial Windows SoundBanks locally.
 - [x] Enable `WwiseGlobal` in the shared gameplay scene.
@@ -175,8 +177,53 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Hook shooting event in Unity.
 - [x] Hook enemy death event.
 - [x] Hook ferry damage event.
-- [ ] Hook UI confirm/cancel events.
+- [x] Hook gameplay, pause, augment, game-over, and shop UI hover/click Events.
+- [x] Hook accepted exterior-entry and interior-exit interactions to the shop
+  door-open Event.
+- [ ] Add dedicated UI back, purchase, and error Events.
 - [ ] Add ambience for river/ferry.
+- [ ] Complete creator, source URL, license, and edit fields in `docs/AUDIO_SOURCES.csv`.
+- [x] Collect and import gravel and grass footsteps.
+- [x] Import initial UI hover/click and shop-door sounds.
+- [ ] Collect and import UI purchase, back, and error sounds.
+- [x] Import assault-rifle fire, enemy/ferry contact, background, shop,
+  victory, and defeat audio.
+- [ ] Collect and import missing pistol-reload, ferry-damage/docking,
+  enemy-death, and ambience audio.
+- [ ] Split Wwise authoring into category Work Units and child SFX busses.
+- [x] Build the `SurfaceType` footstep Switch Container.
+- [ ] Build the `Ferry_Loop` Blend Container driven by `BoatSpeed`.
+- [ ] Add enemy playback limits and final weapon/UI/ambience event names.
+- [x] Create the initial `GameState`/`CombatIntensity` switch-driven music
+  system.
+- [x] Connect Docked, Moving, Shop, and combat-intensity game syncs from Unity.
+- [ ] Tune music transitions and final relative loudness in Wwise.
+- [x] Create the initial three-bank layout: `MainSoundBank`,
+  `OutdoorSoundBank`, and `IndoorSoundBank`.
+- [x] Generate and validate all three Windows SoundBanks after integrating the
+  latest music and combat audio.
+- [x] Finalize first-pass Wwise routing, 3D attenuation, ferry Stop Events, and
+  background-music bus assignment.
+- [x] Add explicit Main/Outdoor bank loading and switch-driven gameplay/shop
+  music through `WwiseAudioRuntime`.
+- [x] Add ferry standing/moving/engine loop transitions and `BoatSpeed` RTPC
+  updates through `FerryAudio`.
+- [x] Detect Wood, Gravel, and Grass surfaces before posting player footsteps.
+- [x] Repair the missing Wwise footstep switch assignments and simplify the
+  runtime rule to Wood-tagged ferry/jetty/shop surfaces with Gravel fallback.
+- [x] Map Harpoon, Pistol, Shotgun, and Assault Rifle fire to authored Events.
+- [x] Add positional fish/pigeon movement loops, hit feedback, and ferry-contact
+  feedback without tying contact playback to the destroyed enemy.
+- [x] Play a Harald voice line after completing a crossing.
+- [x] Add builder-repairable Wwise UI and shop-door components to Main and the
+  additive shop scene.
+- [x] Stop ferry, enemy, background, and defeat loops by playing ID during
+  teardown and refresh persistent audio state across Menu/Main scene loads.
+- [x] Force immediate Docked/Moving/Shop and Mid/Intense music changes and
+  load `IndoorSoundBank` only during additive shop visits.
+- [ ] Run the complete first functional audio Play Mode checklist and tune
+  volume, attenuation, loop transitions, and voice limits.
+- [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation
 

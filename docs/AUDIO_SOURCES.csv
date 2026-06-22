@@ -1,0 +1,77 @@
+filename,creator,source_url,license,edits,usage,status
+Wood_Step_1.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+Wood_Step_2.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+Wood_Step_3.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+Wood_Step_4.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_5.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_6.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_7.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_8.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_9.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_10.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_11.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_12.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_13.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+wood_step_14.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+bird_flap_1.wav,TODO,TODO,TODO,TODO,Pigeon movement,Attribution required
+bird_flap_2.wav,TODO,TODO,TODO,TODO,Pigeon movement,Attribution required
+bird_flap_3.wav,TODO,TODO,TODO,TODO,Pigeon movement,Attribution required
+bird_hit_scream.wav,TODO,TODO,TODO,TODO,Pigeon hit,Attribution required
+fish_hit_scream.wav,TODO,TODO,TODO,TODO,Fish hit,Attribution required
+water-splash-1.wav,TODO,TODO,TODO,TODO,Fish movement,Attribution required
+water-splash-2.wav,TODO,TODO,TODO,TODO,Fish movement,Attribution required
+water-splash-3.wav,TODO,TODO,TODO,TODO,Fish movement,Attribution required
+water-splash-4.wav,TODO,TODO,TODO,TODO,Fish movement,Attribution required
+water-splash-5.wav,TODO,TODO,TODO,TODO,Fish movement,Attribution required
+enginesound.wav,TODO,TODO,TODO,TODO,Ferry engine,Attribution required
+boat_wave_moving.wav,TODO,TODO,TODO,TODO,Ferry moving wake,Attribution required
+boat_wave_standing.wav,TODO,TODO,TODO,TODO,Ferry idle water,Attribution required
+boat_screech.wav,TODO,TODO,TODO,TODO,Ferry steering,Attribution required
+harpoon.wav,TODO,TODO,TODO,TODO,Harpoon fire,Attribution required
+pistol.wav,TODO,TODO,TODO,TODO,Pistol fire,Attribution required
+shotgun_fired.wav,TODO,TODO,TODO,TODO,Shotgun fire,Attribution required
+shotgun_reload.wav,TODO,TODO,TODO,TODO,Shotgun reload,Attribution required
+flamethrower_start.wav,TODO,TODO,TODO,TODO,Legacy weapon source,Review usage
+flamethrower_loop.wav,TODO,TODO,TODO,TODO,Legacy weapon source,Review usage
+flamethrower_stop.wav,TODO,TODO,TODO,TODO,Legacy weapon source,Review usage
+wilhelm_scream.wav,TODO,TODO,TODO,TODO,Player fall/death,Attribution required
+FS_Wood_01.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_02.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_03.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_04.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_05.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_06.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_07.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FS_Wood_08.wav,TODO,TODO,TODO,TODO,Wood footsteps,Attribution required
+FC_Gravel_01.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_02.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_03.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_04.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_05.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_06.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_07.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_08.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Gravel_09.wav,TODO,TODO,TODO,TODO,Gravel footsteps,Attribution required
+FC_Grass_01.wav,TODO,TODO,TODO,TODO,Grass footsteps,Attribution required
+FC_Grass_02.wav,TODO,TODO,TODO,TODO,Grass footsteps,Attribution required
+FC_Grass_03.wav,TODO,TODO,TODO,TODO,Grass footsteps,Attribution required
+FC_Grass_04.wav,TODO,TODO,TODO,TODO,Grass footsteps,Attribution required
+FC_Grass_05.wav,TODO,TODO,TODO,TODO,Grass footsteps,Attribution required
+SFX_Door_Open.wav,TODO,TODO,TODO,TODO,Shop door open,Attribution required
+SFX_Door_Close.wav,TODO,TODO,TODO,TODO,Shop door close,Attribution required
+UI_Menu_Click_01.wav,TODO,TODO,TODO,TODO,UI click,Attribution required
+UI_Menu_Hover_01.wav,TODO,TODO,TODO,TODO,UI hover,Attribution required
+AK47SingleShot.wav,TODO,TODO,TODO,TODO,Assault-rifle fire,Attribution required
+BoatStandingMusic.wav,TODO,TODO,TODO,TODO,Docked/preparation music,Attribution required
+MovingMusic_Mid.wav,TODO,TODO,TODO,TODO,Moving-ferry music source,Review usage
+MovingMusic_Mid_2.wav,TODO,TODO,TODO,TODO,Moving-ferry mid-intensity music,Attribution required
+MovingMusic_Intense.wav,TODO,TODO,TODO,TODO,Moving-ferry intense music,Attribution required
+ShopMusic1.wav,TODO,TODO,TODO,TODO,Shop music,Attribution required
+VictoryMusic.wav,TODO,TODO,TODO,TODO,Victory music,Attribution required
+DefeatMusic.wav,TODO,TODO,TODO,TODO,Defeat music,Attribution required
+FishExplosion.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+FishExplosion2.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+FishExplosion3.wav,TODO,TODO,TODO,TODO,Fish reaches ferry,Attribution required
+Squish1.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required
+Squish2.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required
+Squish3.wav,TODO,TODO,TODO,TODO,Pigeon reaches ferry,Attribution required

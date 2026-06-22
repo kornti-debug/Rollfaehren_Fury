@@ -8,7 +8,7 @@
 						<Action Name="" ID="{6D23690B-7E31-4808-B82E-8D150F6DB5DC}" ShortID="843488586">
 							<ReferenceList>
 								<Reference Name="Target">
-									<ObjectRef Name="Steps" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+									<ObjectRef Name="SC_Footsteps" ID="{0F187D0A-7604-4460-A1C2-C609AC1A15F8}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
 								</Reference>
 							</ReferenceList>
 						</Action>
@@ -20,6 +20,360 @@
 							<ReferenceList>
 								<Reference Name="Target">
 									<ObjectRef Name="HaraldKrullSpeaking" ID="{536AE88E-1119-42CD-AC36-FE768F44849B}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatEngine" ID="{25D6FAD2-B8C1-40EA-BFB7-872BB55F2047}">
+					<ChildrenList>
+						<Action Name="" ID="{FB5DD26A-E370-468F-9374-73C33597C409}" ShortID="779015470">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatEngine" ID="{67A5C376-0AA8-42E2-B777-6E5BC3C6D5BC}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatSteeringScreech" ID="{C0A79341-6BCE-48E6-AD6F-3ED57B873C96}">
+					<ChildrenList>
+						<Action Name="" ID="{55C6B7BE-C9F2-4E9B-8578-4FB455D5DF32}" ShortID="721053847">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatSteeringScreech" ID="{FD647A92-5FCA-4878-9D78-4434ABD9A086}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatWaveMoving" ID="{FD260B79-C915-4B84-BD0A-A4B99CDF51FF}">
+					<ChildrenList>
+						<Action Name="" ID="{44993086-EC33-480B-A9E7-8CB01F496ACB}" ShortID="907954088">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatWaveStanding" ID="{89378F7A-5BFD-479E-968C-F7431DED50CF}">
+					<ChildrenList>
+						<Action Name="" ID="{821FE429-4E22-4AD9-B347-ABB7745B0871}" ShortID="109761334">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveStanding" ID="{160113F1-EDE4-42F7-86D4-743F4887C78F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BirdFlap" ID="{E756A537-D351-4065-95CD-25BCDB938778}">
+					<ChildrenList>
+						<Action Name="" ID="{9CE3A640-DFC2-46E3-AC8D-EA2E1AB59BCA}" ShortID="623524973">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BirdFlap" ID="{63DEC4DA-A1D3-48FD-9111-66B3E6D0D3B5}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}">
+					<ChildrenList>
+						<Action Name="" ID="{C4D1487E-1EFB-4A47-B3A3-1E529D93271D}" ShortID="32673332">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BirdFlap" ID="{63DEC4DA-A1D3-48FD-9111-66B3E6D0D3B5}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyBirdHit" ID="{A73456CB-82EB-4303-BC19-31788599EE48}">
+					<ChildrenList>
+						<Action Name="" ID="{25DC9E16-57EB-4443-B24B-47AE4A885A16}" ShortID="278413082">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyBirdHit" ID="{B4F00A08-5F16-4160-B969-2FC49F4EE676}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyFishHit" ID="{B8B055E1-94CD-4170-A7B0-541AFF47F163}">
+					<ChildrenList>
+						<Action Name="" ID="{596A6696-1535-401D-8E31-F8FFCEDA50A1}" ShortID="935616617">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyFishHit" ID="{F509D88C-FBF6-4FEA-960E-ED3053F2EAD0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_FallingOffWilhelmScream" ID="{D3CEB409-D22B-4C9A-B71E-28EEEC77E3FD}">
+					<ChildrenList>
+						<Action Name="" ID="{6E22699E-8019-4AE0-A580-8B82A471CE53}" ShortID="1047748901">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FallingOffWilhelmScream" ID="{4256C188-F216-407A-AA27-65899E545022}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_FishSwimming" ID="{3DE10C02-82C0-4281-A91C-0C641C532A27}">
+					<ChildrenList>
+						<Action Name="" ID="{8906AFD8-A54B-4090-B2FB-0D548781B1AC}" ShortID="17788632">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FishSwimming" ID="{53C05E75-9EFF-4EE4-8AC6-0231532067A0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_FishSwimming" ID="{6A9C86E0-4BBE-4453-B892-F64570756D2E}">
+					<ChildrenList>
+						<Action Name="" ID="{8751F56B-67CD-46F5-8499-F6FADF38258B}" ShortID="373338689">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="FishSwimming" ID="{53C05E75-9EFF-4EE4-8AC6-0231532067A0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}">
+					<ChildrenList>
+						<Action Name="" ID="{586F6303-88FE-4CEC-B247-048829D80C1C}" ShortID="483031973">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="HarpoonFired" ID="{A618A354-3EFA-496C-981B-FD2E0593FE7A}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_PistolFired" ID="{E612A721-A6BA-4370-BE66-7B1EB683C671}">
+					<ChildrenList>
+						<Action Name="" ID="{30C7E5D5-2C4F-4615-9144-618CA7DC2C58}" ShortID="221288702">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="PistolFired" ID="{64BCA600-B6CF-49F9-948F-9104D123818F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_ShotgunFiredAndReload" ID="{056AB1FC-8197-42E2-AC36-B12EEBA58029}">
+					<ChildrenList>
+						<Action Name="" ID="{CA49617D-6D8C-409A-8E41-2E7A09B2C257}" ShortID="162787849">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ShotgunFiredAndReload" ID="{A16DB7D4-E761-46D2-84AA-A08620B52171}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_RC_UI_Hover" ID="{ACA815EF-315C-4D5A-AE7A-E2DEE0BE5ED9}">
+					<ChildrenList>
+						<Action Name="" ID="{03D85E30-E438-4379-95B0-A815AE643819}" ShortID="1054994569">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="RC_UI_Hover" ID="{86A788B6-FA6A-46BA-9911-2D302C1158DA}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_RC_UI_Click" ID="{6F0BDB75-B255-4130-A641-00EC4DAF7A38}">
+					<ChildrenList>
+						<Action Name="" ID="{E87D53D0-6849-4A8E-B429-E278D16E3A39}" ShortID="531865578">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="RC_UI_Click" ID="{EE62557A-6E4B-475F-BA93-D9C9F00EEB02}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_RC_Door_Open" ID="{BAB7CC0C-8558-4158-9BA3-2688A31514DF}">
+					<ChildrenList>
+						<Action Name="" ID="{B52B9AB3-75CE-4E9A-81B8-33FB7EB62D87}" ShortID="949417904">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="RC_Door_Open" ID="{4AFC7436-E1E8-47B2-A071-EB131EFE55D4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_RC_Door_Close" ID="{5511903C-5D00-4E50-B18A-ECF7402FA2AF}">
+					<ChildrenList>
+						<Action Name="" ID="{46613B8C-4349-4B80-AD91-39C818D0B4DA}" ShortID="397667398">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="RC_Door_Close" ID="{88B6AC63-DADC-40BC-B9CC-B2E192603B67}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_AK47Fired" ID="{6F39F4C3-D32B-43EF-9484-20517631B0D0}">
+					<ChildrenList>
+						<Action Name="" ID="{8FF17EAF-E04D-4D6F-8AF1-82555E64AD2A}" ShortID="771797121">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="AK47Fired" ID="{28A1F493-7CD8-4C81-A332-30AA23BAEE59}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BackgroundMusic" ID="{C67152F4-52FD-4555-B1F9-CC2D60BBE5D1}">
+					<ChildrenList>
+						<Action Name="" ID="{8D4BAD80-EF98-4884-AA91-E101F62A6083}" ShortID="408155871">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BackgroundMusic" ID="{C8021598-55EB-4EB4-BC16-9E480C507E7E}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_DefeatMusic" ID="{9F947384-5AD5-4E28-A7EE-D871C9BFB913}">
+					<ChildrenList>
+						<Action Name="" ID="{7941B51A-3483-4276-96C1-A98E3E0B29AD}" ShortID="165635646">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="DefeatMusic" ID="{A6B14A73-9925-4158-864F-406928251924}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_VictoryMusic" ID="{9C6A7577-A766-485D-9155-18E941076A55}">
+					<ChildrenList>
+						<Action Name="" ID="{888EF0D6-E546-4B06-86DA-C16DA48412BD}" ShortID="135694689">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="VictoryMusic" ID="{C1C0FC01-6595-4CA9-BE59-2356F7E4E6A4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_DefeatMusic" ID="{D17FCD23-77B5-4CD9-9EDD-DF71856FD710}">
+					<ChildrenList>
+						<Action Name="" ID="{051394F5-B36B-4C53-B974-327F2BF84CC2}" ShortID="96221195">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="DefeatMusic" ID="{A6B14A73-9925-4158-864F-406928251924}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_VictoryMusic" ID="{8A477C0A-0EE8-4CA2-8166-AEB154BCE058}">
+					<ChildrenList>
+						<Action Name="" ID="{B69CCD56-84FD-4BC5-BEEC-1638FE2D06E5}" ShortID="990185371">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="VictoryMusic" ID="{C1C0FC01-6595-4CA9-BE59-2356F7E4E6A4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BackgroundMusic" ID="{E0B27749-73A4-45BC-BBAF-1E2E136B7C68}">
+					<ChildrenList>
+						<Action Name="" ID="{E8E681F4-426C-49D0-86E6-9E04E14FB7E6}" ShortID="1011271582">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BackgroundMusic" ID="{C8021598-55EB-4EB4-BC16-9E480C507E7E}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}">
+					<ChildrenList>
+						<Action Name="" ID="{AC57045C-3D20-4513-8E15-A1682A74E4CF}" ShortID="955883333">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyBirdReachFerry" ID="{86F3E1C1-955D-4C40-B4D7-383E0C73C182}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_EnemyFishReachFerry" ID="{5C9650CC-6F39-44CE-ACE1-10B154069800}">
+					<ChildrenList>
+						<Action Name="" ID="{875FB64E-C14F-470A-9CC7-50769070BAAB}" ShortID="804868348">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyFishReachFerry" ID="{64CE25AE-F686-4505-B8C2-5298183041CE}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BoatEngine" ID="{DB83B4BA-3307-46D9-ADB7-997C279B3F62}">
+					<ChildrenList>
+						<Action Name="" ID="{D6E48007-A846-4CC1-9B1F-B79BCC3C2371}" ShortID="487573373">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatEngine" ID="{67A5C376-0AA8-42E2-B777-6E5BC3C6D5BC}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BoatWaveStanding" ID="{084B4BCC-4EBC-42CB-966A-D6E6F74A83C2}">
+					<ChildrenList>
+						<Action Name="" ID="{1F79C954-14DB-4C49-A728-271539E1905E}" ShortID="272883177">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveStanding" ID="{160113F1-EDE4-42F7-86D4-743F4887C78F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BoatWaveMoving" ID="{84BA59E8-24E1-4B54-9AB0-873C0EF73F66}">
+					<ChildrenList>
+						<Action Name="" ID="{342FD18D-325B-4918-ACC6-451DA7FECEAA}" ShortID="702552828">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
 								</Reference>
 							</ReferenceList>
 						</Action>

@@ -45,6 +45,7 @@ namespace RollfaehrenFury.Prototype
 
         public event Action EnemyKilled;
         public event Action FerryDamaged;
+        public event Action<SimpleEnemy> EnemyReachedFerry;
         public event Action RoundCompleted;
         public event Action GameOverReached;
         public event Action UpgradeBought;
@@ -116,6 +117,14 @@ namespace RollfaehrenFury.Prototype
             if (ferryController != null)
             {
                 ferryController.Arrived -= HandleFerryArrived;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
             }
         }
 
@@ -218,6 +227,7 @@ namespace RollfaehrenFury.Prototype
         public void RegisterEnemyReachedFerry(SimpleEnemy enemy, float damage)
         {
             FerryDamaged?.Invoke();
+            EnemyReachedFerry?.Invoke(enemy);
             RefreshHud();
         }
 

@@ -95,7 +95,10 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            coordinator.EnterShop(sceneName, shopId);
+            if (coordinator.EnterShop(sceneName, shopId))
+            {
+                WwiseAudioRuntime.Post(WwiseAudioNames.PlayDoorOpen, gameObject);
+            }
         }
 
         private void ClaimPrompt()

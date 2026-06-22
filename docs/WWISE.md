@@ -66,17 +66,36 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 ## Soundbank Workflow
 
 Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
-`Main.unity`, so each teammate must generate `MainSoundBank` locally before
-entering Play Mode. `PrototypeAudioEvents.postEvents` stays disabled until the
-remaining general gameplay events exist.
+`Main.unity`, so each teammate must generate `MainSoundBank`,
+`OutdoorSoundBank`, and `IndoorSoundBank` locally before testing the complete
+audio setup. `WwiseAudioRuntime` loads Main and Outdoor after Wwise
+initialization. Indoor loads only while the additive shop visit is active and
+unloads after returning outside.
+`PrototypeAudioEvents.postEvents` is enabled.
 
 Authored content currently tracked in the repository:
 
-- Random/sequence containers: `Steps`, `HaraldKrullSpeaking`
-- Events: `Play_Steps`, `Play_HaraldKrullSpeaking`
-- User-defined SoundBank: `MainSoundBank`
+- A `SurfaceType` Switch Group with `Wood`, `Gravel`, and `Grass`
+- A `SC_Footsteps` Switch Container with randomized material-specific
+  footstep containers
+- Random/sequence containers for ferry, fish, pigeons, weapons, doors, and UI
+- Events for footsteps, voice, ferry loops, fish/pigeon movement and hits,
+  harpoon, pistol, shotgun, assault rifle, doors, and UI
+- Ferry-contact effects for fish and pigeons
+- A `BackgroundMusic` Music Switch Container driven by `GameState`, with
+  `CombatIntensity` selecting the moving-ferry music
+- Dedicated victory and defeat Music Segments
+- `BoatSpeed` game parameter for ferry engine pitch
+- Shared distance-volume/low-pass attenuation
+- User-defined SoundBanks: `MainSoundBank`, `OutdoorSoundBank`, and
+  `IndoorSoundBank`
 - Original footstep and voice WAV files under `Rollfaehren_Fury_WwiseProject/Originals/`
 - Unity Event and SoundBank reference assets under `Assets/Wwise/ScriptableObjects/`
+
+The detailed collection list, final event naming, container configuration, and
+three-bank layout are documented in
+[AUDIO_COLLECTION.md](AUDIO_COLLECTION.md). Track source licenses and edits in
+[AUDIO_SOURCES.csv](AUDIO_SOURCES.csv).
 
 Local footsteps test:
 
@@ -87,31 +106,117 @@ Local footsteps test:
 5. Enter Play Mode and walk/sprint.
 6. Confirm `Play_Steps` plays at different walk and sprint intervals.
 
-`PlayerFootsteps` is already attached to the player and references
-`Play_Steps`. `WwiseGlobal` references `MainSoundBank` and is enabled in the
-committed scene. The script checks `AkUnitySoundEngine.IsInitialized()` before
-posting, but missing local banks will still produce Wwise initialization errors.
+`PlayerFootsteps` is attached to the player and references `Play_Steps`.
+`WwiseGlobal` is enabled and owns runtime loading for the Main and Outdoor
+banks. All gameplay posts use guarded helpers, so missing local banks disable
+the authored gameplay audio without blocking the game loop.
 
-`Play_HaraldKrullSpeaking` is preserved but is not connected to gameplay yet.
+`Play_HaraldKrullSpeaking` plays once after a completed crossing.
 Do not commit locally generated banks unless the team changes the current
 ignore policy.
 
-## Starter Event Ideas
+## Existing Authored Events
 
-- `Play_Weapon_Shoot`
-- `Play_Enemy_Hit`
-- `Play_Enemy_Death`
-- `Play_Ferry_Damage`
-- `Play_Round_Complete`
-- `Play_Game_Over`
-- `Play_UI_Upgrade`
-- `Play_UI_Select`
-- `Play_UI_Confirm`
+- `Play_Steps`
+- `Play_HaraldKrullSpeaking`
+- `Play_BoatEngine`
+- `Play_BoatSteeringScreech`
+- `Play_BoatWaveMoving`
+- `Play_BoatWaveStanding`
+- `Play_BirdFlap` / `Stop_BirdFlap`
+- `Play_FishSwimming` / `Stop_FishSwimming`
+- `Play_EnemyBirdHit`
+- `Play_EnemyFishHit`
+- `Play_HarpoonFired`
+- `Play_PistolFired`
+- `Play_ShotgunFiredAndReload`
+- `Play_FallingOffWilhelmScream`
+- `Play_RC_UI_Hover`
+- `Play_RC_UI_Click`
+- `Play_RC_Door_Open`
+- `Play_RC_Door_Close`
+- `Play_AK47Fired`
+- `Play_EnemyFishReachFerry`
+- `Play_EnemyBirdReachFerry`
+- `Play_BackgroundMusic` / `Stop_BackgroundMusic`
+- `Play_VictoryMusic` / `Stop_VictoryMusic`
+- `Play_DefeatMusic` / `Stop_DefeatMusic`
 
-The playable MVP branch has a `PrototypeAudioEvents` component that can post the first seven event names above. Missing events and missing banks must not block gameplay; create the matching Wwise events and generate soundbanks when audio work begins.
+These names remain available while authoring. Before Unity wiring, split
+combined actions such as `Play_ShotgunFiredAndReload` and adopt the final event
+names in `AUDIO_COLLECTION.md`.
 
-For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by default so missing Wwise events do not spam the Unity Console. Enable it in the Inspector after the matching Wwise events exist and the soundbanks have been regenerated.
+The stable Unity-facing footstep event is `Play_Steps`, which targets
+`SC_Footsteps`. Unity must set `SurfaceType` before posting it.
 
-The ferry crossing and enemy-type work does not enable Wwise automatically.
-Generate banks locally and verify authored events only after the gameplay scene
-passes without audio.
+Current bank ownership:
+
+- `MainSoundBank`: footsteps, UI, doors, dialogue, background music, victory,
+  and defeat
+- `OutdoorSoundBank`: weapons, ferry Play/Stop loops, enemies, and enemy/ferry
+  contact
+- `IndoorSoundBank`: reserved for shop ambience and indoor-only dialogue
+
+The first Unity integration uses these game syncs:
+
+- `SurfaceType`: `Wood`, `Gravel`, `Grass`
+- `GameState`: `Docked`, `Shop`, `Moving`
+- `CombatIntensity`: `Mid`, `Intense`
+- `BoatSpeed`: RTPC from `0` to `100`
+
+Weapons and enemy sounds use 3D positioning with `Attn_Medium_40m`. Ferry
+loops use the existing long-distance ferry attenuation. The current combined
+`Play_ShotgunFiredAndReload` Event is intentionally retained for the first
+functional integration pass.
+
+The first in-game listening pass confirmed the main weapon, ferry, enemy,
+voice, and UI Events. Its latest authored level adjustments are kept as a
+separate checkpoint before footstep, lifecycle, and music-transition fixes.
+The final tested mix raises the AK47 to `-16 dB` and applies the `-16 dB`
+background-music adjustment at the parent Music Switch Container so Docked,
+Moving, Intense, and Shop music share the same baseline.
+
+Runtime ownership:
+
+- `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
+  `OutdoorSoundBank`; the previous `AkBank` component is removed to prevent
+  duplicate loading.
+- `WwiseGlobal` is the non-spatial music emitter.
+- `Ferry_Root/FerryAudio` owns standing water, moving wake, engine, steering,
+  and `BoatSpeed`.
+- `PlayerFootsteps` sets `SurfaceType` before posting `Play_Steps`.
+- `PrototypeAudioEvents` maps weapon fire, enemy hits, ferry contact, and the
+  round-complete Harald line to authored Event names.
+- `EnemyMovementAudio` owns per-enemy fish/pigeon movement loops.
+- `WwiseUIButtonAudio` posts non-spatial hover and click feedback from
+  gameplay, pause, augment, game-over, and shop buttons. Runtime-created shop
+  nodes inherit it from their button template.
+- `ShopScenePortal` and `ShopInteriorExit` post `Play_RC_Door_Open` only when
+  their additive transition is accepted. Door-close audio remains unwired.
+- `IndoorSoundBank` remains empty, but its shop-entry load and shop-exit unload
+  lifecycle is wired for later room tone, dialogue, and reverb content.
+
+`PrototypeAudioEvents.postEvents` is enabled in `Main.unity`. All posts are
+guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
+without breaking gameplay.
+
+The footstep Switch Container explicitly maps `Wood`, `Gravel`, and `Grass`
+to their matching Random Containers. Unity currently uses the `Wood` tag or
+the ferry/jetty/shop hierarchy names for Wood and falls back to Gravel for all
+other walkable surfaces. Grass remains authored for possible later use.
+
+Music switch changes use a short restart of the active background-music
+playing ID. This makes Docked, Moving, Shop, Mid, and Intense changes audible
+immediately instead of waiting for the end cue of a multi-minute music segment.
+
+## First Functional Play Mode Check
+
+1. Generate all three Windows SoundBanks locally.
+2. Start from `Bootstrap.unity` or `Menu.unity`, then enter Main.
+3. Confirm docked water and docked music begin.
+4. Test Wood, Gravel, and Grass footsteps.
+5. Start a crossing and confirm engine, wake, weapons, enemy movement/hits,
+   contact feedback, and the Mid-to-Intense music switch.
+6. Enter and leave either shop door and confirm door audio plus Shop music.
+7. Hover and click gameplay, pause, augment, and shop buttons.
+8. Trigger Game Over and confirm background music stops before defeat music.
