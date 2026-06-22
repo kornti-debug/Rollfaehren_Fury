@@ -72,13 +72,16 @@ remaining general gameplay events exist.
 
 Authored content currently tracked in the repository:
 
-- Random/sequence containers for wood footsteps, ferry, fish, pigeons, and
-  weapon sounds
+- A `SurfaceType` Switch Group with `Wood`, `Gravel`, and `Grass`
+- A `SC_Footsteps` Switch Container with randomized material-specific
+  footstep containers
+- Random/sequence containers for ferry, fish, pigeons, weapons, doors, and UI
 - Events for footsteps, voice, ferry loops, fish/pigeon movement and hits,
-  harpoon, pistol, and shotgun
+  harpoon, pistol, shotgun, doors, and UI
 - `BoatSpeed` game parameter for ferry engine pitch
 - Shared distance-volume/low-pass attenuation
-- User-defined SoundBanks: `MainSoundBank` and `IndoorSoundBank`
+- User-defined SoundBanks: `MainSoundBank`, `OutdoorSoundBank`, and
+  `IndoorSoundBank`
 - Original footstep and voice WAV files under `Rollfaehren_Fury_WwiseProject/Originals/`
 - Unity Event and SoundBank reference assets under `Assets/Wwise/ScriptableObjects/`
 
@@ -121,10 +124,19 @@ ignore policy.
 - `Play_PistolFired`
 - `Play_ShotgunFiredAndReload`
 - `Play_FallingOffWilhelmScream`
+- `Play_RC_UI_Hover`
+- `Play_RC_UI_Click`
+- `Play_RC_Door_Open`
+- `Play_RC_Door_Close`
 
 These names remain available while authoring. Before Unity wiring, split
 combined actions such as `Play_ShotgunFiredAndReload` and adopt the final event
 names in `AUDIO_COLLECTION.md`.
+
+`Play_SC_Footsteps` is a temporary authoring event used while the footstep
+switch was assembled. The stable Unity-facing event remains `Play_Steps`; it
+will be retargeted to `SC_Footsteps` and the temporary duplicate removed during
+the next Wwise integration pass.
 
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
 default so missing Wwise events do not spam the Unity Console. Enable it only

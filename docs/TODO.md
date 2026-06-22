@@ -180,15 +180,18 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Hook UI confirm/cancel events.
 - [ ] Add ambience for river/ferry.
 - [ ] Complete creator, source URL, license, and edit fields in `docs/AUDIO_SOURCES.csv`.
-- [ ] Collect and import gravel and grass footsteps.
-- [ ] Collect and import UI hover, click, purchase, back, and error sounds.
+- [x] Collect and import gravel and grass footsteps.
+- [x] Import initial UI hover/click and shop-door sounds.
+- [ ] Collect and import UI purchase, back, and error sounds.
 - [ ] Collect and import missing assault-rifle, pistol-reload, ferry-impact, enemy-death, ambience, and music audio.
 - [ ] Split Wwise authoring into category Work Units and child SFX busses.
-- [ ] Build the `SurfaceType` footstep Switch Container.
+- [x] Build the `SurfaceType` footstep Switch Container.
 - [ ] Build the `Ferry_Loop` Blend Container driven by `BoatSpeed`.
 - [ ] Add enemy playback limits and final weapon/UI/ambience event names.
 - [ ] Create the `MusicState` state-driven music system.
-- [ ] Finalize `MainSoundBank` and `IndoorSoundBank`, then generate both locally.
+- [x] Create the initial three-bank layout: `MainSoundBank`,
+  `OutdoorSoundBank`, and `IndoorSoundBank`.
+- [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation
 
