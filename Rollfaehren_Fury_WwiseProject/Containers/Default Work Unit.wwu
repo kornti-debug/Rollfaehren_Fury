@@ -271,50 +271,6 @@
 						</Sound>
 					</ChildrenList>
 				</RandomSequenceContainer>
-				<Sound Name="boat_wave_moving" ID="{5E60A345-FC99-4BB7-B889-E023F5F3F706}" ShortID="397759949">
-					<ReferenceList>
-						<Reference Name="Conversion">
-							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-						</Reference>
-						<Reference Name="OutputBus">
-							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-						</Reference>
-					</ReferenceList>
-					<ChildrenList>
-						<AudioFileSource Name="boat_wave_moving" ID="{01F680A5-4A03-425D-B360-9C463A559984}">
-							<Language>SFX</Language>
-							<AudioFile>boat_wave_moving.wav</AudioFile>
-							<MediaIDList>
-								<MediaID ID="855650885"/>
-							</MediaIDList>
-						</AudioFileSource>
-					</ChildrenList>
-					<ActiveSourceList>
-						<ActiveSource Name="boat_wave_moving" ID="{01F680A5-4A03-425D-B360-9C463A559984}" Platform="Linked"/>
-					</ActiveSourceList>
-				</Sound>
-				<Sound Name="boat_wave_standing" ID="{B0FBAFDC-4946-4EA4-A381-9A87AD67536B}" ShortID="558177879">
-					<ReferenceList>
-						<Reference Name="Conversion">
-							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-						</Reference>
-						<Reference Name="OutputBus">
-							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-						</Reference>
-					</ReferenceList>
-					<ChildrenList>
-						<AudioFileSource Name="boat_wave_standing" ID="{DBD5DF16-48F5-4D11-B0D4-57710AE56C36}">
-							<Language>SFX</Language>
-							<AudioFile>boat_wave_standing.wav</AudioFile>
-							<MediaIDList>
-								<MediaID ID="406330213"/>
-							</MediaIDList>
-						</AudioFileSource>
-					</ChildrenList>
-					<ActiveSourceList>
-						<ActiveSource Name="boat_wave_standing" ID="{DBD5DF16-48F5-4D11-B0D4-57710AE56C36}" Platform="Linked"/>
-					</ActiveSourceList>
-				</Sound>
 				<Sound Name="fish_hit_scream" ID="{55F620C7-A61F-4492-B433-DEAF93172F90}" ShortID="924353609">
 					<ReferenceList>
 						<Reference Name="Conversion">
@@ -862,12 +818,18 @@
 					</ObjectLists>
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="BoatSteeringScreech" ID="{FD647A92-5FCA-4878-9D78-4434ABD9A086}" ShortID="706961534">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="DistanceVolumeLPF" ID="{1B686FBE-5991-4D27-8FEC-E5FB1CFE3508}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
-							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
@@ -901,10 +863,10 @@
 								<AudioFileSource Name="boat_screech" ID="{62C57391-D13E-4A97-B0AB-B04F0BBD9D07}">
 									<PropertyList>
 										<Property Name="FadeInDuration" Type="Real64" Value="0.368345323741007"/>
-										<Property Name="FadeOutDuration" Type="Real64" Value="0.460431654676259"/>
+										<Property Name="FadeOutDuration" Type="Real64" Value="2.90423568925839"/>
 										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
 										<Property Name="TrimBegin" Type="Real64" Value="0.529496402877698"/>
-										<Property Name="TrimEnd" Type="Real64" Value="8.33381294964029"/>
+										<Property Name="TrimEnd" Type="Real64" Value="6.90441813696017"/>
 									</PropertyList>
 									<Language>SFX</Language>
 									<AudioFile>boat_screech.wav</AudioFile>
@@ -933,6 +895,9 @@
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
 					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="DistanceVolumeLPF" ID="{1B686FBE-5991-4D27-8FEC-E5FB1CFE3508}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
@@ -999,6 +964,109 @@
 							</RTPC>
 						</ObjectList>
 					</ObjectLists>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="BoatWaveStanding" ID="{160113F1-EDE4-42F7-86D4-743F4887C78F}" ShortID="52285350">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="1"/>
+						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="DistanceVolumeLPF" ID="{1B686FBE-5991-4D27-8FEC-E5FB1CFE3508}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="boat_wave_standing" ID="{B0FBAFDC-4946-4EA4-A381-9A87AD67536B}" ShortID="558177879">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="boat_wave_standing" ID="{DBD5DF16-48F5-4D11-B0D4-57710AE56C36}">
+									<PropertyList>
+										<Property Name="FadeInDuration" Type="Real64" Value="1.45978991190592"/>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+										<Property Name="TrimEnd" Type="Real64" Value="9.05069790140788"/>
+									</PropertyList>
+									<Language>SFX</Language>
+									<AudioFile>boat_wave_standing.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="406330213"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="boat_wave_standing" ID="{DBD5DF16-48F5-4D11-B0D4-57710AE56C36}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" ShortID="152731026">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="1"/>
+						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="DistanceVolumeLPF" ID="{1B686FBE-5991-4D27-8FEC-E5FB1CFE3508}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="boat_wave_moving" ID="{5E60A345-FC99-4BB7-B889-E023F5F3F706}" ShortID="397759949">
+							<PropertyList>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-3</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="boat_wave_moving" ID="{01F680A5-4A03-425D-B360-9C463A559984}">
+									<PropertyList>
+										<Property Name="LoopBegin" Type="Real64" Value="0"/>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+										<Property Name="TrimEnd" Type="Real64" Value="41.6826664903429"/>
+									</PropertyList>
+									<Language>SFX</Language>
+									<AudioFile>boat_wave_moving.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="855650885"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="boat_wave_moving" ID="{01F680A5-4A03-425D-B360-9C463A559984}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
 				</RandomSequenceContainer>
 			</ChildrenList>
 		</WorkUnit>
