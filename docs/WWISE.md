@@ -172,6 +172,9 @@ functional integration pass.
 The first in-game listening pass confirmed the main weapon, ferry, enemy,
 voice, and UI Events. Its latest authored level adjustments are kept as a
 separate checkpoint before footstep, lifecycle, and music-transition fixes.
+The final tested mix raises the AK47 to `-16 dB` and applies the `-16 dB`
+background-music adjustment at the parent Music Switch Container so Docked,
+Moving, Intense, and Shop music share the same baseline.
 
 Runtime ownership:
 

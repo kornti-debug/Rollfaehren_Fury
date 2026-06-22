@@ -1756,9 +1756,9 @@
 						</GroupingBehaviorList>
 						<GroupingList>
 							<Grouping>
-								<SwitchRef Name="Wood" ID="{5B015CE3-6BDA-4D5A-908A-754CB6CF85C6}"/>
+								<SwitchRef Name="Grass" ID="{A75EE18D-67B4-4598-8D37-01743EFDBA47}"/>
 								<ItemList>
-									<ItemRef Name="RC_Wood" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}"/>
+									<ItemRef Name="RC_Grass" ID="{C6DE7AAE-E6C4-43BF-B928-90DF95DD3D0A}"/>
 								</ItemList>
 							</Grouping>
 							<Grouping>
@@ -1768,9 +1768,9 @@
 								</ItemList>
 							</Grouping>
 							<Grouping>
-								<SwitchRef Name="Grass" ID="{A75EE18D-67B4-4598-8D37-01743EFDBA47}"/>
+								<SwitchRef Name="Wood" ID="{5B015CE3-6BDA-4D5A-908A-754CB6CF85C6}"/>
 								<ItemList>
-									<ItemRef Name="RC_Grass" ID="{C6DE7AAE-E6C4-43BF-B928-90DF95DD3D0A}"/>
+									<ItemRef Name="RC_Wood" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}"/>
 								</ItemList>
 							</Grouping>
 						</GroupingList>
@@ -1934,7 +1934,7 @@
 						</Property>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-20</Value>
+								<Value>-16</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
@@ -1979,6 +1979,13 @@
 					</ChildrenList>
 				</RandomSequenceContainer>
 				<MusicSwitchContainer Name="BackgroundMusic" ID="{C8021598-55EB-4EB4-BC16-9E480C507E7E}" ShortID="740101141">
+					<PropertyList>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-16</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2006,11 +2013,6 @@
 						<MusicSegment Name="BoatStandingMusic" ID="{4F3CBAC2-C621-4CDD-A52E-2F2C1B256C68}" ShortID="796784276">
 							<PropertyList>
 								<Property Name="EndPosition" Type="Real64" Value="205425.189331477"/>
-								<Property Name="Volume" Type="Real64">
-									<ValueList>
-										<Value>-16</Value>
-									</ValueList>
-								</Property>
 							</PropertyList>
 							<ReferenceList>
 								<Reference Name="Conversion">
