@@ -12,6 +12,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: FerryBody
+    second: {fileID: 2100000, guid: cf0ed1911cf81c546b6e41d995bb020d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Material
     second: {fileID: 2100000, guid: 65f147b6ef840284183eb9e3276bb51e, type: 2}
   - first:
@@ -28,22 +33,27 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: White.006
-    second: {fileID: 2100000, guid: 09a4670f25240ef40a1faa2914a600f9, type: 2}
+    second: {fileID: 2100000, guid: 7acba2d79520aac47ad705e9f2acec93, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: White.007
-    second: {fileID: 2100000, guid: ca92eb592b0f04d4dbb8008d6fad9efa, type: 2}
+    second: {fileID: 2100000, guid: 278e0ec7f5101f044a14b10ef07a8f74, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: White.008
-    second: {fileID: 2100000, guid: a8eb6f1a9b64ef441bf31df6b3dcd037, type: 2}
+    second: {fileID: 2100000, guid: 20368382d6576e245b44abe68989821a, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: White.009
-    second: {fileID: 2100000, guid: f277ad6fa1983cc47a160ca7ce1097a0, type: 2}
+    second: {fileID: 2100000, guid: c0d8b4e056f54bf47b793520c30a2f0e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WoodDeck
+    second: {fileID: 2100000, guid: 11db13cec68cfbe4f9ecc45b89f3b3ae, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
