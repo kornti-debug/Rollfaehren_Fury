@@ -152,10 +152,11 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="BirdFlap" ID="{63DEC4DA-A1D3-48FD-9111-66B3E6D0D3B5}" ShortID="103269414">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
 						<Property Name="RandomOrSequence" Type="int16" Value="0"/>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
 							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
@@ -323,6 +324,7 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="FishSwimming" ID="{53C05E75-9EFF-4EE4-8AC6-0231532067A0}" ShortID="882363830">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Lowpass" Type="int16">
 							<ValueList>
 								<Value>30</Value>
@@ -344,7 +346,7 @@
 								<Value>8</Value>
 							</ValueList>
 						</Property>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
 							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
@@ -825,20 +827,24 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="PistolFired" ID="{64BCA600-B6CF-49F9-948F-9104D123818F}" ShortID="513382224">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-3</Value>
 							</ValueList>
 						</Property>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
 							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
-					<Reference Name="Attenuation"><ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/></Reference></ReferenceList>
+					</ReferenceList>
 					<ChildrenList>
 						<Sound Name="pistol" ID="{AF175C5D-EB27-456C-B4A8-AE9A44EFF238}" ShortID="594451095">
 							<ReferenceList>
@@ -866,6 +872,7 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="ShotgunFiredAndReload" ID="{A16DB7D4-E761-46D2-84AA-A08620B52171}" ShortID="937119489">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
 						<Property Name="RandomOrSequence" Type="int16" Value="0"/>
 						<Property Name="Volume" Type="Real64">
@@ -873,15 +880,18 @@
 								<Value>-3</Value>
 							</ValueList>
 						</Property>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
 							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
-					<Reference Name="Attenuation"><ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/></Reference></ReferenceList>
+					</ReferenceList>
 					<ChildrenList>
 						<Sound Name="shotgun_fired" ID="{C6C2CCEA-14A4-460D-9426-8E0E5CF33638}" ShortID="460221760">
 							<PropertyList>
@@ -950,20 +960,24 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="HarpoonFired" ID="{A618A354-3EFA-496C-981B-FD2E0593FE7A}" ShortID="758159461">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-6</Value>
 							</ValueList>
 						</Property>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
 							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
-					<Reference Name="Attenuation"><ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/></Reference></ReferenceList>
+					</ReferenceList>
 					<ChildrenList>
 						<Sound Name="harpoon" ID="{C28A462B-9BB3-4894-9202-21F94E93C5BE}" ShortID="784256928">
 							<ReferenceList>
@@ -1889,6 +1903,7 @@
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="AK47Fired" ID="{28A1F493-7CD8-4C81-A332-30AA23BAEE59}" ShortID="661255744">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Lowpass" Type="int16">
 							<ValueList>
 								<Value>10</Value>
@@ -1896,18 +1911,21 @@
 						</Property>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-6</Value>
+								<Value>-20</Value>
 							</ValueList>
 						</Property>
-					<Property Name="3DSpatialization" Type="int16" Value="2"/></PropertyList>
+					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
 							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
-					<Reference Name="Attenuation"><ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/></Reference></ReferenceList>
+					</ReferenceList>
 					<ChildrenList>
 						<Sound Name="AK47SingleShot" ID="{DEF92F50-57AC-4E2A-ACDE-7FA62B689285}" ShortID="26571749">
 							<ReferenceList>
@@ -1965,6 +1983,11 @@
 						<MusicSegment Name="BoatStandingMusic" ID="{4F3CBAC2-C621-4CDD-A52E-2F2C1B256C68}" ShortID="796784276">
 							<PropertyList>
 								<Property Name="EndPosition" Type="Real64" Value="205425.189331477"/>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-16</Value>
+									</ValueList>
+								</Property>
 							</PropertyList>
 							<ReferenceList>
 								<Reference Name="Conversion">

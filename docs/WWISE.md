@@ -168,6 +168,10 @@ loops use the existing long-distance ferry attenuation. The current combined
 `Play_ShotgunFiredAndReload` Event is intentionally retained for the first
 functional integration pass.
 
+The first in-game listening pass confirmed the main weapon, ferry, enemy,
+voice, and UI Events. Its latest authored level adjustments are kept as a
+separate checkpoint before footstep, lifecycle, and music-transition fixes.
+
 Runtime ownership:
 
 - `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
