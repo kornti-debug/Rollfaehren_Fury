@@ -68,8 +68,9 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
 `Main.unity`, so each teammate must generate `MainSoundBank`,
 `OutdoorSoundBank`, and `IndoorSoundBank` locally before testing the complete
-audio setup. `PrototypeAudioEvents.postEvents` stays disabled until the
-remaining gameplay Events are wired.
+audio setup. `WwiseAudioRuntime` loads Main and Outdoor after Wwise
+initialization; Indoor remains generated but unloaded while it is empty.
+`PrototypeAudioEvents.postEvents` is enabled.
 
 Authored content currently tracked in the repository:
 
@@ -104,12 +105,12 @@ Local footsteps test:
 5. Enter Play Mode and walk/sprint.
 6. Confirm `Play_Steps` plays at different walk and sprint intervals.
 
-`PlayerFootsteps` is already attached to the player and references
-`Play_Steps`. `WwiseGlobal` references `MainSoundBank` and is enabled in the
-committed scene. The script checks `AkUnitySoundEngine.IsInitialized()` before
-posting, but missing local banks will still produce Wwise initialization errors.
+`PlayerFootsteps` is attached to the player and references `Play_Steps`.
+`WwiseGlobal` is enabled and owns runtime loading for the Main and Outdoor
+banks. All gameplay posts use guarded helpers, so missing local banks disable
+the authored gameplay audio without blocking the game loop.
 
-`Play_HaraldKrullSpeaking` is preserved but is not connected to gameplay yet.
+`Play_HaraldKrullSpeaking` plays once after a completed crossing.
 Do not commit locally generated banks unless the team changes the current
 ignore policy.
 
@@ -179,8 +180,25 @@ Runtime ownership:
 - `PrototypeAudioEvents` maps weapon fire, enemy hits, ferry contact, and the
   round-complete Harald line to authored Event names.
 - `EnemyMovementAudio` owns per-enemy fish/pigeon movement loops.
+- `WwiseUIButtonAudio` posts non-spatial hover and click feedback from
+  gameplay, pause, augment, game-over, and shop buttons. Runtime-created shop
+  nodes inherit it from their button template.
+- `ShopScenePortal` and `ShopInteriorExit` post `Play_RC_Door_Open` only when
+  their additive transition is accepted. Door-close audio remains unwired.
 - `IndoorSoundBank` remains empty and unloaded during this pass.
 
 `PrototypeAudioEvents.postEvents` is enabled in `Main.unity`. All posts are
 guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
 without breaking gameplay.
+
+## First Functional Play Mode Check
+
+1. Generate all three Windows SoundBanks locally.
+2. Start from `Bootstrap.unity` or `Menu.unity`, then enter Main.
+3. Confirm docked water and docked music begin.
+4. Test Wood, Gravel, and Grass footsteps.
+5. Start a crossing and confirm engine, wake, weapons, enemy movement/hits,
+   contact feedback, and the Mid-to-Intense music switch.
+6. Enter and leave either shop door and confirm door audio plus Shop music.
+7. Hover and click gameplay, pause, augment, and shop buttons.
+8. Trigger Game Over and confirm background music stops before defeat music.

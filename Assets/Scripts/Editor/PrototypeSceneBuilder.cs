@@ -80,6 +80,7 @@ namespace RollfaehrenFury.Editor
             EnsureFerryRoundFlow(ferry, ferryTarget, playerController, gameManager, gameManager.GetComponent<EnemySpawner>(), hud);
             EnsureWwiseRuntime(gameManager, ferry);
             EnsureEventSystem();
+            EnsureWwiseUiAndShopAudio();
             ConfigureHudButtons(gameManager);
             ConfigureBuildSettings();
 
@@ -120,6 +121,7 @@ namespace RollfaehrenFury.Editor
             EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
             EnsureWwiseRuntime(gameManager, ferry);
             EnsureEventSystem();
+            EnsureWwiseUiAndShopAudio();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
@@ -149,11 +151,21 @@ namespace RollfaehrenFury.Editor
             EnsureWwiseFootsteps(player);
             EnsureAudioEvents(gameManager, weaponSystem);
             EnsureWwiseRuntime(gameManager, ferry);
+            EnsureWwiseUiAndShopAudio();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ShopScenePath) != null)
+            {
+                Scene shopScene = EditorSceneManager.OpenScene(ShopScenePath, OpenSceneMode.Single);
+                EnsureWwiseUiAndShopAudio();
+                EditorSceneManager.MarkSceneDirty(shopScene);
+                EditorSceneManager.SaveScene(shopScene);
+            }
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Wwise runtime, music, and ferry audio repaired.");
+            Debug.Log("Wwise gameplay, UI, and shop audio repaired.");
         }
 
         [MenuItem("Rollfaehren Fury/Integrate Wwise Footsteps")]
@@ -1072,6 +1084,33 @@ namespace RollfaehrenFury.Editor
             SetObject(ferryAudio, "ferry", ferryController);
             SetFloat(ferryAudio, "rampUpDuration", 2f);
             SetFloat(ferryAudio, "rampDownDuration", 1.5f);
+        }
+
+        private static void EnsureWwiseUiAndShopAudio()
+        {
+            foreach (Button button in Resources.FindObjectsOfTypeAll<Button>())
+            {
+                if (button.gameObject.scene.IsValid())
+                {
+                    EnsureComponent<WwiseUIButtonAudio>(button.gameObject);
+                }
+            }
+
+            foreach (ShopScenePortal portal in Resources.FindObjectsOfTypeAll<ShopScenePortal>())
+            {
+                if (portal.gameObject.scene.IsValid())
+                {
+                    EnsureComponent<AkGameObj>(portal.gameObject);
+                }
+            }
+
+            foreach (ShopInteriorExit exit in Resources.FindObjectsOfTypeAll<ShopInteriorExit>())
+            {
+                if (exit.gameObject.scene.IsValid())
+                {
+                    EnsureComponent<AkGameObj>(exit.gameObject);
+                }
+            }
         }
 
         private static ShopManager EnsureShopManager(GameManager gameManager)

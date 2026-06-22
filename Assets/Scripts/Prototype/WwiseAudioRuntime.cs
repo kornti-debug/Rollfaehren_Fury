@@ -265,5 +265,8 @@ namespace RollfaehrenFury.Prototype
         public const string PlayFishContact = "Play_EnemyFishReachFerry";
         public const string PlayPigeonContact = "Play_EnemyBirdReachFerry";
         public const string PlayHarald = "Play_HaraldKrullSpeaking";
+        public const string PlayUiHover = "Play_RC_UI_Hover";
+        public const string PlayUiClick = "Play_RC_UI_Click";
+        public const string PlayDoorOpen = "Play_RC_Door_Open";
     }
 }

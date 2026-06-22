@@ -177,7 +177,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Hook shooting event in Unity.
 - [x] Hook enemy death event.
 - [x] Hook ferry damage event.
-- [ ] Hook UI confirm/cancel events.
+- [x] Hook gameplay, pause, augment, game-over, and shop UI hover/click Events.
+- [x] Hook accepted exterior-entry and interior-exit interactions to the shop
+  door-open Event.
+- [ ] Add dedicated UI back, purchase, and error Events.
 - [ ] Add ambience for river/ferry.
 - [ ] Complete creator, source URL, license, and edit fields in `docs/AUDIO_SOURCES.csv`.
 - [x] Collect and import gravel and grass footsteps.
@@ -193,7 +196,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Add enemy playback limits and final weapon/UI/ambience event names.
 - [x] Create the initial `GameState`/`CombatIntensity` switch-driven music
   system.
-- [ ] Tune music transitions and connect game-state changes from Unity.
+- [x] Connect Docked, Moving, Shop, and combat-intensity game syncs from Unity.
+- [ ] Tune music transitions and final relative loudness in Wwise.
 - [x] Create the initial three-bank layout: `MainSoundBank`,
   `OutdoorSoundBank`, and `IndoorSoundBank`.
 - [x] Generate and validate all three Windows SoundBanks after integrating the
@@ -209,6 +213,10 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add positional fish/pigeon movement loops, hit feedback, and ferry-contact
   feedback without tying contact playback to the destroyed enemy.
 - [x] Play a Harald voice line after completing a crossing.
+- [x] Add builder-repairable Wwise UI and shop-door components to Main and the
+  additive shop scene.
+- [ ] Run the complete first functional audio Play Mode checklist and tune
+  volume, attenuation, loop transitions, and voice limits.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation

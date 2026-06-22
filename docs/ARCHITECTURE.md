@@ -117,6 +117,13 @@ Planned systems and responsibilities:
   Events on the ferry emitter, and plays Harald after a completed crossing.
 - `EnemyMovementAudio`: is attached to spawned enemies by `EnemySpawner` and
   owns the fish-swimming or pigeon-flapping Play/Stop loop for that enemy.
+- `WwiseUIButtonAudio`: reusable EventSystem feedback for selectable gameplay
+  UI. Pointer hover and controller selection share one guarded hover post;
+  pointer click and submit share one guarded click post. Runtime shop nodes
+  inherit the component from their cloned button template.
+- `ShopScenePortal` / `ShopInteriorExit`: use the portal or exit object as a
+  spatial door emitter and post `Play_RC_Door_Open` only after
+  `ShopSceneCoordinator` accepts the transition.
 - The player's hidden controller capsule owns the camera, movement, weapons,
   and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose.
 - `Cargo`: later destructible cargo with reward value.
