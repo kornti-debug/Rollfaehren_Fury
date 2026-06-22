@@ -36,6 +36,39 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Play_BoatSteeringScreech" ID="{C0A79341-6BCE-48E6-AD6F-3ED57B873C96}">
+					<ChildrenList>
+						<Action Name="" ID="{55C6B7BE-C9F2-4E9B-8578-4FB455D5DF32}" ShortID="721053847">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatSteeringScreech" ID="{FD647A92-5FCA-4878-9D78-4434ABD9A086}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatWaveMoving" ID="{FD260B79-C915-4B84-BD0A-A4B99CDF51FF}">
+					<ChildrenList>
+						<Action Name="" ID="{44993086-EC33-480B-A9E7-8CB01F496ACB}" ShortID="907954088">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_BoatWaveStanding" ID="{89378F7A-5BFD-479E-968C-F7431DED50CF}">
+					<ChildrenList>
+						<Action Name="" ID="{821FE429-4E22-4AD9-B347-ABB7745B0871}" ShortID="109761334">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveStanding" ID="{160113F1-EDE4-42F7-86D4-743F4887C78F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>
