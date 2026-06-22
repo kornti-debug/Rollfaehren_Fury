@@ -3481,6 +3481,8 @@ GameObject:
   - component: {fileID: 797040558}
   - component: {fileID: 797040557}
   - component: {fileID: 797040556}
+  - component: {fileID: 797040563}
+  - component: {fileID: 797040562}
   m_Layer: 0
   m_Name: Ferry_Root
   m_TagString: Untagged
@@ -3609,6 +3611,45 @@ Transform:
   - {fileID: 968904646}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 177.139, z: 0}
+--- !u!114 &797040562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797040555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ce9f4df61064e34ba9cad68a4d1a340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.FerryAudio
+  ferry: {fileID: 797040556}
+  rampUpDuration: 2
+  rampDownDuration: 1.5
+--- !u!114 &797040563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797040555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!4 &806342584 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3453323984105259701, guid: 4510b20c1452f3a49a839466ee3456a5, type: 3}
@@ -3846,6 +3887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 855206645}
   - component: {fileID: 855206644}
+  - component: {fileID: 855206647}
   - component: {fileID: 855206646}
   m_Layer: 0
   m_Name: WwiseGlobal
@@ -3853,7 +3895,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &855206644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3903,22 +3945,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 855206643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c12ce6c8e583ee64eaf2b4d430d46e36, type: 3}
+  m_Script: {fileID: 11500000, guid: b9df2907e92f29447952730a6f3f996c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkBank
-  triggerList: f7e1664c
-  useOtherObject: 0
-  data:
-    idInternal: 0
-    valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: e9d243cfbdfc44209a32f76ef8e57cfa, type: 2}
-  decodeBank: 0
-  overrideLoadSetting: 0
-  loadAsynchronous: 0
-  saveDecodedBank: 0
-  unloadTriggerList: 958ca0ea
-  bankNameInternal: 
-  valueGuidInternal: 
+  m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WwiseAudioRuntime
+  gameManager: {fileID: 1557749295}
+  mainBankName: MainSoundBank
+  outdoorBankName: OutdoorSoundBank
+--- !u!114 &855206647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855206643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181fdb22c34adac458ccecc58079f140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &855494139
 GameObject:
   m_ObjectHideFlags: 0

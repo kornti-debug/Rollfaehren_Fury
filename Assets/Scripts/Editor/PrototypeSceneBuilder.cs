@@ -31,7 +31,6 @@ namespace RollfaehrenFury.Editor
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
         private const string PlayerAnimatorControllerPath = "Assets/Animations/FraunzAnimator.controller";
         private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
-        private const string MainSoundBankReferencePath = "Assets/Wwise/ScriptableObjects/Soundbank/216757D1-222F-4AA5-8C50-BBE647F38374.asset";
         private const string PlayerVisualName = "Fraunz Visual";
         private const float EnemySpawnHeight = 7f;
         private const float PlayerVisualScale = 1f;
@@ -80,6 +79,7 @@ namespace RollfaehrenFury.Editor
             EnsureAugmentSystem(gameManager, gameManager.GetComponent<EnemySpawner>());
             EnsureAudioEvents(gameManager, weaponSystem);
             EnsureFerryRoundFlow(ferry, ferryTarget, playerController, gameManager, gameManager.GetComponent<EnemySpawner>(), hud);
+            EnsureWwiseRuntime(gameManager, ferry);
             EnsureEventSystem();
             ConfigureHudButtons(gameManager);
             ConfigureBuildSettings();
@@ -119,6 +119,7 @@ namespace RollfaehrenFury.Editor
             EnsureFishContactAnimation();
             EnsureWwiseFootsteps(player);
             EnsureFerryRoundFlow(ferry, ferryTarget, player, gameManager, spawner, hud);
+            EnsureWwiseRuntime(gameManager, ferry);
             EnsureEventSystem();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -130,6 +131,26 @@ namespace RollfaehrenFury.Editor
         public static void UpgradeFerryRoundFlowSceneFromCommandLine()
         {
             UpgradeFerryRoundFlowScene();
+        }
+
+        public static void BuildWwiseAudioIntegrationFromCommandLine()
+        {
+            Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            GameManager gameManager = Object.FindFirstObjectByType<GameManager>();
+            GameObject ferry = FindSceneObjectIncludingInactive("Ferry_Root")
+                               ?? FindSceneObjectIncludingInactive("Ferry");
+            if (gameManager == null || ferry == null)
+            {
+                Debug.LogError("Main.unity is missing GameManager or Ferry_Root.");
+                return;
+            }
+
+            EnsureWwiseRuntime(gameManager, ferry);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Wwise runtime, music, and ferry audio repaired.");
         }
 
         [MenuItem("Rollfaehren Fury/Integrate Wwise Footsteps")]
@@ -1013,10 +1034,39 @@ namespace RollfaehrenFury.Editor
                 return;
             }
 
-            AkBank bank = EnsureComponent<AkBank>(wwiseGlobal);
-            SetWwiseReference(bank, "data", MainSoundBankReferencePath);
             wwiseGlobal.SetActive(true);
             EditorUtility.SetDirty(wwiseGlobal);
+        }
+
+        private static void EnsureWwiseRuntime(GameManager gameManager, GameObject ferry)
+        {
+            GameObject wwiseGlobal = FindSceneObjectIncludingInactive("WwiseGlobal");
+            if (wwiseGlobal == null)
+            {
+                Debug.LogWarning("WwiseGlobal was not found.", gameManager);
+                return;
+            }
+
+            AkBank legacyBank = wwiseGlobal.GetComponent<AkBank>();
+            if (legacyBank != null)
+            {
+                Object.DestroyImmediate(legacyBank);
+            }
+
+            EnsureComponent<AkGameObj>(wwiseGlobal);
+            WwiseAudioRuntime runtime = EnsureComponent<WwiseAudioRuntime>(wwiseGlobal);
+            SetObject(runtime, "gameManager", gameManager);
+            SetString(runtime, "mainBankName", "MainSoundBank");
+            SetString(runtime, "outdoorBankName", "OutdoorSoundBank");
+            wwiseGlobal.SetActive(true);
+            EditorUtility.SetDirty(wwiseGlobal);
+
+            FerryController ferryController = ferry.GetComponent<FerryController>();
+            EnsureComponent<AkGameObj>(ferry);
+            FerryAudio ferryAudio = EnsureComponent<FerryAudio>(ferry);
+            SetObject(ferryAudio, "ferry", ferryController);
+            SetFloat(ferryAudio, "rampUpDuration", 2f);
+            SetFloat(ferryAudio, "rampDownDuration", 1.5f);
         }
 
         private static ShopManager EnsureShopManager(GameManager gameManager)

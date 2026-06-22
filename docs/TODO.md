@@ -200,6 +200,10 @@ This list is the working task board for the prototype. Keep it practical and upd
   latest music and combat audio.
 - [x] Finalize first-pass Wwise routing, 3D attenuation, ferry Stop Events, and
   background-music bus assignment.
+- [x] Add explicit Main/Outdoor bank loading and switch-driven gameplay/shop
+  music through `WwiseAudioRuntime`.
+- [x] Add ferry standing/moving/engine loop transitions and `BoatSpeed` RTPC
+  updates through `FerryAudio`.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation

@@ -102,6 +102,13 @@ Planned systems and responsibilities:
   follows a sampled cubic route aligned to each dock's forward direction,
   carries the player through matching translation and rotation, reports
   distance-based progress, and signals arrival to `GameManager`.
+- `WwiseAudioRuntime`: owns gameplay audio-bank loading and the music emitter
+  in `Main`. It loads `MainSoundBank` and `OutdoorSoundBank`, drives
+  `GameState` and `CombatIntensity`, starts/stops background and defeat music,
+  and exposes guarded Event, Switch, and RTPC helpers.
+- `FerryAudio`: owns ferry standing-water, moving-wake, engine, and steering
+  playback. It follows `FerryController.IsCrossing` and drives the
+  `BoatSpeed` RTPC from `0` to `100`.
 - `PlayerFootsteps`: reads the controller's movement, grounded, and sprint
   state and posts the authored Wwise `Play_Steps` event at walk/sprint
   intervals. It posts only while the Wwise engine is initialized, so missing

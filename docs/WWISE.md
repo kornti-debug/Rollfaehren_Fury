@@ -167,6 +167,16 @@ loops use the existing long-distance ferry attenuation. The current combined
 `Play_ShotgunFiredAndReload` Event is intentionally retained for the first
 functional integration pass.
 
+Runtime ownership:
+
+- `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
+  `OutdoorSoundBank`; the previous `AkBank` component is removed to prevent
+  duplicate loading.
+- `WwiseGlobal` is the non-spatial music emitter.
+- `Ferry_Root/FerryAudio` owns standing water, moving wake, engine, steering,
+  and `BoatSpeed`.
+- `IndoorSoundBank` remains empty and unloaded during this pass.
+
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
 default so missing Wwise events do not spam the Unity Console. Enable it only
 after the final events exist and SoundBanks have been regenerated.
