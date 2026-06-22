@@ -198,6 +198,8 @@ This list is the working task board for the prototype. Keep it practical and upd
   `OutdoorSoundBank`, and `IndoorSoundBank`.
 - [x] Generate and validate all three Windows SoundBanks after integrating the
   latest music and combat audio.
+- [x] Finalize first-pass Wwise routing, 3D attenuation, ferry Stop Events, and
+  background-music bus assignment.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
 
 ## Presentation

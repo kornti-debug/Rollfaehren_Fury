@@ -337,6 +337,48 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Stop_BoatEngine" ID="{DB83B4BA-3307-46D9-ADB7-997C279B3F62}">
+					<ChildrenList>
+						<Action Name="" ID="{D6E48007-A846-4CC1-9B1F-B79BCC3C2371}" ShortID="487573373">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatEngine" ID="{67A5C376-0AA8-42E2-B777-6E5BC3C6D5BC}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BoatWaveStanding" ID="{084B4BCC-4EBC-42CB-966A-D6E6F74A83C2}">
+					<ChildrenList>
+						<Action Name="" ID="{1F79C954-14DB-4C49-A728-271539E1905E}" ShortID="272883177">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveStanding" ID="{160113F1-EDE4-42F7-86D4-743F4887C78F}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_BoatWaveMoving" ID="{84BA59E8-24E1-4B54-9AB0-873C0EF73F66}">
+					<ChildrenList>
+						<Action Name="" ID="{342FD18D-325B-4918-ACC6-451DA7FECEAA}" ShortID="702552828">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>

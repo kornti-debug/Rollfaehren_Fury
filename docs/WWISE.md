@@ -151,8 +151,21 @@ Current bank ownership:
 
 - `MainSoundBank`: footsteps, UI, doors, dialogue, background music, victory,
   and defeat
-- `OutdoorSoundBank`: weapons, ferry, enemies, and enemy/ferry contact
+- `OutdoorSoundBank`: weapons, ferry Play/Stop loops, enemies, and enemy/ferry
+  contact
 - `IndoorSoundBank`: reserved for shop ambience and indoor-only dialogue
+
+The first Unity integration uses these game syncs:
+
+- `SurfaceType`: `Wood`, `Gravel`, `Grass`
+- `GameState`: `Docked`, `Shop`, `Moving`
+- `CombatIntensity`: `Mid`, `Intense`
+- `BoatSpeed`: RTPC from `0` to `100`
+
+Weapons and enemy sounds use 3D positioning with `Attn_Medium_40m`. Ferry
+loops use the existing long-distance ferry attenuation. The current combined
+`Play_ShotgunFiredAndReload` Event is intentionally retained for the first
+functional integration pass.
 
 For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
 default so missing Wwise events do not spam the Unity Console. Enable it only
