@@ -250,6 +250,16 @@ namespace RollfaehrenFury.Prototype
 
             Vector3 spawnPosition = ApplyClusterOffset(clusterCenter, profile);
             SimpleEnemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
+            if (enemy.GetComponent<AkGameObj>() == null)
+            {
+                enemy.gameObject.AddComponent<AkGameObj>();
+            }
+
+            if (enemy.GetComponent<EnemyMovementAudio>() == null)
+            {
+                enemy.gameObject.AddComponent<EnemyMovementAudio>();
+            }
+
             string profileName = profile != null && !string.IsNullOrWhiteSpace(profile.DisplayName)
                 ? profile.DisplayName
                 : prefab.name;

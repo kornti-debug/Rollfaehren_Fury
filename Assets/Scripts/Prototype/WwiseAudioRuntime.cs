@@ -250,5 +250,20 @@ namespace RollfaehrenFury.Prototype
         public const string PlayBoatMoving = "Play_BoatWaveMoving";
         public const string StopBoatMoving = "Stop_BoatWaveMoving";
         public const string PlayBoatSteering = "Play_BoatSteeringScreech";
+
+        public const string PlaySteps = "Play_Steps";
+        public const string PlayHarpoon = "Play_HarpoonFired";
+        public const string PlayPistol = "Play_PistolFired";
+        public const string PlayShotgun = "Play_ShotgunFiredAndReload";
+        public const string PlayAssaultRifle = "Play_AK47Fired";
+        public const string PlayFishMovement = "Play_FishSwimming";
+        public const string StopFishMovement = "Stop_FishSwimming";
+        public const string PlayPigeonMovement = "Play_BirdFlap";
+        public const string StopPigeonMovement = "Stop_BirdFlap";
+        public const string PlayFishHit = "Play_EnemyFishHit";
+        public const string PlayPigeonHit = "Play_EnemyBirdHit";
+        public const string PlayFishContact = "Play_EnemyFishReachFerry";
+        public const string PlayPigeonContact = "Play_EnemyBirdReachFerry";
+        public const string PlayHarald = "Play_HaraldKrullSpeaking";
     }
 }

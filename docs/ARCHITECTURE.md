@@ -110,9 +110,13 @@ Planned systems and responsibilities:
   playback. It follows `FerryController.IsCrossing` and drives the
   `BoatSpeed` RTPC from `0` to `100`.
 - `PlayerFootsteps`: reads the controller's movement, grounded, and sprint
-  state and posts the authored Wwise `Play_Steps` event at walk/sprint
-  intervals. It posts only while the Wwise engine is initialized, so missing
-  local SoundBanks do not block gameplay.
+  state, raycasts the current walking surface, sets `SurfaceType` to Wood,
+  Gravel, or Grass, and posts `Play_Steps` at walk/sprint intervals.
+- `PrototypeAudioEvents`: maps the active weapon to its authored fire Event,
+  posts fish/pigeon hit Events on the enemy emitter, posts enemy/ferry contact
+  Events on the ferry emitter, and plays Harald after a completed crossing.
+- `EnemyMovementAudio`: is attached to spawned enemies by `EnemySpawner` and
+  owns the fish-swimming or pigeon-flapping Play/Stop loop for that enemy.
 - The player's hidden controller capsule owns the camera, movement, weapons,
   and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose.
 - `Cargo`: later destructible cargo with reward value.
@@ -124,6 +128,8 @@ movement or full 3D `Flying` movement from the prefab. Spawn points are
 ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
 The spawner ignores points behind the ferry and uses a forward fallback arc.
+Each spawned enemy receives `AkGameObj` and `EnemyMovementAudio` after
+instantiation so positional movement audio follows runtime-created swarms.
 The fish profile is fixed to world Y `7`, preventing ferry hierarchy offsets
 from lifting surface enemies above the river.
 The pigeon prefab owns an `AlwaysAnimate` Animator using

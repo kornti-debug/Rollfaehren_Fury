@@ -30,7 +30,6 @@ namespace RollfaehrenFury.Editor
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string PlayerVisualPrefabPath = "Assets/Prefabs/CHAR_Fraunz.prefab";
         private const string PlayerAnimatorControllerPath = "Assets/Animations/FraunzAnimator.controller";
-        private const string StepsEventReferencePath = "Assets/Wwise/ScriptableObjects/Event/FD99B580-42F1-422A-9C48-DE59AC07F1D6.asset";
         private const string PlayerVisualName = "Fraunz Visual";
         private const float EnemySpawnHeight = 7f;
         private const float PlayerVisualScale = 1f;
@@ -137,14 +136,18 @@ namespace RollfaehrenFury.Editor
         {
             Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
             GameManager gameManager = Object.FindFirstObjectByType<GameManager>();
+            SimpleFPSController player = Object.FindFirstObjectByType<SimpleFPSController>();
+            WeaponSystem weaponSystem = Object.FindFirstObjectByType<WeaponSystem>();
             GameObject ferry = FindSceneObjectIncludingInactive("Ferry_Root")
                                ?? FindSceneObjectIncludingInactive("Ferry");
-            if (gameManager == null || ferry == null)
+            if (gameManager == null || player == null || weaponSystem == null || ferry == null)
             {
-                Debug.LogError("Main.unity is missing GameManager or Ferry_Root.");
+                Debug.LogError("Main.unity is missing GameManager, player, weapons, or Ferry_Root.");
                 return;
             }
 
+            EnsureWwiseFootsteps(player);
+            EnsureAudioEvents(gameManager, weaponSystem);
             EnsureWwiseRuntime(gameManager, ferry);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -1009,7 +1012,9 @@ namespace RollfaehrenFury.Editor
             PrototypeAudioEvents audioEvents = EnsureComponent<PrototypeAudioEvents>(gameManager.gameObject);
             SetObject(audioEvents, "gameManager", gameManager);
             SetObject(audioEvents, "weaponSystem", weaponSystem);
-            SetBool(audioEvents, "postEvents", false);
+            SetObject(audioEvents, "ferryController", Object.FindFirstObjectByType<FerryController>());
+            SetObject(audioEvents, "playerController", Object.FindFirstObjectByType<SimpleFPSController>());
+            SetBool(audioEvents, "postEvents", true);
         }
 
         private static void EnsureWwiseFootsteps(SimpleFPSController playerController)
@@ -1023,9 +1028,9 @@ namespace RollfaehrenFury.Editor
             EnsureComponent<AkGameObj>(player);
 
             PlayerFootsteps footsteps = EnsureComponent<PlayerFootsteps>(player);
+            SetString(footsteps, "stepsEventName", WwiseAudioNames.PlaySteps);
             SetFloat(footsteps, "walkInterval", 0.45f);
             SetFloat(footsteps, "sprintInterval", 0.3f);
-            SetWwiseReference(footsteps, "stepsEvent", StepsEventReferencePath);
 
             GameObject wwiseGlobal = FindSceneObjectIncludingInactive("WwiseGlobal");
             if (wwiseGlobal == null)

@@ -175,12 +175,12 @@ Runtime ownership:
 - `WwiseGlobal` is the non-spatial music emitter.
 - `Ferry_Root/FerryAudio` owns standing water, moving wake, engine, steering,
   and `BoatSpeed`.
+- `PlayerFootsteps` sets `SurfaceType` before posting `Play_Steps`.
+- `PrototypeAudioEvents` maps weapon fire, enemy hits, ferry contact, and the
+  round-complete Harald line to authored Event names.
+- `EnemyMovementAudio` owns per-enemy fish/pigeon movement loops.
 - `IndoorSoundBank` remains empty and unloaded during this pass.
 
-For the current prototype, `PrototypeAudioEvents.postEvents` is disabled by
-default so missing Wwise events do not spam the Unity Console. Enable it only
-after the final events exist and SoundBanks have been regenerated.
-
-The ferry crossing and enemy-type work does not enable Wwise automatically.
-Generate banks locally and verify authored events only after the gameplay scene
-passes without audio.
+`PrototypeAudioEvents.postEvents` is enabled in `Main.unity`. All posts are
+guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
+without breaking gameplay.

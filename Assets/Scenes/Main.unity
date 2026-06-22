@@ -1090,12 +1090,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8bda0675781441f29bc6c528a09e1eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.PlayerFootsteps
-  stepsEvent:
-    idInternal: 0
-    valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 57b620bdcc3fa410fae913c12cd00ee4, type: 2}
+  stepsEventName: Play_Steps
   walkInterval: 0.45
   sprintInterval: 0.3
+  surfaceProbeDistance: 2.5
+  surfaceMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  defaultSurface: Wood
+  woodObjectTokens:
+  - Ferry
+  - Jetty
+  - Shop Interior
+  grassTerrainLayers:
+  - NewLayer
+  gravelTerrainLayers:
+  - NewLayer 1
+  - NewLayer 2
+  - NewLayer 3
 --- !u!114 &217455391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7408,14 +7420,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.PrototypeAudioEvents
   gameManager: {fileID: 1557749295}
   weaponSystem: {fileID: 654526154}
-  postEvents: 0
-  weaponShootEvent: Play_Weapon_Shoot
-  enemyHitEvent: Play_Enemy_Hit
-  enemyDeathEvent: Play_Enemy_Death
-  ferryDamageEvent: Play_Ferry_Damage
-  roundCompleteEvent: Play_Round_Complete
-  gameOverEvent: Play_Game_Over
-  upgradeBoughtEvent: Play_UI_Upgrade
+  ferryController: {fileID: 797040556}
+  playerController: {fileID: 217455385}
+  postEvents: 1
 --- !u!114 &1557749298
 MonoBehaviour:
   m_ObjectHideFlags: 0
