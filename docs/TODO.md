@@ -209,6 +209,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add ferry standing/moving/engine loop transitions and `BoatSpeed` RTPC
   updates through `FerryAudio`.
 - [x] Detect Wood, Gravel, and Grass surfaces before posting player footsteps.
+- [x] Repair the missing Wwise footstep switch assignments and simplify the
+  runtime rule to Wood-tagged ferry/jetty/shop surfaces with Gravel fallback.
 - [x] Map Harpoon, Pistol, Shotgun, and Assault Rifle fire to authored Events.
 - [x] Add positional fish/pigeon movement loops, hit feedback, and ferry-contact
   feedback without tying contact playback to the destroyed enemy.

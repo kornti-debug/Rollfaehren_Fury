@@ -195,6 +195,11 @@ Runtime ownership:
 guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
 without breaking gameplay.
 
+The footstep Switch Container explicitly maps `Wood`, `Gravel`, and `Grass`
+to their matching Random Containers. Unity currently uses the `Wood` tag or
+the ferry/jetty/shop hierarchy names for Wood and falls back to Gravel for all
+other walkable surfaces. Grass remains authored for possible later use.
+
 ## First Functional Play Mode Check
 
 1. Generate all three Windows SoundBanks locally.

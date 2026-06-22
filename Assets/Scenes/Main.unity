@@ -1132,21 +1132,17 @@ MonoBehaviour:
   stepsEventName: Play_Steps
   walkInterval: 0.45
   sprintInterval: 0.3
-  surfaceProbeDistance: 2.5
+  surfaceProbeDistance: 3.5
+  surfaceProbeRadius: 0.18
   surfaceMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  defaultSurface: Wood
+  defaultSurface: Gravel
+  woodTag: Wood
   woodObjectTokens:
   - Ferry
   - Jetty
   - Shop Interior
-  grassTerrainLayers:
-  - NewLayer
-  gravelTerrainLayers:
-  - NewLayer 1
-  - NewLayer 2
-  - NewLayer 3
 --- !u!114 &217455391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3581,7 +3577,7 @@ GameObject:
   - component: {fileID: 797040562}
   m_Layer: 0
   m_Name: Ferry_Root
-  m_TagString: Untagged
+  m_TagString: Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4315,6 +4311,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: m_Name
       value: jetty
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: m_TagString
+      value: Wood
       objectReference: {fileID: 0}
     - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -5635,6 +5635,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: m_Name
       value: jetty 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: m_TagString
+      value: Wood
       objectReference: {fileID: 0}
     - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

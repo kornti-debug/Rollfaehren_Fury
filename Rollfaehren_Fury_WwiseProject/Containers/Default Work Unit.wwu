@@ -1067,6 +1067,9 @@
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
+						<Reference Name="DefaultSwitchOrState">
+							<ObjectRef Name="Gravel" ID="{DCEF4CA0-B1DC-40C0-9832-F29991A6DD99}" WorkUnitID="{E8DF619D-25B7-412A-B5D7-14F08AC250FF}"/>
+						</Reference>
 						<Reference Name="OutputBus">
 							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
@@ -1751,6 +1754,26 @@
 								<ItemRef Name="RC_Grass" ID="{C6DE7AAE-E6C4-43BF-B928-90DF95DD3D0A}"/>
 							</GroupingBehavior>
 						</GroupingBehaviorList>
+						<GroupingList>
+							<Grouping>
+								<SwitchRef Name="Wood" ID="{5B015CE3-6BDA-4D5A-908A-754CB6CF85C6}"/>
+								<ItemList>
+									<ItemRef Name="RC_Wood" ID="{87F49903-67E9-4B50-BC26-AC4B772EA0FE}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Gravel" ID="{DCEF4CA0-B1DC-40C0-9832-F29991A6DD99}"/>
+								<ItemList>
+									<ItemRef Name="RC_Gravel" ID="{A6933B66-F625-46EE-9A88-7733F58C25C3}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Grass" ID="{A75EE18D-67B4-4598-8D37-01743EFDBA47}"/>
+								<ItemList>
+									<ItemRef Name="RC_Grass" ID="{C6DE7AAE-E6C4-43BF-B928-90DF95DD3D0A}"/>
+								</ItemList>
+							</Grouping>
+						</GroupingList>
 					</GroupingInfo>
 				</SwitchContainer>
 				<RandomSequenceContainer Name="RC_Door_Open" ID="{4AFC7436-E1E8-47B2-A071-EB131EFE55D4}" ShortID="950970690">

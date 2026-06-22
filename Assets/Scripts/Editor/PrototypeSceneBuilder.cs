@@ -1043,6 +1043,11 @@ namespace RollfaehrenFury.Editor
             SetString(footsteps, "stepsEventName", WwiseAudioNames.PlaySteps);
             SetFloat(footsteps, "walkInterval", 0.45f);
             SetFloat(footsteps, "sprintInterval", 0.3f);
+            SetFloat(footsteps, "surfaceProbeDistance", 3.5f);
+            SetFloat(footsteps, "surfaceProbeRadius", 0.18f);
+            SetString(footsteps, "defaultSurface", "Gravel");
+            SetString(footsteps, "woodTag", "Wood");
+            EnsureWoodSurfaceTags();
 
             GameObject wwiseGlobal = FindSceneObjectIncludingInactive("WwiseGlobal");
             if (wwiseGlobal == null)
@@ -1088,6 +1093,8 @@ namespace RollfaehrenFury.Editor
 
         private static void EnsureWwiseUiAndShopAudio()
         {
+            EnsureWoodSurfaceTags();
+
             foreach (Button button in Resources.FindObjectsOfTypeAll<Button>())
             {
                 if (button.gameObject.scene.IsValid())
@@ -1111,6 +1118,54 @@ namespace RollfaehrenFury.Editor
                     EnsureComponent<AkGameObj>(exit.gameObject);
                 }
             }
+        }
+
+        private static void EnsureWoodSurfaceTags()
+        {
+            EnsureTag("Wood");
+
+            foreach (Transform transform in Object.FindObjectsByType<Transform>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                if (!transform.gameObject.scene.IsValid())
+                {
+                    continue;
+                }
+
+                string objectName = transform.name;
+                if (string.Equals(objectName, "Ferry_Root", System.StringComparison.OrdinalIgnoreCase)
+                    || objectName.IndexOf("Jetty", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || objectName.IndexOf("Shop Interior Root", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    transform.gameObject.tag = "Wood";
+                    EditorUtility.SetDirty(transform.gameObject);
+                }
+            }
+        }
+
+        private static void EnsureTag(string tagName)
+        {
+            Object[] assets = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+            if (assets.Length == 0)
+            {
+                return;
+            }
+
+            SerializedObject tagManager = new SerializedObject(assets[0]);
+            SerializedProperty tags = tagManager.FindProperty("tags");
+            for (int i = 0; i < tags.arraySize; i++)
+            {
+                if (tags.GetArrayElementAtIndex(i).stringValue == tagName)
+                {
+                    return;
+                }
+            }
+
+            int index = tags.arraySize;
+            tags.InsertArrayElementAtIndex(index);
+            tags.GetArrayElementAtIndex(index).stringValue = tagName;
+            tagManager.ApplyModifiedProperties();
         }
 
         private static ShopManager EnsureShopManager(GameManager gameManager)
