@@ -7893,7 +7893,7 @@ MonoBehaviour:
     - {fileID: 271402681}
     - {fileID: 2134003221}
     firstRound: 1
-    spawnWeight: 0.7
+    spawnWeight: 0.5
     useFixedSpawnHeight: 1
     fixedSpawnHeight: 7
   - displayName: Pigeon
@@ -7905,8 +7905,8 @@ MonoBehaviour:
     - {fileID: 1953358630}
     - {fileID: 1340613499}
     - {fileID: 863978476}
-    firstRound: 2
-    spawnWeight: 0.3
+    firstRound: 1
+    spawnWeight: 0.5
     useFixedSpawnHeight: 0
     fixedSpawnHeight: 0
   enemyPrefab: {fileID: 3449651742218595715, guid: 0e033d2168fa09d44808313152dae514, type: 3}
