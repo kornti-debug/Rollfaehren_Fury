@@ -3203,7 +3203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
   m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
+  m_RequiresDepthTextureOption: 1
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
@@ -10238,7 +10238,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8a98bf0126cfd894fbb58fdefab8869d, type: 2}
+  - {fileID: 2100000, guid: ac941ebf7c4d042498eb53543c30c081, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10282,7 +10282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7c8d9e0f1a246c8b9d0e1f2a3b4c5d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textureTiling: {x: 14, y: 14}
+  textureTiling: {x: 1, y: 1}
   scrollSpeed: {x: 0.025, y: 0.012}
   baseMapTransformProperty: _BaseMap_ST
   fallbackMapTransformProperty: _MainTex_ST
