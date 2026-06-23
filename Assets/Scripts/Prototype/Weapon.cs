@@ -48,6 +48,16 @@ namespace RollfaehrenFury.Prototype
         public WeaponDefinition Definition => definition;
         public string DisplayName => definition != null ? definition.DisplayName : name;
         public float Damage => currentDamage;
+        public string DamageDisplay
+        {
+            get
+            {
+                int pellets = definition != null ? definition.PelletsPerShot : 1;
+                return pellets > 1
+                    ? $"{currentDamage:0.#} \u00d7 {pellets}"
+                    : $"{currentDamage:0.#}";
+            }
+        }
         public float FireCooldown => currentCooldown;
         public float ShotsPerSecond => currentCooldown <= 0f ? 0f : 1f / currentCooldown;
         public bool IsAutomatic => definition != null && definition.Automatic;

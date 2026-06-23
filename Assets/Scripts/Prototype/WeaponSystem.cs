@@ -54,6 +54,7 @@ namespace RollfaehrenFury.Prototype
         /// <summary>The weapon at a slot index, or null. Used by the per-weapon upgrade shop.</summary>
         public Weapon WeaponAt(int index) => index >= 0 && index < weapons.Count ? weapons[index] : null;
         public float ActiveDamage => ActiveWeapon != null ? ActiveWeapon.Damage : 0f;
+        public string ActiveDamageDisplay => ActiveWeapon != null ? ActiveWeapon.DamageDisplay : "0";
         public float ActiveShotsPerSecond => ActiveWeapon != null ? ActiveWeapon.ShotsPerSecond : 0f;
         public string ActiveWeaponName => ActiveWeapon != null ? ActiveWeapon.DisplayName : "None";
         public int ActiveAmmo => ActiveWeapon != null ? ActiveWeapon.CurrentAmmo : 0;

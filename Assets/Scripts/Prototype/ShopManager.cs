@@ -18,7 +18,6 @@ namespace RollfaehrenFury.Prototype
             Unlock,
             Damage,
             FireRate,
-            MagazineSize,
             ReserveCapacity,
             Reload,
             Refill,
@@ -33,7 +32,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(1f)] private float costGrowthPerPurchase = 1.7f;
         [SerializeField] private int refillCost = 20;
 
-        private const int MaxUpgradeSlots = 6;
+        private const int MaxUpgradeSlots = 5;
 
         // Layout (anchored positions inside the Shop Panel) — tune if the spacing feels off.
         private const float WeaponColumnX = -200f;
@@ -281,7 +280,6 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: weapon.MultiplyDamage(1.2f); break;
                 case UpgradeKind.FireRate: weapon.MultiplyCooldown(0.82f); break;
-                case UpgradeKind.MagazineSize: weapon.AddMagazineSize(MagazineIncreaseFor(weapon)); break;
                 case UpgradeKind.ReserveCapacity: weapon.AddReserveMagazines(1); break;
                 case UpgradeKind.Reload: weapon.MultiplyReloadDuration(0.82f); break;
                 case UpgradeKind.Ricochet: weapon.AddRicochet(1); break;
@@ -307,7 +305,6 @@ namespace RollfaehrenFury.Prototype
 
             if (weapon.MagazineSize > 0)
             {
-                yield return UpgradeKind.MagazineSize;
                 yield return UpgradeKind.ReserveCapacity;
                 yield return UpgradeKind.Reload;
                 yield return UpgradeKind.Refill;
@@ -325,8 +322,7 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: return "Damage +20%";
                 case UpgradeKind.FireRate: return "Fire Rate";
-                case UpgradeKind.MagazineSize: return $"Magazine +{MagazineIncreaseFor(weapon)}";
-                case UpgradeKind.ReserveCapacity: return "Reserve +1 mag";
+                case UpgradeKind.ReserveCapacity: return "Extra Magazine +1";
                 case UpgradeKind.Reload: return "Faster Reload";
                 case UpgradeKind.Ricochet: return "Ricochet";
                 default: return kind.ToString();
@@ -339,7 +335,6 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: return 15;
                 case UpgradeKind.FireRate: return 10;
-                case UpgradeKind.MagazineSize: return 20;
                 case UpgradeKind.ReserveCapacity: return 15;
                 case UpgradeKind.Reload: return 20;
                 case UpgradeKind.Ricochet: return 30;
@@ -353,26 +348,10 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Ricochet:
                     return 1;
-                case UpgradeKind.MagazineSize:
                 case UpgradeKind.ReserveCapacity:
                     return 3;
                 default:
                     return 5;
-            }
-        }
-
-        private static int MagazineIncreaseFor(Weapon weapon)
-        {
-            if (weapon == null)
-            {
-                return 1;
-            }
-
-            switch (weapon.DisplayName)
-            {
-                case "Pistol": return 2;
-                case "Assault Rifle": return 5;
-                default: return 1;
             }
         }
 

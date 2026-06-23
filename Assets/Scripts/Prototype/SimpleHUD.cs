@@ -64,7 +64,7 @@ namespace RollfaehrenFury.Prototype
             gameManager = manager;
         }
 
-        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, float weaponDamage, float shotsPerSecond, int ammoInMagazine, int magazineSize, int reserveAmmo, bool infiniteAmmo, bool isReloading, float reloadProgress)
+        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, string weaponDamage, float shotsPerSecond, int ammoInMagazine, int magazineSize, int reserveAmmo, bool infiniteAmmo, bool isReloading, float reloadProgress)
         {
             if (ferryHealthText != null)
             {
@@ -105,7 +105,7 @@ namespace RollfaehrenFury.Prototype
                     ammo = $"{mag}   Reserve {Mathf.Max(0, reserveAmmo)}";
                 }
 
-                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
+                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
             }
 
             bool showReload = isReloading && !infiniteAmmo;

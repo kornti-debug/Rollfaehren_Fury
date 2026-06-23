@@ -144,10 +144,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
 - [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
 - [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
-- [x] Add permanent ammo-capacity nodes to the active node-tree shop: Bigger
-  Magazine (Pistol `+2`, Shotgun `+1`, Assault Rifle `+5`) and Reserve Capacity
-  (`+1` spare magazine), each capped at three levels. Newly added capacity is
-  filled immediately; Refill Ammo remains a repeatable `$20` purchase.
+- [x] Simplify ammo progression to one `Extra Magazine +1` upgrade, capped at
+  three levels. Loaded-magazine growth remains available as a dormant runtime
+  API but is no longer exposed in the shop.
 - [x] Weapon Damage upgrade is percentage-based (`+20%` per purchase) instead
   of flat damage, so it scales every weapon consistently without excessive
   per-pellet growth on the Shotgun.
@@ -155,9 +154,8 @@ This list is the working task board for the prototype. Keep it practical and upd
   Damage, Fire Rate, and Faster Reload reach level 5; Magazine Size and Reserve
   Capacity reach level 3; Harpoon Ricochet reaches level 1; Refill is
   repeatable. The old `UpgradeDefinition` catalog is dormant.
-- [ ] Verify ammo-capacity purchases in Unity: locked weapons expose no
-  upgrades, magazine/reserve purchases fill their added capacity, larger
-  magazines also enlarge each spare magazine, refill restores the upgraded
+- [ ] Verify ammo purchases in Unity: locked weapons expose no upgrades,
+  Extra Magazine adds one complete spare reload, refill restores the upgraded
   cap, and New Game restores definition defaults.
 - [x] Lower income to match the simpler shop: kill reward 6 → 3 (tunable via `killRewardScale`).
 - [ ] Verify the node-tree shop in Unity: weapon nodes + branching lines render; per-weapon purchases apply; Refill greys out when full; Harpoon ricochet chains. Tune node spacing/line constants in `ShopManager` if the layout looks off.

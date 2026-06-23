@@ -95,10 +95,9 @@ Planned systems and responsibilities:
   Owned weapons show their existing upgrade branches; locked weapons show one
   unlock node with predecessor, minimum-round, and price requirements.
   Purchasing ownership equips the weapon immediately and replaces the unlock
-  node with Damage, Fire Rate, Magazine Size, Reserve Capacity, Reload/Refill,
-  or Harpoon Ricochet upgrades. Magazine and reserve capacity have three
-  levels; damage, fire rate, and reload have five; refill is repeatable and
-  restores the upgraded cap.
+  node with Damage, Fire Rate, Extra Magazine, Reload/Refill, or Harpoon
+  Ricochet upgrades. Extra Magazine has three levels; damage, fire rate, and
+  reload have five; refill is repeatable and restores the upgraded cap.
   Spending goes through `GameManager.TrySpendMoney`; locked weapons cannot be
   upgraded.
 - `ShopInteractable` (Track C): vending-machine interaction available while

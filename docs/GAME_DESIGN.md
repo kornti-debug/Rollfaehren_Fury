@@ -93,6 +93,15 @@ Enemy behavior should be simple:
 - Take damage.
 - Die and reward money.
 
+Enemy health scales linearly:
+
+```text
+health = base health * (1 + 0.35 * (round - 1))
+```
+
+Fish start at `50 HP`; pigeons start at `30 HP`. This gives `137.5 / 82.5`
+HP in round 6 and `207.5 / 124.5` HP in round 10.
+
 Fish contact has a short visual payoff: the fish damages the ferry, plays its
 explosion effect, then disappears. The effect does not delay or repeat the
 damage.
@@ -113,6 +122,12 @@ Harpoon-focused build to remain a deliberate option.
 Weapon rules:
 
 - Keep the first weapon reliable and easy to tune.
+- Harpoon and Shotgun are the deliberate one-shot weapons. The unupgraded
+  Harpoon one-shots fish through round 6. A full Shotgun blast deals
+  `20 x 10 = 200` theoretical damage and one-shots fish through round 9 when
+  most pellets connect.
+- Pistol and Assault Rifle are sustained-damage weapons rather than one-shot
+  weapons.
 - The Shotgun is a close-range crowd weapon: ten pellets use a circular
   nine-degree cone, with enough point-blank damage to defeat a round-six fish
   when most pellets connect. Its short range prevents it replacing precision
@@ -143,11 +158,8 @@ Prototype shop:
 - Allow buying multiple affordable upgrades during preparation.
 - Damage, fire-rate, and reload can reach five levels, allowing a focused
   single-weapon build. Damage adds `20%` multiplicatively per level.
-- Ammo weapons can permanently expand their loaded magazine and spare-magazine
-  capacity up to three times, or pay for a repeatable refill to restore the
-  current capacity.
-- Magazine growth is weapon-specific: Pistol `+2`, Shotgun `+1`, and Assault
-  Rifle `+5` rounds per level. Reserve Capacity adds one spare magazine.
+- Ammo weapons can buy `Extra Magazine +1` up to three times, or pay for a
+  repeatable refill to restore the current capacity.
 
 Augment rules:
 
