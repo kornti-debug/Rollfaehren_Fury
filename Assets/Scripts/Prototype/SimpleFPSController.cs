@@ -385,7 +385,7 @@ namespace RollfaehrenFury.Prototype
                 lastLoggedTargetStateId = targetStateId;
             }
 
-            PlayAnimationState(targetStateId, !isMoving);
+            // PlayAnimationState(targetStateId, !isMoving);
             animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
         }
 
