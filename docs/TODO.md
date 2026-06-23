@@ -68,6 +68,12 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Max-ammo / reserve magazines: Pistol 8, Assault Rifle 6, Shotgun 8 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
 - [x] Fire modes: Assault Rifle stays automatic (hold to fire); Pistol/Shotgun/Harpoon are semi-auto — one shot per press.
 - [x] Widen Shotgun range (85 → 150) so it reaches the spawn arc.
+- [x] Rebalance the Shotgun as a close-range crowd weapon: `20` damage per
+  pellet, ten pellets in a circular `9` degree cone, `90` range, and four
+  spare magazines.
+- [ ] Verify the rebalanced Shotgun in Unity: a close blast kills a round-six
+  fish when most pellets connect, can hit clustered enemies, and is unreliable
+  at long range.
 - [ ] Verify projectiles in Unity: re-run `Build Prototype Scene`, Harpoon arcs and hits.
 - [ ] Verify reload + ammo in Unity: weapon empties, reload bar fills, reserve drains; switching mid-reload pauses it; running fully dry leaves only the Harpoon.
 - [x] First-person weapon viewmodels: imported Easy Weapons gun models (Pistol/Shotgun/M4) shown via `WeaponVisuals` (muzzle flash, recoil, hit FX, fire/reload sounds, procedural reload dip), driven by existing `Weapon` events. `Tools > Rollfaehren Fury > Setup Weapon Viewmodels` wires them (forces the textured URP material; cosmetic-only). Harpoon has no gun model. (Easy Weapons scripts + demo removed; materials converted to URP.)

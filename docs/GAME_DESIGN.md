@@ -113,6 +113,10 @@ Harpoon-focused build to remain a deliberate option.
 Weapon rules:
 
 - Keep the first weapon reliable and easy to tune.
+- The Shotgun is a close-range crowd weapon: ten pellets use a circular
+  nine-degree cone, with enough point-blank damage to defeat a round-six fish
+  when most pellets connect. Its short range prevents it replacing precision
+  weapons.
 - Weapon feedback should be clear: fire, hit, enemy death, reload or cooldown.
 - Wwise events should be connected after the gameplay event exists.
 

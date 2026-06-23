@@ -752,8 +752,8 @@ namespace RollfaehrenFury.Editor
 
             WeaponDefinition shotgun = EnsureWeaponDefinition(
                 "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
-                13f, 190f, 0.75f, 0f, 10, 20f);
-            ConfigureWeaponAmmo(shotgun, false, 4, 2.2f, 8);
+                20f, 90f, 0.8f, 0f, 10, 9f);
+            ConfigureWeaponAmmo(shotgun, false, 4, 2.2f, 4);
             ConfigureWeaponProgression(shotgun, false, 110, 3);
 
             WeaponDefinition harpoon = EnsureWeaponDefinition(

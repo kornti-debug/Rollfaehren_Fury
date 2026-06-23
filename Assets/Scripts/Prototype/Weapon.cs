@@ -418,18 +418,21 @@ namespace RollfaehrenFury.Prototype
 
         private Vector3 GetShotDirection(Camera fireCamera)
         {
-            Vector3 forward = fireCamera.transform.forward;
+            Transform cameraTransform = fireCamera.transform;
+            Vector3 forward = cameraTransform.forward;
             float spread = definition.SpreadAngle;
             if (spread <= 0f)
             {
                 return forward;
             }
 
-            Quaternion offset = Quaternion.Euler(
-                UnityEngine.Random.Range(-spread, spread),
-                UnityEngine.Random.Range(-spread, spread),
-                0f);
-            return offset * forward;
+            Vector2 spreadOffset = UnityEngine.Random.insideUnitCircle
+                * Mathf.Tan(spread * Mathf.Deg2Rad);
+            return (
+                forward
+                + cameraTransform.right * spreadOffset.x
+                + cameraTransform.up * spreadOffset.y
+            ).normalized;
         }
 
         private bool TryFindHit(Ray ray, Transform ignoredRoot, LayerMask hitMask, out RaycastHit selectedHit)
