@@ -766,7 +766,7 @@ namespace RollfaehrenFury.Editor
             WeaponDefinition assaultRifle = EnsureWeaponDefinition(
                 "Assets/Weapons/Flamethrower.asset", "Assault Rifle", WeaponFireMode.Hitscan,
                 18f, 280f, 0.1f, 0.5f, 1, 1f);
-            ConfigureWeaponAmmo(assaultRifle, true, 20, 2f, 1);
+            ConfigureWeaponAmmo(assaultRifle, true, 20, 2f, 2);
             ConfigureWeaponProgression(assaultRifle, false, 170, 4);
 
             GameObject weaponsParent = FindChild(camera.transform, "Weapons");

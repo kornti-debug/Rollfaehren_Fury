@@ -79,7 +79,7 @@ Planned systems and responsibilities:
   weapon immediately. It reloads on `R` and forwards fire/hit/change/unlock
   events so HUD, viewmodels, shop, and audio do not care which weapon is
   active.
-- `Weapon`: implemented — data-driven runtime weapon. Reads a `WeaponDefinition` and fires by fire mode (hitscan / spread / projectile). Spread weapons sample directions inside a circular camera-space cone instead of using independent square pitch/yaw randomization. Keeps runtime copies of the stats, so upgrades never mutate the shared asset. Owns the magazine + reserve: each shot consumes a round, an empty magazine (or pressing `R`) starts a timed reload that draws from the reserve, and firing the last round auto-reloads. The reload only advances while the weapon is equipped, so switching weapons pauses it instead of finishing it in the background. Magazine size 0 means unlimited ammo (no reload, no reserve). `RefillAmmo` restores magazine + reserve; runtime upgrade hooks adjust magazine size, reserve, and reload time.
+- `Weapon`: implemented — data-driven runtime weapon. Reads a `WeaponDefinition` and fires by fire mode (hitscan / spread / projectile). Spread weapons sample directions inside a circular camera-space cone instead of using independent square pitch/yaw randomization. Keeps runtime copies of the stats, so upgrades never mutate the shared asset. Owns the magazine + reserve: each shot consumes a round, an empty magazine (or pressing `R`) starts a timed reload that draws from the reserve, and firing the last round auto-reloads. Spare capacity is tracked as a magazine count while firing consumes individual reserve rounds; increasing magazine size therefore grows every carried spare consistently. Capacity upgrades fill only their newly added space. Magazine size 0 means unlimited ammo. `RefillAmmo` restores magazine + reserve.
 - `WeaponDefinition`: implemented — ScriptableObject of combat stats plus
   progression metadata (`InitiallyUnlocked`, unlock price, minimum round).
   Assets live in `Assets/Weapons/`; the rifle still uses the
@@ -95,7 +95,9 @@ Planned systems and responsibilities:
   Owned weapons show their existing upgrade branches; locked weapons show one
   unlock node with predecessor, minimum-round, and price requirements.
   Purchasing ownership equips the weapon immediately and replaces the unlock
-  node with Damage, Fire Rate, Reload/Refill, or Harpoon Ricochet upgrades.
+  node with Damage, Fire Rate, Magazine Size, Reserve Capacity, Reload/Refill,
+  or Harpoon Ricochet upgrades. Magazine and reserve capacity have three
+  levels; refill is repeatable and restores the upgraded cap.
   Spending goes through `GameManager.TrySpendMoney`; locked weapons cannot be
   upgraded.
 - `ShopInteractable` (Track C): vending-machine interaction available while

@@ -141,6 +141,11 @@ Prototype shop:
 - Show the chained weapon unlocks and per-weapon upgrade tree.
 - Keep locked weapon requirements visible.
 - Allow buying multiple affordable upgrades during preparation.
+- Ammo weapons can permanently expand their loaded magazine and spare-magazine
+  capacity up to three times, or pay for a repeatable refill to restore the
+  current capacity.
+- Magazine growth is weapon-specific: Pistol `+2`, Shotgun `+1`, and Assault
+  Rifle `+5` rounds per level. Reserve Capacity adds one spare magazine.
 
 ## MVP Boundaries
 

@@ -7,13 +7,23 @@ namespace RollfaehrenFury.Prototype
     /// <summary>
     /// Node-tree weapon shop. The player clicks a weapon node and connecting lines branch out to its
     /// purchasable nodes. Every weapon has power upgrades (Damage, Fire Rate) that level up with an
-    /// escalating cost; weapons with ammo also get Faster Reload + Refill Ammo (tops the magazine and
-    /// reserve back to the current cap), and the Harpoon gets Ricochet. Built entirely at runtime
-    /// under the existing Shop Panel, so no scene/builder work is needed.
+    /// escalating cost; weapons with ammo also get magazine/reserve capacity, Faster Reload, and
+    /// Refill Ammo (tops the magazine and reserve back to the current cap). The Harpoon gets
+    /// Ricochet. Built entirely at runtime under the existing Shop Panel.
     /// </summary>
     public sealed class ShopManager : MonoBehaviour
     {
-        private enum UpgradeKind { Unlock, Damage, FireRate, Reload, Refill, Ricochet }
+        private enum UpgradeKind
+        {
+            Unlock,
+            Damage,
+            FireRate,
+            MagazineSize,
+            ReserveCapacity,
+            Reload,
+            Refill,
+            Ricochet
+        }
 
         [SerializeField] private GameManager gameManager;
         [SerializeField] private WeaponSystem weaponSystem;
@@ -23,7 +33,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(1f)] private float costGrowthPerPurchase = 1.7f;
         [SerializeField] private int refillCost = 20;
 
-        private const int MaxUpgradeSlots = 4;
+        private const int MaxUpgradeSlots = 6;
 
         // Layout (anchored positions inside the Shop Panel) — tune if the spacing feels off.
         private const float WeaponColumnX = -200f;
@@ -210,8 +220,8 @@ namespace RollfaehrenFury.Prototype
                 if (label != null)
                 {
                     label.text = maxed
-                        ? $"{KindLabel(kind)}\nmax {level}/{max}"
-                        : $"{KindLabel(kind)}\n{level}/{max}   ${cost}";
+                        ? $"{KindLabel(kind, weapon)}\nmax {level}/{max}"
+                        : $"{KindLabel(kind, weapon)}\n{level}/{max}   ${cost}";
                 }
             }
         }
@@ -271,6 +281,8 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: weapon.MultiplyDamage(1.25f); break;
                 case UpgradeKind.FireRate: weapon.MultiplyCooldown(0.82f); break;
+                case UpgradeKind.MagazineSize: weapon.AddMagazineSize(MagazineIncreaseFor(weapon)); break;
+                case UpgradeKind.ReserveCapacity: weapon.AddReserveMagazines(1); break;
                 case UpgradeKind.Reload: weapon.MultiplyReloadDuration(0.82f); break;
                 case UpgradeKind.Ricochet: weapon.AddRicochet(1); break;
             }
@@ -295,6 +307,8 @@ namespace RollfaehrenFury.Prototype
 
             if (weapon.MagazineSize > 0)
             {
+                yield return UpgradeKind.MagazineSize;
+                yield return UpgradeKind.ReserveCapacity;
                 yield return UpgradeKind.Reload;
                 yield return UpgradeKind.Refill;
             }
@@ -305,12 +319,14 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private static string KindLabel(UpgradeKind kind)
+        private static string KindLabel(UpgradeKind kind, Weapon weapon)
         {
             switch (kind)
             {
                 case UpgradeKind.Damage: return "Damage +25%";
                 case UpgradeKind.FireRate: return "Fire Rate";
+                case UpgradeKind.MagazineSize: return $"Magazine +{MagazineIncreaseFor(weapon)}";
+                case UpgradeKind.ReserveCapacity: return "Reserve +1 mag";
                 case UpgradeKind.Reload: return "Faster Reload";
                 case UpgradeKind.Ricochet: return "Ricochet";
                 default: return kind.ToString();
@@ -323,6 +339,8 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: return 15;
                 case UpgradeKind.FireRate: return 10;
+                case UpgradeKind.MagazineSize: return 20;
+                case UpgradeKind.ReserveCapacity: return 15;
                 case UpgradeKind.Reload: return 20;
                 case UpgradeKind.Ricochet: return 30;
                 default: return 20;
@@ -332,6 +350,21 @@ namespace RollfaehrenFury.Prototype
         private static int KindMaxLevel(UpgradeKind kind)
         {
             return kind == UpgradeKind.Ricochet ? 1 : 3;
+        }
+
+        private static int MagazineIncreaseFor(Weapon weapon)
+        {
+            if (weapon == null)
+            {
+                return 1;
+            }
+
+            switch (weapon.DisplayName)
+            {
+                case "Pistol": return 2;
+                case "Assault Rifle": return 5;
+                default: return 1;
+            }
         }
 
         private int EffectiveCost(UpgradeKind kind, int level)

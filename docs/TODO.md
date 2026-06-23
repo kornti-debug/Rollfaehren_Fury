@@ -65,7 +65,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Weapon switching: mouse scroll + keys `1`–`4` (1 Harpoon, 2 Pistol, 3 Shotgun, 4 Flamethrower).
 - [x] Magazine & reload system: Pistol 6, Assault Rifle 20, Shotgun 4, Harpoon unlimited. Empty magazine (or `R`) starts a timed reload; firing the last round auto-reloads. HUD shows ammo in the weapon panel + a centered reload progress bar while reloading.
 - [x] Reload pauses while a weapon is holstered (only the equipped weapon's reload advances), so switching weapons no longer skips the reload wait.
-- [x] Max-ammo / reserve magazines: Pistol 8, Assault Rifle 6, Shotgun 8 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
+- [x] Max-ammo / reserve magazines: Pistol 4, Assault Rifle 2, Shotgun 4 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
 - [x] Fire modes: Assault Rifle stays automatic (hold to fire); Pistol/Shotgun/Harpoon are semi-auto — one shot per press.
 - [x] Widen Shotgun range (85 → 150) so it reaches the spawn arc.
 - [x] Rebalance the Shotgun as a close-range crowd weapon: `20` damage per
@@ -144,9 +144,16 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
 - [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
 - [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
-- [x] Weapon-ammo upgrades in the shop: Bigger Magazine (+rounds), Extra Ammo (+reserve mags), Faster Reload (shorter reload), Resupply Ammo (refill mags + reserve). Added to the catalog at runtime with tunable cost/amount on `ShopManager` (~15–20 each, coherent with the base upgrades).
+- [x] Add permanent ammo-capacity nodes to the active node-tree shop: Bigger
+  Magazine (Pistol `+2`, Shotgun `+1`, Assault Rifle `+5`) and Reserve Capacity
+  (`+1` spare magazine), each capped at three levels. Newly added capacity is
+  filled immediately; Refill Ammo remains a repeatable `$20` purchase.
 - [x] Weapon Damage upgrade is now a **percentage** (+25%/buy) instead of flat +10, so it scales every weapon evenly (no more per-pellet blow-up on the shotgun). Harpoon base damage 120 → 140 (one-shots fish through ~round 6).
-- [x] Node-tree shop: `ShopManager` now builds a per-weapon upgrade tree at runtime (click a weapon node → lines branch to its upgrade nodes). Per weapon: Damage (+25%/level, escalating cost), Fire Rate; ammo weapons also Faster Reload + Refill Ammo (tops magazine + reserve to current cap); Harpoon gets Ricochet (wired into the projectile). Replaces the flat catalog shop; the old `UpgradeDefinition` assets are now dormant.
+- [x] Node-tree shop: `ShopManager` now builds a per-weapon upgrade tree at runtime (click a weapon node → lines branch to its upgrade nodes). Per weapon: Damage (+25%/level, escalating cost), Fire Rate; ammo weapons also Magazine Size, Reserve Capacity, Faster Reload, and Refill Ammo; Harpoon gets Ricochet. Replaces the flat catalog shop; the old `UpgradeDefinition` assets are now dormant.
+- [ ] Verify ammo-capacity purchases in Unity: locked weapons expose no
+  upgrades, magazine/reserve purchases fill their added capacity, larger
+  magazines also enlarge each spare magazine, refill restores the upgraded
+  cap, and New Game restores definition defaults.
 - [x] Lower income to match the simpler shop: kill reward 6 → 3 (tunable via `killRewardScale`).
 - [ ] Verify the node-tree shop in Unity: weapon nodes + branching lines render; per-weapon purchases apply; Refill greys out when full; Harpoon ricochet chains. Tune node spacing/line constants in `ShopManager` if the layout looks off.
 - [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.

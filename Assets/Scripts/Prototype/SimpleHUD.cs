@@ -102,7 +102,7 @@ namespace RollfaehrenFury.Prototype
                 else
                 {
                     string mag = isReloading ? "Reloading" : $"Ammo {Mathf.Max(0, ammoInMagazine)}/{magazineSize}";
-                    ammo = $"{mag}   Magazine {Mathf.Max(0, reserveAmmo)}";
+                    ammo = $"{mag}   Reserve {Mathf.Max(0, reserveAmmo)}";
                 }
 
                 weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
