@@ -143,11 +143,11 @@ namespace RollfaehrenFury.Editor
             scrim.GetComponent<Image>().raycastTarget = false;
 
             GameObject mainPanel = CreatePanel(canvas, "Main Panel", Vector2.zero, new Vector2(560f, 600f), TextAnchor.MiddleCenter);
-            AddHeader(mainPanel.transform, "Title", "ROLLFAEHREN\nFURY", new Vector2(24f, -26f), new Vector2(472f, 142f), 58);
-            CreateText(mainPanel.transform, "Subtitle", "Protect the ferry. Survive the crossing.", new Vector2(24f, -176f), new Vector2(460f, 44f), 24, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
-            CreateButton(mainPanel.transform, "New Game Button", "NEW GAME", new Vector2(24f, -258f), new Vector2(360f, 58f), out _);
-            CreateButton(mainPanel.transform, "Settings Button", "SETTINGS", new Vector2(24f, -332f), new Vector2(360f, 58f), out _);
-            CreateButton(mainPanel.transform, "Quit Button", "QUIT", new Vector2(24f, -406f), new Vector2(360f, 58f), out _);
+            AddHeader(mainPanel.transform, "Title", "ROLLFAEHREN\nFURY", new Vector2(0f, -26f), new Vector2(472f, 142f), 58, TextAnchor.UpperCenter);
+            CreateText(mainPanel.transform, "Subtitle", "Protect the ferry. Survive the crossing.", new Vector2(0f, -176f), new Vector2(460f, 44f), 24, TextAnchor.MiddleCenter, UiTheme.Muted, TextAnchor.UpperCenter);
+            CreateButton(mainPanel.transform, "New Game Button", "NEW GAME", new Vector2(0f, -258f), new Vector2(360f, 58f), out _, TextAnchor.UpperCenter);
+            CreateButton(mainPanel.transform, "Settings Button", "SETTINGS", new Vector2(0f, -332f), new Vector2(360f, 58f), out _, TextAnchor.UpperCenter);
+            CreateButton(mainPanel.transform, "Quit Button", "QUIT", new Vector2(0f, -406f), new Vector2(360f, 58f), out _, TextAnchor.UpperCenter);
 
             GameObject settings = CreatePanel(canvas, "Settings Panel", Vector2.zero, new Vector2(720f, 560f), TextAnchor.MiddleCenter);
             settings.SetActive(false);
@@ -192,45 +192,47 @@ namespace RollfaehrenFury.Editor
 
             GameObject frame = CreatePanel(shop.transform, "Shop Frame", Vector2.zero, new Vector2(1500f, 820f), TextAnchor.MiddleCenter);
             CreateText(frame.transform, "Shop Title", "FERRY SUPPLY OFFICE", new Vector2(32f, -24f), new Vector2(620f, 48f), 36, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
-            CreateText(frame.transform, "Shop Money", "AVAILABLE FUNDS $0", new Vector2(-32f, -28f), new Vector2(420f, 42f), 26, TextAnchor.MiddleRight, UiTheme.Warning, TextAnchor.UpperRight);
+            CreateText(frame.transform, "Shop Money", "AVAILABLE FUNDS  $0", new Vector2(0f, -76f), new Vector2(520f, 34f), 24, TextAnchor.MiddleCenter, UiTheme.Warning, TextAnchor.UpperCenter);
 
-            GameObject tabs = CreatePanel(frame.transform, "Weapon Tabs", new Vector2(32f, -104f), new Vector2(280f, 516f), TextAnchor.UpperLeft);
+            GameObject tabs = CreatePanel(frame.transform, "Weapon Tabs", new Vector2(32f, -132f), new Vector2(280f, 516f), TextAnchor.UpperLeft);
             string[] names = { "HARPOON", "PISTOL", "SHOTGUN", "ASSAULT RIFLE" };
             for (int i = 0; i < names.Length; i++)
             {
                 CreateButton(tabs.transform, $"Weapon Tab {i}", names[i], new Vector2(18f, -22f - i * 112f), new Vector2(244f, 82f), out _);
             }
 
-            GameObject summary = CreatePanel(frame.transform, "Weapon Summary", new Vector2(340f, -104f), new Vector2(430f, 516f), TextAnchor.UpperLeft);
+            GameObject summary = CreatePanel(frame.transform, "Weapon Summary", new Vector2(340f, -132f), new Vector2(430f, 516f), TextAnchor.UpperLeft);
             Image accent = CreateBlock(summary.transform, "Selected Weapon Accent", new Vector2(18f, -24f), new Vector2(10f, 120f), UiTheme.Warning, TextAnchor.UpperLeft);
             accent.raycastTarget = false;
             CreateText(summary.transform, "Selected Weapon Name", "HARPOON", new Vector2(42f, -22f), new Vector2(340f, 42f), 32, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
             CreateText(summary.transform, "Selected Weapon Stats", "25 damage | 60 RPM\nUnlimited ammunition", new Vector2(42f, -84f), new Vector2(340f, 96f), 22, TextAnchor.UpperLeft, UiTheme.Muted, TextAnchor.UpperLeft);
             CreateText(summary.transform, "Selected Weapon Requirement", "OWNED", new Vector2(42f, -214f), new Vector2(340f, 60f), 24, TextAnchor.MiddleLeft, UiTheme.Warning, TextAnchor.UpperLeft);
 
-            GameObject grid = CreatePanel(frame.transform, "Upgrade Grid", new Vector2(-32f, -104f), new Vector2(660f, 516f), TextAnchor.UpperRight);
+            GameObject grid = CreatePanel(frame.transform, "Upgrade Grid", new Vector2(-32f, -132f), new Vector2(660f, 470f), TextAnchor.UpperRight);
             for (int i = 0; i < 4; i++)
             {
-                float x = i % 2 == 0 ? 20f : 340f;
-                float y = i < 2 ? -24f : -264f;
-                CreateButton(grid.transform, $"Upgrade Card {i}", "UPGRADE", new Vector2(x, y), new Vector2(300f, 210f), out _);
+                float x = 20f + (i % 3) * 210f;
+                float y = i < 3 ? -24f : -224f;
+                Text cardText = CreateButton(grid.transform, $"Upgrade Card {i}", "UPGRADE", new Vector2(x, y), new Vector2(200f, 180f), out _);
+                cardText.fontSize = 18;
             }
 
             CreateButton(frame.transform, "Close Shop Button", "X", new Vector2(-32f, -24f), new Vector2(52f, 52f), out _, TextAnchor.UpperRight);
-            CreateButton(frame.transform, "Refill Ammo Button", "REFILL AMMO", new Vector2(340f, 34f), new Vector2(300f, 58f), out _);
-            CreateButton(frame.transform, "Next Round Button", "NEXT ROUND", new Vector2(-360f, 34f), new Vector2(260f, 58f), out _);
+            Text refillText = CreateButton(grid.transform, "Refill Ammo Button", "REFILL\nAMMO", new Vector2(230f, -224f), new Vector2(200f, 180f), out _);
+            refillText.fontSize = 18;
+            CreateButton(frame.transform, "Next Round Button", "NEXT ROUND", new Vector2(0f, 34f), new Vector2(260f, 58f), out _, TextAnchor.LowerCenter);
         }
 
         private static void BuildPausePanels(Transform canvas)
         {
             GameObject pause = CreateFullRect(canvas, "Pause Panel", UiTheme.WithAlpha(Color.black, 0.58f));
             GameObject column = CreatePanel(pause.transform, "Pause Command Panel", Vector2.zero, new Vector2(440f, 560f), TextAnchor.MiddleCenter);
-            CreateText(column.transform, "Pause Title", "PAUSED", new Vector2(24f, -28f), new Vector2(350f, 56f), 40, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
-            CreateButton(column.transform, "Pause Resume Button", "RESUME", new Vector2(24f, -116f), new Vector2(330f, 56f), out _);
-            CreateButton(column.transform, "Pause New Game Button", "NEW GAME", new Vector2(24f, -186f), new Vector2(330f, 56f), out _);
-            CreateButton(column.transform, "Pause Settings Button", "SETTINGS", new Vector2(24f, -256f), new Vector2(330f, 56f), out _);
-            CreateButton(column.transform, "Pause Main Menu Button", "MAIN MENU", new Vector2(24f, -326f), new Vector2(330f, 56f), out _);
-            CreateButton(column.transform, "Pause Quit Button", "QUIT", new Vector2(24f, -396f), new Vector2(330f, 56f), out _);
+            CreateText(column.transform, "Pause Title", "PAUSED", new Vector2(0f, -28f), new Vector2(350f, 56f), 40, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.UpperCenter);
+            CreateButton(column.transform, "Pause Resume Button", "RESUME", new Vector2(0f, -116f), new Vector2(330f, 56f), out _, TextAnchor.UpperCenter);
+            CreateButton(column.transform, "Pause New Game Button", "NEW GAME", new Vector2(0f, -186f), new Vector2(330f, 56f), out _, TextAnchor.UpperCenter);
+            CreateButton(column.transform, "Pause Settings Button", "SETTINGS", new Vector2(0f, -256f), new Vector2(330f, 56f), out _, TextAnchor.UpperCenter);
+            CreateButton(column.transform, "Pause Main Menu Button", "MAIN MENU", new Vector2(0f, -326f), new Vector2(330f, 56f), out _, TextAnchor.UpperCenter);
+            CreateButton(column.transform, "Pause Quit Button", "QUIT", new Vector2(0f, -396f), new Vector2(330f, 56f), out _, TextAnchor.UpperCenter);
             pause.SetActive(false);
 
             GameObject settings = CreateFullRect(canvas, "Pause Settings Panel", UiTheme.WithAlpha(Color.black, 0.62f));
@@ -598,9 +600,16 @@ namespace RollfaehrenFury.Editor
             return label;
         }
 
-        private static void AddHeader(Transform parent, string name, string text, Vector2 position, Vector2 size, int fontSize)
+        private static void AddHeader(
+            Transform parent,
+            string name,
+            string text,
+            Vector2 position,
+            Vector2 size,
+            int fontSize,
+            TextAnchor anchor = TextAnchor.UpperCenter)
         {
-            Text label = CreateText(parent, name, text, position, size, fontSize, TextAnchor.MiddleCenter, UiTheme.Warning, TextAnchor.UpperCenter);
+            Text label = CreateText(parent, name, text, position, size, fontSize, TextAnchor.MiddleCenter, UiTheme.Warning, anchor);
             label.fontStyle = FontStyle.Bold;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
         }
@@ -654,11 +663,7 @@ namespace RollfaehrenFury.Editor
             fillObject.transform.SetParent(backgroundObject.transform, false);
             fill = EnsureComponent<Image>(fillObject);
             fill.color = fillColor;
-            fill.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-            fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal;
-            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
-            fill.fillAmount = 1f;
+            fill.type = Image.Type.Simple;
             RectTransform fillRect = fill.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;

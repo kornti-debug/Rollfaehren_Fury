@@ -82,7 +82,9 @@ Planned systems and responsibilities:
   texts, bars, prompts, shop, augment, and game-over panels instead of creating
   runtime UI objects. The current HUD layout keeps round, ferry health,
   crossing progress, and money together in the top-left status block, with
-  weapon/ammo details in the bottom-right block.
+  weapon/ammo details in the bottom-right block. Health, crossing, and reload
+  bars resize their fill rects directly instead of using sprite-filled images,
+  so small percentages remain visually accurate.
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: implemented (Track A) — owns the player's weapons, per-run
   ownership state, and the firing input (`Player/Attack`). Fixed digit slots
@@ -166,7 +168,9 @@ Planned systems and responsibilities:
 - `UiOverhaulBuilder`: editor-only repair/build tool. `Rollfaehren Fury >
   Build Ferry Hazard UI` creates reusable theme prefabs, removes known generated
   UI roots from Menu/Main canvases, recreates one clean layout, wires serialized
-  references, and marks the Canvas with `UiLayoutMarker`.
+  references, and marks the Canvas with `UiLayoutMarker`. The generated shop
+  layout keeps funds in the centered header area, a top-right close button, and
+  five compact action slots in the upgrade frame.
 - `UiLayoutMarker`: protects manually authored Canvas roots. Prototype scene
   builders should repair references around a marked Canvas and must not delete
   or recreate it.

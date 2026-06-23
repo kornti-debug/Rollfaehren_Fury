@@ -282,9 +282,13 @@ This list is the working task board for the prototype. Keep it practical and upd
   mouse-sensitivity settings.
 - [x] Compact gameplay HUD direction: top-left combines round, ferry health,
   crossing progress, and money; bottom-right stays weapon/ammo-only.
+- [x] Use exact-width rectangular HUD bars for ferry health, crossing progress,
+  and reload so low percentages read accurately.
 - [x] UI builder cleanup direction: `Build Ferry Hazard UI` removes known
   generated roots before rebuilding, preventing duplicate HUD/shop panels.
-- [x] Shop close direction: use a top-right `X` for the preparation shop overlay.
+- [x] Shop close direction: use a top-right `X`, move available funds to the
+  centered header area, and keep refill ammo as the fifth compact shop card.
+- [x] Center Menu and Pause command columns, subtitles, and buttons.
 - [ ] Verify the new UI at `1920x1080`, `1600x900`, and `1280x720`.
 - [ ] Verify no duplicate `Gameplay Panel`, `Shop Panel`, or `Close Shop Button`
   remains after rerunning `Build Ferry Hazard UI`.

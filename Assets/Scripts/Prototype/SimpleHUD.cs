@@ -38,12 +38,15 @@ namespace RollfaehrenFury.Prototype
         private float warningHideTime;
         private float healthFillTarget = 1f;
         private float crossingFillTarget;
+        private RectTransform ferryHealthFillRect;
+        private RectTransform crossingFillRect;
+        private RectTransform reloadBarFillRect;
 
         private void Awake()
         {
-            MakeFillable(ferryHealthFill);
-            MakeFillable(crossingFill);
-            MakeFillable(reloadBarFill);
+            ferryHealthFillRect = PrepareFillRect(ferryHealthFill);
+            crossingFillRect = PrepareFillRect(crossingFill);
+            reloadBarFillRect = PrepareFillRect(reloadBarFill);
             SetActive(reloadBarRoot, false);
             SetActive(warningText != null ? warningText.gameObject : null, false);
         }
@@ -57,11 +60,11 @@ namespace RollfaehrenFury.Prototype
                 warningText.gameObject.SetActive(false);
             }
 
-            AnimateBar(ferryHealthFill, healthFillTarget);
-            AnimateBar(crossingFill, crossingFillTarget);
+            float currentHealthFill = AnimateBar(ferryHealthFillRect, healthFillTarget);
+            AnimateBar(crossingFillRect, crossingFillTarget);
             if (ferryHealthFill != null)
             {
-                ferryHealthFill.color = HealthColor(ferryHealthFill.fillAmount);
+                ferryHealthFill.color = HealthColor(currentHealthFill);
             }
         }
 
@@ -116,10 +119,7 @@ namespace RollfaehrenFury.Prototype
 
             bool showReload = isReloading && !infiniteAmmo;
             SetActive(reloadBarRoot, showReload);
-            if (reloadBarFill != null)
-            {
-                reloadBarFill.fillAmount = Mathf.Clamp01(reloadProgress);
-            }
+            SetBarImmediate(reloadBarFillRect, Mathf.Clamp01(reloadProgress));
 
             SetText(reloadBarLabel, "RELOADING");
         }
@@ -204,27 +204,47 @@ namespace RollfaehrenFury.Prototype
             gameManager?.RestartGame();
         }
 
-        private static void AnimateBar(Image bar, float target)
+        private static float AnimateBar(RectTransform fillRect, float target)
         {
-            if (bar != null)
+            if (fillRect == null)
             {
-                bar.fillAmount = Mathf.MoveTowards(
-                    bar.fillAmount,
-                    target,
-                    Time.unscaledDeltaTime * 1.5f);
+                return Mathf.Clamp01(target);
             }
+
+            float next = Mathf.MoveTowards(
+                fillRect.anchorMax.x,
+                Mathf.Clamp01(target),
+                Time.unscaledDeltaTime * 1.5f);
+            SetBarImmediate(fillRect, next);
+            return next;
         }
 
-        private static void MakeFillable(Image bar)
+        private static RectTransform PrepareFillRect(Image bar)
         {
             if (bar == null)
+            {
+                return null;
+            }
+
+            bar.type = Image.Type.Simple;
+            RectTransform rect = bar.rectTransform;
+            rect.anchorMin = Vector2.zero;
+            SetBarImmediate(rect, 1f);
+            return rect;
+        }
+
+        private static void SetBarImmediate(RectTransform fillRect, float value)
+        {
+            if (fillRect == null)
             {
                 return;
             }
 
-            bar.type = Image.Type.Filled;
-            bar.fillMethod = Image.FillMethod.Horizontal;
-            bar.fillOrigin = (int)Image.OriginHorizontal.Left;
+            Vector2 anchorMax = fillRect.anchorMax;
+            anchorMax.x = Mathf.Clamp01(value);
+            fillRect.anchorMax = anchorMax;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
         }
 
         private static Color HealthColor(float fill)
