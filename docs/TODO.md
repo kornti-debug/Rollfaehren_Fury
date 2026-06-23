@@ -67,6 +67,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Widen Shotgun range (85 → 150) so it reaches the spawn arc.
 - [ ] Verify projectiles in Unity: re-run `Build Prototype Scene`, Harpoon arcs and hits.
 - [ ] Verify reload + ammo in Unity: weapon empties, reload bar fills, reserve drains; switching mid-reload pauses it; running fully dry leaves only the Harpoon.
+- [x] First-person weapon viewmodels: imported Easy Weapons gun models (Pistol/Shotgun/M4) shown via `WeaponVisuals` (muzzle flash, recoil, hit FX, fire/reload sounds, procedural reload dip), driven by existing `Weapon` events. `Tools > Rollfaehren Fury > Setup Weapon Viewmodels` wires them (forces the textured URP material; cosmetic-only). Harpoon has no gun model. (Easy Weapons scripts + demo removed; materials converted to URP.)
+- [ ] Verify/tune viewmodels in Unity: right gun shows per active weapon, textured, muzzle/recoil/reload play; dial in size/position + recoil & reload-dip feel.
 
 ## Ferry and Cargo
 
