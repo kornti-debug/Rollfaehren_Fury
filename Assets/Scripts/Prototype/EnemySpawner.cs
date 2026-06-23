@@ -59,20 +59,22 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float fallbackSpawnRadius = 65f;
         [SerializeField] private bool useFixedSpawnHeight = true;
         [SerializeField] private float spawnHeight = 7f;
-        [Tooltip("Spawn height for flying enemies (birds) that have no fixed spawn height. Keeps them in the air, above the surface fish.")]
-        [SerializeField] private float flyingSpawnHeight = 16f;
-        [SerializeField] private float flyingSpawnHeightJitter = 3f;
+        [Tooltip("Cruising altitude for flying enemies (birds): they hold this height while approaching, well above the fish, then dive onto the ferry once in attack range. Renamed from flyingSpawnHeight so the old lower scene value is dropped and this default applies.")]
+        [SerializeField] private float birdCruiseAltitude = 24f;
+        [Tooltip("Random +/- vertical scatter on the cruise altitude so a swarm is not a flat sheet.")]
+        [SerializeField] private float birdCruiseAltitudeJitter = 3f;
 
         [Header("Cluster Spawning")]
         [Tooltip("Enemies in one swarm are scattered within this radius so they flock together.")]
         [SerializeField, Min(0f)] private float clusterRadius = 5f;
 
         [Header("Round Progression")]
-        [Tooltip("Round-1 swarm size: each swarm spawns a random count in [baseSwarmMin, baseSwarmMax].")]
-        [SerializeField, Min(1)] private int baseSwarmMin = 2;
-        [SerializeField, Min(1)] private int baseSwarmMax = 3;
-        [Tooltip("Swarm size added to both min and max for every round past round 1 (accumulated, then rounded).")]
-        [SerializeField, Min(0f)] private float swarmSizePerRound = 1f;
+        [Tooltip("Largest a single swarm can be in round 1. The max grows by swarmSizeGrowthPerRound each round after that.")]
+        [SerializeField, Min(1)] private int swarmSizeRound1Max = 1;
+        [Tooltip("How much a swarm's MAX size grows per round after round 1.")]
+        [SerializeField, Min(0f)] private float swarmSizeGrowthPerRound = 1f;
+        [Tooltip("A swarm rolls a random count in [maxSize - swarmSizeRange, maxSize], floored at 1. With range 1: round 1 = 1, round 2 = 1-2, round 3 = 2-3, ...")]
+        [SerializeField, Min(0)] private int swarmSizeRange = 1;
         [Tooltip("Hard cap on a single swarm so very late rounds stay sane.")]
         [SerializeField, Min(1)] private int swarmSizeCap = 16;
         [Tooltip("Seconds between swarm spawns in round 1 (before the first-round factor below).")]
@@ -204,9 +206,15 @@ namespace RollfaehrenFury.Prototype
         {
             // Progressive difficulty: swarms grow and arrive faster every round. Round 1 stays
             // small + slow (beatable with just harpoon/pistol); later rounds ramp up.
-            int sizeBonus = Mathf.FloorToInt((activeRound - 1) * swarmSizePerRound);
-            int low = Mathf.Clamp(Mathf.Min(baseSwarmMin, baseSwarmMax) + sizeBonus, 1, swarmSizeCap);
-            int high = Mathf.Clamp(Mathf.Max(baseSwarmMin, baseSwarmMax) + sizeBonus, low, swarmSizeCap);
+            // Swarm size scales with the round: the MAX grows by one per round (R1 max = 1, R2 = 2, ...)
+            // and the swarm rolls a random size in [max - swarmSizeRange, max], floored at 1. With the
+            // default range of 1 that gives R1 = 1, R2 = 1-2, R3 = 2-3, and so on.
+            int maxSize = Mathf.Clamp(
+                swarmSizeRound1Max + Mathf.FloorToInt((activeRound - 1) * swarmSizeGrowthPerRound),
+                1,
+                swarmSizeCap);
+            int low = Mathf.Clamp(maxSize - swarmSizeRange, 1, maxSize);
+            int high = maxSize;
 
             float interval = Mathf.Max(minSwarmInterval, baseSwarmInterval - (activeRound - 1) * intervalStepPerRound);
             if (activeRound <= 1)
@@ -375,9 +383,10 @@ namespace RollfaehrenFury.Prototype
             }
             else if (profile != null)
             {
-                // Flying enemies (birds) spawn up in the air, well above the fish, with a little
-                // vertical scatter so a swarm does not form a flat sheet.
-                position.y = flyingSpawnHeight + Random.Range(-flyingSpawnHeightJitter, flyingSpawnHeightJitter);
+                // Flying enemies (birds) spawn at their cruise altitude, well above the fish, with a
+                // little vertical scatter so a swarm does not form a flat sheet. They hold this height
+                // while approaching and only descend once they commit to a dive (see SimpleEnemy).
+                position.y = birdCruiseAltitude + Random.Range(-birdCruiseAltitudeJitter, birdCruiseAltitudeJitter);
             }
 
             return position;

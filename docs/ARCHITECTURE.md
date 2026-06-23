@@ -132,13 +132,16 @@ Planned systems and responsibilities:
   spatial door emitter and post `Play_RC_Door_Open` only after
   `ShopSceneCoordinator` accepts the transition.
 - The player's hidden controller capsule owns the camera, movement, weapons,
-  and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose.
+  and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose. Falling below `SimpleFPSController.fallDeathHeight` (into the river) calls `GameManager.TriggerGameOver`, so leaving the ferry ends the run.
 - `Cargo`: later destructible cargo with reward value.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
 prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
 height. `SimpleEnemy` remains shared and selects either planar `Surface`
-movement or full 3D `Flying` movement from the prefab. Spawn points are
+movement or `Flying` movement from the prefab. Flying enemies cruise level at
+`birdCruiseAltitude` at the same speed as the fish, then commit to a downward
+dive onto the ferry once within `diveRange` (horizontal distance); `SwarmMovement`
+owns both the boids cruise and the committed plunge. Spawn points are
 ferry-relative forward attack arcs, while spawn timing is distributed across
 configured ferry-progress thresholds so enemies do not all appear at departure.
 The spawner ignores points behind the ferry and uses a forward fallback arc.
