@@ -13,6 +13,8 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float pitchClamp = 60f;
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float jumpHeight = 1.1f;
+        [Tooltip("Falling below this world Y (into the river) is instant game over. Water surface sits ~7.3 and the deck ~9.6, so ~6 means the player is in the water.")]
+        [SerializeField] private float fallDeathHeight = 6f;
         [SerializeField] private bool lockCursorOnPlay = true;
         [SerializeField] private bool animateCharacter;
 
@@ -27,6 +29,7 @@ namespace RollfaehrenFury.Prototype
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
+        private bool hasFallenInWater;
         private Animator animator;
         private bool animatorHasIsWalking;
         private bool animatorHasIsIdle;
@@ -105,6 +108,8 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
+            CheckFallDeath();
+
             if (!InputEnabled)
             {
                 pendingLookDelta = Vector2.zero;
@@ -113,6 +118,19 @@ namespace RollfaehrenFury.Prototype
 
             HandleLook();
             HandleMovement();
+        }
+
+        // Falling off the ferry into the river is an instant loss. The water has no collider, so the
+        // player keeps sinking; we watch world Y and trigger game over once, the first time we cross it.
+        private void CheckFallDeath()
+        {
+            if (hasFallenInWater || transform.position.y > fallDeathHeight)
+            {
+                return;
+            }
+
+            hasFallenInWater = true;
+            GameManager.Instance?.TriggerGameOver();
         }
 
         public void SetInputEnabled(bool isEnabled)
@@ -165,6 +183,7 @@ namespace RollfaehrenFury.Prototype
 
             transform.SetPositionAndRotation(position, rotation);
             verticalVelocity = -2f;
+            hasFallenInWater = false;
 
             if (wasEnabled)
             {

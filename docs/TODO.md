@@ -27,6 +27,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Verify Resume, New Game, Settings, Main Menu, and Quit pause buttons.
 - [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
 - [x] Add game over state.
+- [x] Falling off the ferry into the river is instant game over (`SimpleFPSController.fallDeathHeight` → `GameManager.TriggerGameOver`).
 - [x] Add shop/upgrade state.
 - [x] Add round restart/next round behavior.
 - [x] Add docked preparation state and shared `E` interaction for the ferry console/shop.
@@ -107,9 +108,12 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Intercept-lead spawn: swarms spawn ahead + to the side of the moving ferry (computed lead) so they reach its flank instead of trailing behind; spawns constrained to the water-surface bounds.
 - [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream is now the normal spawn behavior (crossing-paced/flood-test path removed).
 - [x] Removed the adaptive-escalation / big-swarm-warning mechanic; swarms are plain random-size waves.
-- [x] Progressive per-round difficulty: swarm size grows (`baseSwarmMin/Max` + `swarmSizePerRound`, capped) and the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored) each round; round 1 stays small + slow (`firstRoundIntervalFactor`) so it is beatable with harpoon/pistol.
+- [x] Progressive per-round difficulty: the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored) each round; round 1 stays slow (`firstRoundIntervalFactor`) so it is beatable with harpoon/pistol.
+- [x] Swarm size scales with the round: max size = `swarmSizeRound1Max` + `swarmSizeGrowthPerRound`·(round−1), capped at `swarmSizeCap`; each swarm rolls a random count in `[max − swarmSizeRange, max]` (floored at 1). Defaults give round 1 = 1, round 2 = 1-2, round 3 = 2-3, … (replaces the old `baseSwarmMin/Max` + `swarmSizePerRound`).
+- [x] Birds cruise high then dive: flying enemies hold `birdCruiseAltitude` (raised from the old `flyingSpawnHeight`) and approach level at the same speed as the fish, then commit to a plunge onto the ferry once within `diveRange` (horizontal), descending a touch faster (`diveSpeedMultiplier`). Dive/impact animation + explosion are a later pass.
 - [x] More round-end augments: Sluggish Tide (slower enemies), Bounty (+kill reward), War Chest (instant cash), Reinforced Hull (+ferry max HP).
 - [ ] Verify swarm feel in Unity. (`testFerryMaxHealth` in GameManager still forces 100 ferry HP — drop if undesired.)
+- [ ] Verify the new balancing in Unity: round 1 spawns single enemies and swarm size grows each round; birds fly higher, cruise in level, then dive onto the ferry; birds match fish speed; walking off the ferry into the water ends the run.
 - [ ] Later: add boss fish or boss pigeon variants.
 
 ## Score, Money, and Upgrades

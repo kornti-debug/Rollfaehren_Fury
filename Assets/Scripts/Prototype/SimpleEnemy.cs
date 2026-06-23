@@ -18,6 +18,12 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float moveSpeed = 3f;
         [SerializeField] private bool useSwarmMovement = true;
 
+        [Header("Flying Dive (birds)")]
+        [Tooltip("Flying enemies commit to a dive at the ferry once within this HORIZONTAL distance (m). Until then they cruise at spawn altitude.")]
+        [SerializeField, Min(0f)] private float diveRange = 14f;
+        [Tooltip("Speed multiplier while diving. 1 = exactly the cruising/fish speed; >1 = a faster plunge.")]
+        [SerializeField, Min(1f)] private float diveSpeedMultiplier = 1.4f;
+
         [Header("Rear Catch-up (small)")]
         [Tooltip("Enemies behind the ferry slowly ramp their speed up so they don't fall behind forever. Kept gentle.")]
         [SerializeField] private bool rearRampEnabled = true;
@@ -38,6 +44,7 @@ namespace RollfaehrenFury.Prototype
         private bool rewardOnDeath = true;
         private bool hasHitFerry;
         private float activeMoveSpeed;
+        private bool isDiving;
 
         public event Action<SimpleEnemy> Removed;
 
@@ -50,6 +57,10 @@ namespace RollfaehrenFury.Prototype
         public Vector3 TargetPosition => ferryTarget != null ? ferryTarget.AimPoint.position : transform.position;
         public float ActiveMoveSpeed => activeMoveSpeed;
         public bool FaceTarget => faceTarget;
+
+        // Flying enemies only: true once the bird has committed to its plunge onto the ferry.
+        public bool IsDiving => isDiving;
+        public float DiveSpeedMultiplier => Mathf.Max(1f, diveSpeedMultiplier);
 
         private void Awake()
         {
@@ -71,6 +82,7 @@ namespace RollfaehrenFury.Prototype
         {
             rewardOnDeath = true;
             hasHitFerry = false;
+            isDiving = false;
         }
 
         private void OnDestroy()
@@ -86,6 +98,7 @@ namespace RollfaehrenFury.Prototype
         private void Update()
         {
             RampRearSpeed();
+            UpdateDiveState();
 
             if (swarmMovement != null && swarmMovement.enabled)
             {
@@ -99,8 +112,19 @@ namespace RollfaehrenFury.Prototype
 
             Vector3 targetPosition = ferryTarget.AimPoint.position;
             Vector3 direction = targetPosition - transform.position;
+            float speed = activeMoveSpeed;
             if (movementMode == EnemyMovementMode.Surface)
             {
+                direction.y = 0f;
+            }
+            else if (isDiving)
+            {
+                // Committed plunge: head straight at the ferry (downward), a touch faster.
+                speed *= DiveSpeedMultiplier;
+            }
+            else
+            {
+                // Cruise: hold altitude until in dive range so birds approach high, then plunge.
                 direction.y = 0f;
             }
 
@@ -109,12 +133,35 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            Vector3 step = direction.normalized * activeMoveSpeed * Time.deltaTime;
+            Vector3 step = direction.normalized * speed * Time.deltaTime;
             transform.position += step;
 
             if (faceTarget)
             {
                 transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            }
+        }
+
+        // Flying enemies cruise at altitude, then commit to a dive once within diveRange (horizontal)
+        // of the ferry. Once committed it stays committed so they plunge instead of pulling back up.
+        private void UpdateDiveState()
+        {
+            if (movementMode != EnemyMovementMode.Flying || ferryTarget == null || hasHitFerry)
+            {
+                isDiving = false;
+                return;
+            }
+
+            if (isDiving)
+            {
+                return;
+            }
+
+            Vector3 toTarget = ferryTarget.AimPoint.position - transform.position;
+            float horizontalDistance = new Vector2(toTarget.x, toTarget.z).magnitude;
+            if (horizontalDistance <= Mathf.Max(0f, diveRange))
+            {
+                isDiving = true;
             }
         }
 

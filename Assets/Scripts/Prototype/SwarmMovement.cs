@@ -26,6 +26,8 @@ namespace RollfaehrenFury.Prototype
         [Header("Motion")]
         [SerializeField, Range(0.5f, 20f)] private float turnResponsiveness = 4f;
         [SerializeField, Range(0f, 1f)] private float wander = 0.15f;
+        [Tooltip("How sharply a diving flyer snaps onto its plunge line. Higher = a more committed, direct dive.")]
+        [SerializeField, Range(0.5f, 20f)] private float diveTurnResponsiveness = 8f;
 
         // Shared registry so each agent finds neighbours without scanning the whole scene.
         private static readonly List<SwarmMovement> Flock = new List<SwarmMovement>();
@@ -67,8 +69,25 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            bool surface = enemy.MovementMode == EnemyMovementMode.Surface;
             Vector3 position = transform.position;
+
+            // Committed dive (a flying enemy in attack range): ignore the flock and plunge straight at
+            // the ferry's aim point, a touch faster, so birds crash onto it instead of circling above.
+            if (enemy.MovementMode == EnemyMovementMode.Flying && enemy.IsDiving)
+            {
+                Vector3 toFerry = enemy.TargetPosition - position;
+                float diveSpeed = enemy.ActiveMoveSpeed * enemy.DiveSpeedMultiplier;
+                Vector3 dived = toFerry.sqrMagnitude > 0.0001f ? toFerry.normalized * diveSpeed : velocity;
+                velocity = Vector3.Lerp(velocity, dived, Mathf.Clamp01(diveTurnResponsiveness * Time.deltaTime));
+                transform.position += velocity * Time.deltaTime;
+
+                if (enemy.FaceTarget && velocity.sqrMagnitude > 0.0001f)
+                {
+                    transform.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
+                }
+
+                return;
+            }
 
             Vector3 separation = Vector3.zero;
             Vector3 alignment = Vector3.zero;
@@ -130,25 +149,21 @@ namespace RollfaehrenFury.Prototype
                 steer += Random.insideUnitSphere * wander;
             }
 
-            if (surface)
-            {
-                steer.y = 0f;
-            }
+            // Fish on the water and cruising birds both stay on a level plane (birds only descend once
+            // they commit to a dive, handled above), so we flatten steering on Y for both.
+            steer.y = 0f;
 
             float speed = enemy.ActiveMoveSpeed;
             Vector3 desiredVelocity = steer.sqrMagnitude > 0.0001f ? steer.normalized * speed : velocity;
             velocity = Vector3.Lerp(velocity, desiredVelocity, Mathf.Clamp01(turnResponsiveness * Time.deltaTime));
 
-            if (surface)
-            {
-                velocity.y = 0f;
-            }
+            velocity.y = 0f;
 
             transform.position += velocity * Time.deltaTime;
 
             if (enemy.FaceTarget && velocity.sqrMagnitude > 0.0001f)
             {
-                Vector3 facing = surface ? new Vector3(velocity.x, 0f, velocity.z) : velocity;
+                Vector3 facing = new Vector3(velocity.x, 0f, velocity.z);
                 if (facing.sqrMagnitude > 0.0001f)
                 {
                     transform.rotation = Quaternion.LookRotation(facing.normalized, Vector3.up);
