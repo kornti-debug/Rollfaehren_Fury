@@ -18,7 +18,7 @@ The first target is a prototype, not a content-heavy finished game. Placeholder 
 8. Docking grants a small round reward.
 9. Player chooses an augment and prepares at the opposite shore.
 10. Next round crosses back with harder enemies.
-11. Ferry destruction triggers game over.
+11. Ferry destruction — or the player falling off the ferry into the river — triggers game over.
 
 ## Scenes and States
 
@@ -75,13 +75,15 @@ Reward condition:
 Current enemy types:
 
 1. Fish spawn at river-surface points and approach horizontally from round 1.
-2. Pigeons spawn at aerial points, dive in full 3D, and join the mix from round 2.
+2. Pigeons spawn high and cruise in level at the fish's speed, then dive onto the ferry once within attack range; they join the mix from round 2.
 3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
 During a crossing, enemies spawn ahead and beside the moving ferry rather than
 behind it. Fish stay at world Y `7`, just below the visible water surface. The
 wave is spread from roughly 5% to 90% crossing progress, keeping combat active
-without requiring every enemy to outrun the ferry.
+without requiring every enemy to outrun the ferry. Swarm size scales with the
+round: round 1 sends single enemies and the maximum grows by one each round
+(round 2 = 1-2, round 3 = 2-3, ...), so early crossings stay readable.
 
 Enemy behavior should be simple:
 

@@ -449,6 +449,12 @@ namespace RollfaehrenFury.Prototype
 
         private void HandleFerryDestroyed(Health destroyedHealth)
         {
+            TriggerGameOver();
+        }
+
+        /// <summary>Ends the run — ferry sunk, or the player fell into the river. Safe to call repeatedly.</summary>
+        public void TriggerGameOver()
+        {
             if (State == PrototypeGameState.GameOver)
             {
                 return;
