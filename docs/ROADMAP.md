@@ -18,7 +18,9 @@ last command repairs required references without replacing manual room edits.
 
 - `GameManager` — docked preparation, crossing, augment, and game-over states
 - `Health` — reusable health/damage component with events (target-agnostic)
-- `WeaponSystem` + `Weapon` + `WeaponDefinition` — data-driven weapons (Track A): the active weapon fires, weapons switch, upgrades hit the active weapon
+- `WeaponSystem` + `Weapon` + `WeaponDefinition` — data-driven weapons with
+  per-run ownership: Harpoon starts unlocked; Pistol, Shotgun, and Assault
+  Rifle follow a round- and predecessor-gated shop chain
 - `SimpleEnemy` + `EnemySpawner` — weighted fish/pigeon profiles, round unlocks, surface/flying movement, and contact damage
 - `FerryDamageTarget` — the ferry as the protected/damageable object
 - `SimpleHUD` — HUD + shop panel + game over panel
@@ -37,7 +39,8 @@ round, game over on ferry death, Esc back to the menu.
 ### Known shortcuts in the current code (these drive the order below)
 
 - The **Settings panel exists but has no real options yet**.
-- Shop prices, augments, enemy pacing, and ferry values need a balancing pass.
+- Weapon unlock prices, shop upgrades, augments, enemy pacing, and ferry values
+  need a balancing pass.
 - Ferry damage has no strong visual low-health feedback yet.
 - Core Wwise gameplay events are connected, but UI sounds and river/ferry
   ambience remain open. Generated banks stay local; see [WWISE.md](WWISE.md).

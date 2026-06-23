@@ -3154,7 +3154,7 @@ MonoBehaviour:
   - {fileID: 1115022638}
   - {fileID: 24191707}
   - {fileID: 395929848}
-  startWeaponIndex: 1
+  startWeaponIndex: 0
   fireActionPath: Player/Attack
 --- !u!114 &654526155
 MonoBehaviour:

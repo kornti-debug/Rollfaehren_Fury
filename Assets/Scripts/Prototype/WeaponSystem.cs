@@ -20,15 +20,35 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private string fireActionPath = "Player/Attack";
 
         private int activeIndex;
+        private bool[] unlockedWeapons;
+        private Weapon subscribedWeapon;
         private bool fireHeld;
         private InputAction fireAction;
 
         public event Action Fired;
         public event Action<Health> HitHealth;
         public event Action<Weapon> WeaponChanged;
+        public event Action<Weapon> WeaponUnlocked;
 
         public bool InputEnabled { get; private set; } = true;
         public int WeaponCount => weapons.Count;
+        public int UnlockedWeaponCount
+        {
+            get
+            {
+                EnsureOwnershipState();
+                int count = 0;
+                for (int i = 0; i < unlockedWeapons.Length; i++)
+                {
+                    if (unlockedWeapons[i])
+                    {
+                        count++;
+                    }
+                }
+
+                return count;
+            }
+        }
         public int ActiveIndex => activeIndex;
         public Weapon ActiveWeapon => activeIndex >= 0 && activeIndex < weapons.Count ? weapons[activeIndex] : null;
         /// <summary>The weapon at a slot index, or null. Used by the per-weapon upgrade shop.</summary>
@@ -50,7 +70,7 @@ namespace RollfaehrenFury.Prototype
                 fireCamera = GetComponentInParent<Camera>();
             }
 
-            activeIndex = weapons.Count == 0 ? 0 : Mathf.Clamp(startWeaponIndex, 0, weapons.Count - 1);
+            ResetWeaponOwnership(false);
         }
 
         private void OnEnable()
@@ -116,11 +136,11 @@ namespace RollfaehrenFury.Prototype
                 float scroll = mouse.scroll.ReadValue().y;
                 if (scroll > 0.01f)
                 {
-                    SwitchTo(activeIndex + 1);
+                    SwitchByOffset(1);
                 }
                 else if (scroll < -0.01f)
                 {
-                    SwitchTo(activeIndex - 1);
+                    SwitchByOffset(-1);
                 }
             }
         }
@@ -184,23 +204,61 @@ namespace RollfaehrenFury.Prototype
 
         public void SwitchTo(int index)
         {
-            if (weapons.Count == 0)
-            {
-                return;
-            }
-
-            int wrapped = ((index % weapons.Count) + weapons.Count) % weapons.Count;
-            if (wrapped == activeIndex)
+            EnsureOwnershipState();
+            if (index < 0
+                || index >= weapons.Count
+                || !IsWeaponUnlocked(index)
+                || index == activeIndex)
             {
                 return;
             }
 
             UnsubscribeWeapon(ActiveWeapon);
             ActiveWeapon?.SetEquipped(false);
-            activeIndex = wrapped;
+            activeIndex = index;
             ActiveWeapon?.SetEquipped(true);
             SubscribeWeapon(ActiveWeapon);
             WeaponChanged?.Invoke(ActiveWeapon);
+        }
+
+        public bool IsWeaponUnlocked(int index)
+        {
+            EnsureOwnershipState();
+            return index >= 0
+                   && index < unlockedWeapons.Length
+                   && unlockedWeapons[index];
+        }
+
+        public bool CanUnlockWeapon(int index, int currentRound)
+        {
+            EnsureOwnershipState();
+            if (index < 0 || index >= weapons.Count || IsWeaponUnlocked(index))
+            {
+                return false;
+            }
+
+            Weapon weapon = weapons[index];
+            WeaponDefinition definition = weapon != null ? weapon.Definition : null;
+            if (definition == null || currentRound < definition.MinimumUnlockRound)
+            {
+                return false;
+            }
+
+            return index == 0 || IsWeaponUnlocked(index - 1);
+        }
+
+        public bool TryUnlockWeapon(int index)
+        {
+            int currentRound = GameManager.Instance != null ? GameManager.Instance.Round : 1;
+            if (!CanUnlockWeapon(index, currentRound))
+            {
+                return false;
+            }
+
+            unlockedWeapons[index] = true;
+            SwitchTo(index);
+            WeaponUnlocked?.Invoke(weapons[index]);
+            return true;
         }
 
         /// <summary>Marks only the active weapon as equipped so holstered weapons pause their reload.</summary>
@@ -227,6 +285,101 @@ namespace RollfaehrenFury.Prototype
             for (int i = 0; i < weapons.Count; i++)
             {
                 weapons[i]?.ResetStats();
+            }
+
+            ResetWeaponOwnership(true);
+        }
+
+        private void SwitchByOffset(int direction)
+        {
+            EnsureOwnershipState();
+            if (weapons.Count <= 1 || UnlockedWeaponCount <= 1)
+            {
+                return;
+            }
+
+            int step = direction >= 0 ? 1 : -1;
+            for (int offset = 1; offset <= weapons.Count; offset++)
+            {
+                int candidate = (activeIndex + step * offset) % weapons.Count;
+                if (candidate < 0)
+                {
+                    candidate += weapons.Count;
+                }
+
+                if (IsWeaponUnlocked(candidate))
+                {
+                    SwitchTo(candidate);
+                    return;
+                }
+            }
+        }
+
+        private void ResetWeaponOwnership(bool notify)
+        {
+            Weapon previous = ActiveWeapon;
+            UnsubscribeWeapon(previous);
+
+            unlockedWeapons = new bool[weapons.Count];
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                WeaponDefinition definition = weapons[i] != null ? weapons[i].Definition : null;
+                unlockedWeapons[i] = definition != null && definition.InitiallyUnlocked;
+            }
+
+            if (weapons.Count > 0 && UnlockedWeaponCount == 0)
+            {
+                unlockedWeapons[0] = true;
+            }
+
+            activeIndex = ResolveStartingWeaponIndex();
+            RefreshEquipped();
+            SubscribeWeapon(ActiveWeapon);
+            if (notify)
+            {
+                WeaponChanged?.Invoke(ActiveWeapon);
+            }
+        }
+
+        private int ResolveStartingWeaponIndex()
+        {
+            if (weapons.Count == 0)
+            {
+                return 0;
+            }
+
+            int preferred = Mathf.Clamp(startWeaponIndex, 0, weapons.Count - 1);
+            if (IsWeaponUnlocked(preferred))
+            {
+                return preferred;
+            }
+
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                if (IsWeaponUnlocked(i))
+                {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+        private void EnsureOwnershipState()
+        {
+            if (unlockedWeapons == null || unlockedWeapons.Length != weapons.Count)
+            {
+                unlockedWeapons = new bool[weapons.Count];
+                for (int i = 0; i < weapons.Count; i++)
+                {
+                    WeaponDefinition definition = weapons[i] != null ? weapons[i].Definition : null;
+                    unlockedWeapons[i] = definition != null && definition.InitiallyUnlocked;
+                }
+
+                if (weapons.Count > 0 && UnlockedWeaponCount == 0)
+                {
+                    unlockedWeapons[0] = true;
+                }
             }
         }
 
@@ -257,24 +410,31 @@ namespace RollfaehrenFury.Prototype
 
         private void SubscribeWeapon(Weapon weapon)
         {
-            if (weapon == null)
+            if (weapon == null || subscribedWeapon == weapon)
             {
                 return;
             }
 
+            if (subscribedWeapon != null)
+            {
+                UnsubscribeWeapon(subscribedWeapon);
+            }
+
             weapon.Fired += HandleActiveFired;
             weapon.HitHealth += HandleActiveHitHealth;
+            subscribedWeapon = weapon;
         }
 
         private void UnsubscribeWeapon(Weapon weapon)
         {
-            if (weapon == null)
+            if (weapon == null || subscribedWeapon != weapon)
             {
                 return;
             }
 
             weapon.Fired -= HandleActiveFired;
             weapon.HitHealth -= HandleActiveHitHealth;
+            subscribedWeapon = null;
         }
 
         private void HandleActiveFired()

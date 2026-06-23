@@ -15,7 +15,7 @@ Build a small but complete ferry-only vertical slice with placeholder low-poly a
 - Enemies damage only the ferry on contact, then disappear
 - Weapon/shooting loop with enemy kill rewards
 - Physical ferry crossings between two jetties
-- Simple shop/upgrades between rounds
+- Chained shop progression: Harpoon start, then Pistol, Shotgun, and Assault Rifle unlocks
 - Next round with higher difficulty
 - Game over when the ferry is destroyed
 
@@ -79,7 +79,8 @@ Controls:
 - `WASD`: move
 - Mouse: look
 - Left click: shoot
-- Scroll / `1`–`4`: switch weapon (`1` Harpoon, `2` Pistol, `3` Shotgun, `4` Flamethrower)
+- Scroll / `1`–`4`: switch among owned weapons (`1` Harpoon, `2` Pistol,
+  `3` Shotgun, `4` Assault Rifle)
 - `Shift`: sprint
 - `Space`: jump
 - `E`: enter/leave either shore shop, talk to the shop NPC, or start the ferry
