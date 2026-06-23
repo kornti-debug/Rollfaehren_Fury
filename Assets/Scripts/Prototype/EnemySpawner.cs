@@ -88,7 +88,6 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Spawn each swarm on a ring around the ferry's CURRENT position (any angle, incl. behind) instead of fixed spawn points.")]
         [SerializeField] private bool spawnRelativeToFerry = true;
         [SerializeField] private float spawnRadius = 70f;
-        [SerializeField] private float spawnRadiusJitter = 10f;
         [Tooltip("How far AHEAD of the moving ferry swarms spawn so they reach its side (multiplier on the computed intercept lead).")]
         [SerializeField, Min(0f)] private float spawnLeadFactor = 1.5f;
         [Tooltip("Swarms only spawn over this water surface's XZ bounds. Found by name at runtime if not assigned.")]
