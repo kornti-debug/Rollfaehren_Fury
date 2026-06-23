@@ -21,9 +21,9 @@ namespace RollfaehrenFury.Prototype
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
         private static readonly int IsJumpingId = Animator.StringToHash("IsJumping");
         private static readonly int WalkingStateId = Animator.StringToHash("Base Layer.Armature|WalkCycle");
-        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|Idle");
+        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|IdleCrossing");
         private static readonly string WalkingStateName = "Base Layer.Armature|WalkCycle";
-        private static readonly string IdleStateName = "Base Layer.Armature|Idle";
+        private static readonly string IdleStateName = "Base Layer.Armature|IdleCrossing";
 
         private CharacterController controller;
         private float pitch;
