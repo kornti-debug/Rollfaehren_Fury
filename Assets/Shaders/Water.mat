@@ -44,9 +44,9 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Ripple_Height: 0.75
+    - _Ripple_Height: 0.5
     - _Ripple_Speed: 0.05
-    - _WaveHeight: 0.25
+    - _WaveHeight: 0.1
     - _WaveSpeed: 0.025
     m_Colors:
     - _DeepColor: {r: 0.002447496, g: 0.20614195, b: 0.51886785, a: 1}
