@@ -248,12 +248,12 @@ namespace RollfaehrenFury.Editor
             CreateText(frame.transform, "Augment Title", "CHOOSE YOUR NEXT EDGE", new Vector2(0f, -34f), new Vector2(1100f, 56f), 38, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.UpperCenter);
             for (int i = 0; i < 3; i++)
             {
-                float x = -460f + i * 460f;
-                CreateButton(frame.transform, $"Augment Draft Button {i}", "AUGMENT", new Vector2(x, -148f), new Vector2(390f, 330f), out Button button);
+                float x = -420f + i * 420f;
+                CreateButton(frame.transform, $"Augment Draft Button {i}", "AUGMENT", new Vector2(x, -148f), new Vector2(340f, 310f), out Button button, TextAnchor.UpperCenter);
                 Text label = button.GetComponentInChildren<Text>();
                 if (label != null)
                 {
-                    label.fontSize = 23;
+                    label.fontSize = 21;
                     label.supportRichText = true;
                     label.horizontalOverflow = HorizontalWrapMode.Wrap;
                     label.verticalOverflow = VerticalWrapMode.Overflow;
@@ -269,8 +269,8 @@ namespace RollfaehrenFury.Editor
             GameObject frame = CreatePanel(gameOver.transform, "Game Over Frame", Vector2.zero, new Vector2(760f, 430f), TextAnchor.MiddleCenter);
             AddHeader(frame.transform, "Game Over Header", "FERRY LOST", new Vector2(0f, -36f), new Vector2(640f, 76f), 52);
             CreateText(frame.transform, "Game Over Text", "ROUND 1 | $0", new Vector2(0f, -132f), new Vector2(620f, 92f), 28, TextAnchor.MiddleCenter, UiTheme.Muted, TextAnchor.UpperCenter);
-            CreateButton(frame.transform, "Restart Button", "RESTART RUN", new Vector2(-150f, 128f), new Vector2(240f, 58f), out _);
-            CreateButton(frame.transform, "Game Over Main Menu Button", "MAIN MENU", new Vector2(150f, 128f), new Vector2(240f, 58f), out _);
+            CreateButton(frame.transform, "Restart Button", "RESTART RUN", new Vector2(-140f, 48f), new Vector2(240f, 58f), out _, TextAnchor.LowerCenter);
+            CreateButton(frame.transform, "Game Over Main Menu Button", "MAIN MENU", new Vector2(140f, 48f), new Vector2(240f, 58f), out _, TextAnchor.LowerCenter);
             gameOver.SetActive(false);
         }
 

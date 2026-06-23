@@ -289,6 +289,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Shop close direction: use a top-right `X`, move available funds to the
   centered header area, and keep refill ammo as the fifth compact shop card.
 - [x] Center Menu and Pause command columns, subtitles, and buttons.
+- [x] Center Augment Draft cards and Game Over command buttons inside their
+  frames.
 - [ ] Verify the new UI at `1920x1080`, `1600x900`, and `1280x720`.
 - [ ] Verify no duplicate `Gameplay Panel`, `Shop Panel`, or `Close Shop Button`
   remains after rerunning `Build Ferry Hazard UI`.
