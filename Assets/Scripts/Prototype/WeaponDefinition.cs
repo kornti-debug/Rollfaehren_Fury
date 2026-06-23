@@ -36,6 +36,14 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Spare magazines carried in reserve (beyond the loaded one). Total reserve ammo = this x magazineSize. Ignored for unlimited weapons.")]
         [SerializeField, Min(0)] private int reserveMagazines = 6;
 
+        [Header("Progression")]
+        [Tooltip("Owned automatically when a new run begins.")]
+        [SerializeField] private bool initiallyUnlocked;
+        [Tooltip("Money required to unlock this weapon in the shop.")]
+        [SerializeField, Min(0)] private int unlockPrice;
+        [Tooltip("Earliest round preparation in which this weapon can be unlocked.")]
+        [SerializeField, Min(1)] private int minimumUnlockRound = 1;
+
         [Header("Projectile (fire mode = Projectile)")]
         [SerializeField] private float projectileSpeed = 40f;
         [SerializeField] private float projectileGravity = 18f;
@@ -53,6 +61,9 @@ namespace RollfaehrenFury.Prototype
         public int MagazineSize => Mathf.Max(0, magazineSize);
         public float ReloadTime => Mathf.Max(0.1f, reloadTime);
         public int ReserveMagazines => Mathf.Max(0, reserveMagazines);
+        public bool InitiallyUnlocked => initiallyUnlocked;
+        public int UnlockPrice => Mathf.Max(0, unlockPrice);
+        public int MinimumUnlockRound => Mathf.Max(1, minimumUnlockRound);
         public float ProjectileSpeed => projectileSpeed;
         public float ProjectileGravity => projectileGravity;
         public float ProjectileLifetime => projectileLifetime;

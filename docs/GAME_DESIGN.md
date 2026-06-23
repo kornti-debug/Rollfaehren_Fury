@@ -99,20 +99,24 @@ damage.
 
 ## Weapons
 
-Prototype weapon:
+Per-run weapon progression:
 
-- One hitscan or projectile gun.
+1. Harpoon is the only starting weapon.
+2. Pistol unlocks from round 2 after owning the Harpoon.
+3. Shotgun unlocks from round 3 after owning the Pistol.
+4. Assault Rifle unlocks from round 4 after owning the Shotgun.
 
-Possible later weapons:
-
-- Flamethrower
-- Stronger gun
-- Wider spread weapon
-- Faster reload weapon
+All four weapons remain visible in the shop. Players may spend early money on
+Harpoon upgrades instead of immediately saving for the next gun, allowing a
+Harpoon-focused build to remain a deliberate option.
 
 Weapon rules:
 
 - Keep the first weapon reliable and easy to tune.
+- The Shotgun is a close-range crowd weapon: ten pellets use a circular
+  nine-degree cone, with enough point-blank damage to defeat a round-six fish
+  when most pellets connect. Its short range prevents it replacing precision
+  weapons.
 - Weapon feedback should be clear: fire, hit, enemy death, reload or cooldown.
 - Wwise events should be connected after the gameplay event exists.
 
@@ -134,9 +138,22 @@ Upgrade examples:
 
 Prototype shop:
 
-- Show three upgrade choices or a small fixed list.
-- Allow buying one or more upgrades with money.
-- Start next round after purchase/continue.
+- Show the chained weapon unlocks and per-weapon upgrade tree.
+- Keep locked weapon requirements visible.
+- Allow buying multiple affordable upgrades during preparation.
+- Damage, fire-rate, and reload can reach five levels, allowing a focused
+  single-weapon build. Damage adds `20%` multiplicatively per level.
+- Ammo weapons can permanently expand their loaded magazine and spare-magazine
+  capacity up to three times, or pay for a repeatable refill to restore the
+  current capacity.
+- Magazine growth is weapon-specific: Pistol `+2`, Shotgun `+1`, and Assault
+  Rifle `+5` rounds per level. Reserve Capacity adds one spare magazine.
+
+Augment rules:
+
+- Augments are repeatable unless explicitly marked unique.
+- Bilge Pump is unique per run and restores `0.5` ferry HP per kill, capped at
+  `10` HP actually restored during each crossing.
 
 ## MVP Boundaries
 

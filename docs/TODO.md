@@ -50,6 +50,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add weapon cooldown.
 - [x] Add Wwise hook for shooting.
 - [x] Add Wwise hook for hit confirmation.
+- [x] Add per-run weapon ownership to `WeaponSystem`, including locked hotkeys,
+  scroll skipping, immediate equip on unlock, and Harpoon-only reset support.
 - [x] Track A1: extract data-driven `Weapon` + `WeaponDefinition` (ScriptableObject) from the single hitscan weapon.
 - [x] Track A2: add `WeaponSystem` that owns firing input and weapon switching.
 - [x] Track A: add a second weapon (Shotgun, spread fire mode) to prove the abstraction.
@@ -63,9 +65,15 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Weapon switching: mouse scroll + keys `1`–`4` (1 Harpoon, 2 Pistol, 3 Shotgun, 4 Flamethrower).
 - [x] Magazine & reload system: Pistol 6, Assault Rifle 20, Shotgun 4, Harpoon unlimited. Empty magazine (or `R`) starts a timed reload; firing the last round auto-reloads. HUD shows ammo in the weapon panel + a centered reload progress bar while reloading.
 - [x] Reload pauses while a weapon is holstered (only the equipped weapon's reload advances), so switching weapons no longer skips the reload wait.
-- [x] Max-ammo / reserve magazines: Pistol 8, Assault Rifle 6, Shotgun 8 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
+- [x] Max-ammo / reserve magazines: Pistol 4, Assault Rifle 2, Shotgun 4 spare mags (Harpoon unlimited). Empty mag + empty reserve = that weapon is dry; HUD shows `Ammo m/n   Reserve r`. Ammo refills to full at the start of a run and otherwise only via the shop.
 - [x] Fire modes: Assault Rifle stays automatic (hold to fire); Pistol/Shotgun/Harpoon are semi-auto — one shot per press.
 - [x] Widen Shotgun range (85 → 150) so it reaches the spawn arc.
+- [x] Rebalance the Shotgun as a close-range crowd weapon: `20` damage per
+  pellet, ten pellets in a circular `9` degree cone, `90` range, and four
+  spare magazines.
+- [ ] Verify the rebalanced Shotgun in Unity: a close blast kills a round-six
+  fish when most pellets connect, can hit clustered enemies, and is unreliable
+  at long range.
 - [ ] Verify projectiles in Unity: re-run `Build Prototype Scene`, Harpoon arcs and hits.
 - [ ] Verify reload + ammo in Unity: weapon empties, reload bar fills, reserve drains; switching mid-reload pauses it; running fully dry leaves only the Harpoon.
 - [x] First-person weapon viewmodels: imported Easy Weapons gun models (Pistol/Shotgun/M4) shown via `WeaponVisuals` (muzzle flash, recoil, hit FX, fire/reload sounds, procedural reload dip), driven by existing `Weapon` events. `Tools > Rollfaehren Fury > Setup Weapon Viewmodels` wires them (forces the textured URP material; cosmetic-only). Harpoon has no gun model. (Easy Weapons scripts + demo removed; materials converted to URP.)
@@ -124,6 +132,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add round completion reward.
 - [x] Add money display.
 - [x] Add shop UI.
+- [x] Add visible chained shop unlocks: Harpoon -> Pistol -> Shotgun ->
+  Assault Rifle, with predecessor, round, and price gates.
+- [ ] Verify weapon unlock progression in Play Mode: Harpoon-only start,
+  locked hotkeys/scroll, round 2/3/4 gates, exact prices, immediate equip, and
+  new-run reset.
 - [x] Add first upgrade: weapon damage.
 - [x] Add second upgrade: ferry health.
 - [x] Add third upgrade: fire rate.
@@ -131,18 +144,38 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
 - [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
 - [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
-- [x] Weapon-ammo upgrades in the shop: Bigger Magazine (+rounds), Extra Ammo (+reserve mags), Faster Reload (shorter reload), Resupply Ammo (refill mags + reserve). Added to the catalog at runtime with tunable cost/amount on `ShopManager` (~15–20 each, coherent with the base upgrades).
-- [x] Weapon Damage upgrade is now a **percentage** (+25%/buy) instead of flat +10, so it scales every weapon evenly (no more per-pellet blow-up on the shotgun). Harpoon base damage 120 → 140 (one-shots fish through ~round 6).
-- [x] Node-tree shop: `ShopManager` now builds a per-weapon upgrade tree at runtime (click a weapon node → lines branch to its upgrade nodes). Per weapon: Damage (+25%/level, escalating cost), Fire Rate; ammo weapons also Faster Reload + Refill Ammo (tops magazine + reserve to current cap); Harpoon gets Ricochet (wired into the projectile). Replaces the flat catalog shop; the old `UpgradeDefinition` assets are now dormant.
+- [x] Add permanent ammo-capacity nodes to the active node-tree shop: Bigger
+  Magazine (Pistol `+2`, Shotgun `+1`, Assault Rifle `+5`) and Reserve Capacity
+  (`+1` spare magazine), each capped at three levels. Newly added capacity is
+  filled immediately; Refill Ammo remains a repeatable `$20` purchase.
+- [x] Weapon Damage upgrade is percentage-based (`+20%` per purchase) instead
+  of flat damage, so it scales every weapon consistently without excessive
+  per-pellet growth on the Shotgun.
+- [x] Node-tree shop: `ShopManager` builds a per-weapon upgrade tree at runtime.
+  Damage, Fire Rate, and Faster Reload reach level 5; Magazine Size and Reserve
+  Capacity reach level 3; Harpoon Ricochet reaches level 1; Refill is
+  repeatable. The old `UpgradeDefinition` catalog is dormant.
+- [ ] Verify ammo-capacity purchases in Unity: locked weapons expose no
+  upgrades, magazine/reserve purchases fill their added capacity, larger
+  magazines also enlarge each spare magazine, refill restores the upgraded
+  cap, and New Game restores definition defaults.
 - [x] Lower income to match the simpler shop: kill reward 6 → 3 (tunable via `killRewardScale`).
 - [ ] Verify the node-tree shop in Unity: weapon nodes + branching lines render; per-weapon purchases apply; Refill greys out when full; Harpoon ricochet chains. Tune node spacing/line constants in `ShopManager` if the layout looks off.
 - [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
-- [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
+- [x] Shop: Close/Exit button in the automat overlay; core weapon upgrades
+  allow 5 buys, ammo capacity 3, and Querschläger/Ricochet 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
-- [x] Track C augments v2 (added to the pool at runtime): Bilge Pump (heal per kill), Reload Fury (+50% damage 10s after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+40% move speed 5s every 5th kill). Kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
+- [x] Track C augments v2 (added to the pool at runtime): Bilge Pump (unique;
+  heal `0.5` per kill, maximum `10` actual HP per crossing), Reload Fury (+50%
+  damage 10s after each reload), Rapid Reload (−30% reload on all weapons),
+  Adrenaline (+40% move speed 5s every 5th kill). Augments are repeatable unless
+  explicitly unique, and acquired unique choices reset on New Game.
+- [ ] Verify specialization and Bilge Pump in Unity: core upgrades stop at
+  level 5, ammo capacity stops at level 3, Bilge Pump is not offered twice,
+  and it restores no more than 10 HP during one crossing.
 - [ ] Verify augments in Unity: survive a round → draft shows the new augments → pick → effect applies (heal-on-kill, post-reload damage, faster reload, kill-streak speed).
 - [ ] Later: mechanic-heavy augments (mines, gulls, oil slick, shield...) + the spec's master weapon upgrades.
 - [ ] Track C: round-end augment draft (1 of 3) — replaces the round-end shop popup. (Next.)

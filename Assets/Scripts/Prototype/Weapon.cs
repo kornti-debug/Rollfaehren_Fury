@@ -30,6 +30,7 @@ namespace RollfaehrenFury.Prototype
         private int currentAmmo;
         private int currentReserve;
         private int maxReserve;
+        private int reserveMagazineCapacity;
         private bool isReloading;
         private float reloadRemaining;
         private bool isEquipped = true;
@@ -59,6 +60,7 @@ namespace RollfaehrenFury.Prototype
         /// <summary>Rounds left in reserve (outside the magazine); -1 for an infinite-ammo weapon.</summary>
         public int ReserveAmmo { get { EnsureStats(); return magazineSize <= 0 ? -1 : currentReserve; } }
         public int MaxReserveAmmo { get { EnsureStats(); return maxReserve; } }
+        public int ReserveMagazineCapacity { get { EnsureStats(); return reserveMagazineCapacity; } }
         /// <summary>True when the magazine and reserve are both topped up (or the weapon is unlimited).</summary>
         public bool IsAmmoFull { get { EnsureStats(); return magazineSize <= 0 || (currentAmmo >= magazineSize && currentReserve >= maxReserve); } }
         public bool IsReloading => isReloading;
@@ -117,7 +119,8 @@ namespace RollfaehrenFury.Prototype
             magazineSize = definition.MagazineSize;
             reloadDuration = definition.ReloadTime;
             currentAmmo = magazineSize;
-            maxReserve = magazineSize * definition.ReserveMagazines;
+            reserveMagazineCapacity = definition.ReserveMagazines;
+            maxReserve = magazineSize * reserveMagazineCapacity;
             currentReserve = maxReserve;
             statsInitialized = true;
         }
@@ -214,25 +217,32 @@ namespace RollfaehrenFury.Prototype
         public void AddMagazineSize(int amount)
         {
             EnsureStats();
-            if (magazineSize <= 0)
+            int addedRounds = Mathf.Max(0, amount);
+            if (magazineSize <= 0 || addedRounds <= 0)
             {
                 return; // unlimited weapons have no magazine to grow
             }
 
-            magazineSize = Mathf.Max(1, magazineSize + amount);
+            int oldMaxReserve = maxReserve;
+            magazineSize += addedRounds;
+            currentAmmo += addedRounds;
+            maxReserve = magazineSize * reserveMagazineCapacity;
+            currentReserve = Mathf.Min(maxReserve, currentReserve + (maxReserve - oldMaxReserve));
         }
 
         public void AddReserveMagazines(int magazines)
         {
             EnsureStats();
-            if (magazineSize <= 0)
+            int addedMagazines = Mathf.Max(0, magazines);
+            if (magazineSize <= 0 || addedMagazines <= 0)
             {
                 return;
             }
 
-            int extra = Mathf.Max(0, magazines) * magazineSize;
-            maxReserve += extra;
-            currentReserve += extra;
+            int oldMaxReserve = maxReserve;
+            reserveMagazineCapacity += addedMagazines;
+            maxReserve = magazineSize * reserveMagazineCapacity;
+            currentReserve = Mathf.Min(maxReserve, currentReserve + (maxReserve - oldMaxReserve));
         }
 
         public void MultiplyReloadDuration(float multiplier)
@@ -418,18 +428,21 @@ namespace RollfaehrenFury.Prototype
 
         private Vector3 GetShotDirection(Camera fireCamera)
         {
-            Vector3 forward = fireCamera.transform.forward;
+            Transform cameraTransform = fireCamera.transform;
+            Vector3 forward = cameraTransform.forward;
             float spread = definition.SpreadAngle;
             if (spread <= 0f)
             {
                 return forward;
             }
 
-            Quaternion offset = Quaternion.Euler(
-                UnityEngine.Random.Range(-spread, spread),
-                UnityEngine.Random.Range(-spread, spread),
-                0f);
-            return offset * forward;
+            Vector2 spreadOffset = UnityEngine.Random.insideUnitCircle
+                * Mathf.Tan(spread * Mathf.Deg2Rad);
+            return (
+                forward
+                + cameraTransform.right * spreadOffset.x
+                + cameraTransform.up * spreadOffset.y
+            ).normalized;
         }
 
         private bool TryFindHit(Ray ray, Transform ignoredRoot, LayerMask hitMask, out RaycastHit selectedHit)

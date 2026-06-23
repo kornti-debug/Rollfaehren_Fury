@@ -7,13 +7,23 @@ namespace RollfaehrenFury.Prototype
     /// <summary>
     /// Node-tree weapon shop. The player clicks a weapon node and connecting lines branch out to its
     /// purchasable nodes. Every weapon has power upgrades (Damage, Fire Rate) that level up with an
-    /// escalating cost; weapons with ammo also get Faster Reload + Refill Ammo (tops the magazine and
-    /// reserve back to the current cap), and the Harpoon gets Ricochet. Built entirely at runtime
-    /// under the existing Shop Panel, so no scene/builder work is needed.
+    /// escalating cost; weapons with ammo also get magazine/reserve capacity, Faster Reload, and
+    /// Refill Ammo (tops the magazine and reserve back to the current cap). The Harpoon gets
+    /// Ricochet. Built entirely at runtime under the existing Shop Panel.
     /// </summary>
     public sealed class ShopManager : MonoBehaviour
     {
-        private enum UpgradeKind { Damage, FireRate, Reload, Refill, Ricochet }
+        private enum UpgradeKind
+        {
+            Unlock,
+            Damage,
+            FireRate,
+            MagazineSize,
+            ReserveCapacity,
+            Reload,
+            Refill,
+            Ricochet
+        }
 
         [SerializeField] private GameManager gameManager;
         [SerializeField] private WeaponSystem weaponSystem;
@@ -23,7 +33,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(1f)] private float costGrowthPerPurchase = 1.7f;
         [SerializeField] private int refillCost = 20;
 
-        private const int MaxUpgradeSlots = 4;
+        private const int MaxUpgradeSlots = 6;
 
         // Layout (anchored positions inside the Shop Panel) — tune if the spacing feels off.
         private const float WeaponColumnX = -200f;
@@ -33,6 +43,7 @@ namespace RollfaehrenFury.Prototype
         private const float UpgradeNodeSpacing = 46f;
         private static readonly Vector2 WeaponNodeSize = new Vector2(155f, 40f);
         private static readonly Vector2 UpgradeNodeSize = new Vector2(176f, 38f);
+        private static readonly Vector2 UnlockNodeSize = new Vector2(230f, 64f);
 
         private readonly Dictionary<(int target, UpgradeKind kind), int> levels = new Dictionary<(int, UpgradeKind), int>();
         private readonly List<Button> weaponNodes = new List<Button>();
@@ -58,13 +69,20 @@ namespace RollfaehrenFury.Prototype
         public void OpenShop()
         {
             EnsureBuilt();
-            RefreshTree();
+            if (built && weaponSystem != null && weaponSystem.WeaponCount > 0)
+            {
+                SelectTarget(Mathf.Clamp(selectedTarget, 0, weaponSystem.WeaponCount - 1));
+            }
         }
 
         public void ResetPurchases()
         {
             levels.Clear();
-            RefreshTree();
+            selectedTarget = 0;
+            if (built)
+            {
+                SelectTarget(0);
+            }
         }
 
         // The old flat-list buttons (now hidden) still reference this through their serialized
@@ -150,8 +168,13 @@ namespace RollfaehrenFury.Prototype
                 }
 
                 Vector2 pos = new Vector2(UpgradeColumnX, ColumnY(i, count, UpgradeNodeSpacing));
-                ((RectTransform)upgradeSlots[i].transform).anchoredPosition = pos;
-                SetLine(lines[i], fromEdge, new Vector2(pos.x - UpgradeNodeSize.x * 0.5f, pos.y));
+                Vector2 nodeSize = currentKinds[i] == UpgradeKind.Unlock
+                    ? UnlockNodeSize
+                    : UpgradeNodeSize;
+                RectTransform slotRect = (RectTransform)upgradeSlots[i].transform;
+                slotRect.anchoredPosition = pos;
+                slotRect.sizeDelta = nodeSize;
+                SetLine(lines[i], fromEdge, new Vector2(pos.x - nodeSize.x * 0.5f, pos.y));
             }
 
             HighlightSelectedNode();
@@ -162,12 +185,19 @@ namespace RollfaehrenFury.Prototype
         {
             int money = gameManager != null ? gameManager.Money : 0;
             Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(selectedTarget) : null;
+            RefreshWeaponNodes();
 
             for (int i = 0; i < currentKinds.Count && i < upgradeSlots.Count; i++)
             {
                 UpgradeKind kind = currentKinds[i];
                 Button slot = upgradeSlots[i];
                 Text label = slot.GetComponentInChildren<Text>();
+
+                if (kind == UpgradeKind.Unlock)
+                {
+                    RefreshUnlockSlot(slot, label, weapon, money);
+                    continue;
+                }
 
                 if (kind == UpgradeKind.Refill)
                 {
@@ -190,8 +220,8 @@ namespace RollfaehrenFury.Prototype
                 if (label != null)
                 {
                     label.text = maxed
-                        ? $"{KindLabel(kind)}\nmax {level}/{max}"
-                        : $"{KindLabel(kind)}\n{level}/{max}   ${cost}";
+                        ? $"{KindLabel(kind, weapon)}\nmax {level}/{max}"
+                        : $"{KindLabel(kind, weapon)}\n{level}/{max}   ${cost}";
                 }
             }
         }
@@ -210,6 +240,12 @@ namespace RollfaehrenFury.Prototype
             }
 
             UpgradeKind kind = currentKinds[slot];
+            if (kind == UpgradeKind.Unlock)
+            {
+                BuyWeaponUnlock(weapon);
+                return;
+            }
+
             if (kind == UpgradeKind.Refill)
             {
                 if (weapon.IsAmmoFull || !gameManager.TrySpendMoney(refillCost))
@@ -243,8 +279,10 @@ namespace RollfaehrenFury.Prototype
         {
             switch (kind)
             {
-                case UpgradeKind.Damage: weapon.MultiplyDamage(1.25f); break;
+                case UpgradeKind.Damage: weapon.MultiplyDamage(1.2f); break;
                 case UpgradeKind.FireRate: weapon.MultiplyCooldown(0.82f); break;
+                case UpgradeKind.MagazineSize: weapon.AddMagazineSize(MagazineIncreaseFor(weapon)); break;
+                case UpgradeKind.ReserveCapacity: weapon.AddReserveMagazines(1); break;
                 case UpgradeKind.Reload: weapon.MultiplyReloadDuration(0.82f); break;
                 case UpgradeKind.Ricochet: weapon.AddRicochet(1); break;
             }
@@ -258,11 +296,19 @@ namespace RollfaehrenFury.Prototype
                 yield break;
             }
 
+            if (!weaponSystem.IsWeaponUnlocked(target))
+            {
+                yield return UpgradeKind.Unlock;
+                yield break;
+            }
+
             yield return UpgradeKind.Damage;
             yield return UpgradeKind.FireRate;
 
             if (weapon.MagazineSize > 0)
             {
+                yield return UpgradeKind.MagazineSize;
+                yield return UpgradeKind.ReserveCapacity;
                 yield return UpgradeKind.Reload;
                 yield return UpgradeKind.Refill;
             }
@@ -273,12 +319,14 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private static string KindLabel(UpgradeKind kind)
+        private static string KindLabel(UpgradeKind kind, Weapon weapon)
         {
             switch (kind)
             {
-                case UpgradeKind.Damage: return "Damage +25%";
+                case UpgradeKind.Damage: return "Damage +20%";
                 case UpgradeKind.FireRate: return "Fire Rate";
+                case UpgradeKind.MagazineSize: return $"Magazine +{MagazineIncreaseFor(weapon)}";
+                case UpgradeKind.ReserveCapacity: return "Reserve +1 mag";
                 case UpgradeKind.Reload: return "Faster Reload";
                 case UpgradeKind.Ricochet: return "Ricochet";
                 default: return kind.ToString();
@@ -291,6 +339,8 @@ namespace RollfaehrenFury.Prototype
             {
                 case UpgradeKind.Damage: return 15;
                 case UpgradeKind.FireRate: return 10;
+                case UpgradeKind.MagazineSize: return 20;
+                case UpgradeKind.ReserveCapacity: return 15;
                 case UpgradeKind.Reload: return 20;
                 case UpgradeKind.Ricochet: return 30;
                 default: return 20;
@@ -299,7 +349,31 @@ namespace RollfaehrenFury.Prototype
 
         private static int KindMaxLevel(UpgradeKind kind)
         {
-            return kind == UpgradeKind.Ricochet ? 1 : 3;
+            switch (kind)
+            {
+                case UpgradeKind.Ricochet:
+                    return 1;
+                case UpgradeKind.MagazineSize:
+                case UpgradeKind.ReserveCapacity:
+                    return 3;
+                default:
+                    return 5;
+            }
+        }
+
+        private static int MagazineIncreaseFor(Weapon weapon)
+        {
+            if (weapon == null)
+            {
+                return 1;
+            }
+
+            switch (weapon.DisplayName)
+            {
+                case "Pistol": return 2;
+                case "Assault Rifle": return 5;
+                default: return 1;
+            }
         }
 
         private int EffectiveCost(UpgradeKind kind, int level)
@@ -344,11 +418,99 @@ namespace RollfaehrenFury.Prototype
                 Image image = weaponNodes[i].GetComponent<Image>();
                 if (image != null)
                 {
-                    image.color = i == selectedTarget
-                        ? new Color(0.18f, 0.42f, 0.70f, 0.95f)
-                        : new Color(0.10f, 0.14f, 0.20f, 0.90f);
+                    bool unlocked = weaponSystem != null && weaponSystem.IsWeaponUnlocked(i);
+                    if (i == selectedTarget)
+                    {
+                        image.color = unlocked
+                            ? new Color(0.18f, 0.42f, 0.70f, 0.95f)
+                            : new Color(0.58f, 0.38f, 0.10f, 0.95f);
+                    }
+                    else
+                    {
+                        image.color = unlocked
+                            ? new Color(0.10f, 0.14f, 0.20f, 0.90f)
+                            : new Color(0.16f, 0.16f, 0.18f, 0.90f);
+                    }
                 }
             }
+        }
+
+        private void RefreshWeaponNodes()
+        {
+            for (int i = 0; i < weaponNodes.Count; i++)
+            {
+                Button node = weaponNodes[i];
+                Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(i) : null;
+                if (node == null || weapon == null)
+                {
+                    continue;
+                }
+
+                Text label = node.GetComponentInChildren<Text>();
+                if (label != null)
+                {
+                    label.text = weaponSystem.IsWeaponUnlocked(i)
+                        ? weapon.DisplayName
+                        : $"{weapon.DisplayName}\nLOCKED";
+                }
+            }
+
+            HighlightSelectedNode();
+        }
+
+        private void RefreshUnlockSlot(Button slot, Text label, Weapon weapon, int money)
+        {
+            WeaponDefinition definition = weapon != null ? weapon.Definition : null;
+            if (definition == null || weaponSystem == null || gameManager == null)
+            {
+                slot.interactable = false;
+                if (label != null)
+                {
+                    label.text = "Unavailable";
+                }
+
+                return;
+            }
+
+            bool prerequisiteOwned = selectedTarget == 0 || weaponSystem.IsWeaponUnlocked(selectedTarget - 1);
+            bool canUnlock = weaponSystem.CanUnlockWeapon(selectedTarget, gameManager.Round);
+            slot.interactable = canUnlock && money >= definition.UnlockPrice;
+
+            if (label == null)
+            {
+                return;
+            }
+
+            string requirement = string.Empty;
+            if (!prerequisiteOwned)
+            {
+                Weapon prerequisite = weaponSystem.WeaponAt(selectedTarget - 1);
+                string prerequisiteName = prerequisite != null ? prerequisite.DisplayName : "previous weapon";
+                requirement = $"\nRequires {prerequisiteName}";
+            }
+
+            label.text =
+                $"Unlock {weapon.DisplayName}\n${definition.UnlockPrice} | Round {definition.MinimumUnlockRound}{requirement}";
+        }
+
+        private void BuyWeaponUnlock(Weapon weapon)
+        {
+            WeaponDefinition definition = weapon.Definition;
+            if (definition == null
+                || !weaponSystem.CanUnlockWeapon(selectedTarget, gameManager.Round)
+                || !gameManager.TrySpendMoney(definition.UnlockPrice))
+            {
+                RefreshTree();
+                return;
+            }
+
+            if (!weaponSystem.TryUnlockWeapon(selectedTarget))
+            {
+                Debug.LogError($"Weapon '{weapon.DisplayName}' passed shop validation but could not be unlocked.", this);
+                return;
+            }
+
+            SelectTarget(selectedTarget);
         }
 
         private Button CreateNode(Button template, Transform parent, string objectName, string label, Vector2 pos, Vector2 size)

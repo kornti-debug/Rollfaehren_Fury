@@ -19,6 +19,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private bool addExtraAugments = true;
 
         private readonly List<AugmentDefinition> offered = new List<AugmentDefinition>();
+        private readonly HashSet<AugmentDefinition> acquiredUnique = new HashSet<AugmentDefinition>();
         private bool extraAugmentsAdded;
 
         private void Awake()
@@ -48,7 +49,10 @@ namespace RollfaehrenFury.Prototype
             extraAugmentsAdded = true;
 
             BilgePumpAugment bilge = ScriptableObject.CreateInstance<BilgePumpAugment>();
-            bilge.InitRuntime("Bilge Pump", "Repair 1 ferry HP on every kill");
+            bilge.InitRuntime(
+                "Bilge Pump",
+                "Repair 0.5 ferry HP per kill, up to 10 HP each crossing",
+                false);
             pool.Add(bilge);
 
             ReloadFuryAugment fury = ScriptableObject.CreateInstance<ReloadFuryAugment>();
@@ -72,7 +76,7 @@ namespace RollfaehrenFury.Prototype
             List<AugmentDefinition> available = new List<AugmentDefinition>();
             foreach (AugmentDefinition augment in pool)
             {
-                if (augment != null)
+                if (augment != null && (augment.IsRepeatable || !acquiredUnique.Contains(augment)))
                 {
                     available.Add(augment);
                 }
@@ -116,10 +120,21 @@ namespace RollfaehrenFury.Prototype
         {
             if (index >= 0 && index < offered.Count && offered[index] != null)
             {
-                offered[index].Apply(new AugmentContext(gameManager, spawner));
+                AugmentDefinition selected = offered[index];
+                selected.Apply(new AugmentContext(gameManager, spawner));
+                if (!selected.IsRepeatable)
+                {
+                    acquiredUnique.Add(selected);
+                }
             }
 
             gameManager?.StartNextRound();
+        }
+
+        public void ResetRun()
+        {
+            acquiredUnique.Clear();
+            offered.Clear();
         }
     }
 }

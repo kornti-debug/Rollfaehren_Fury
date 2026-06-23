@@ -24,6 +24,9 @@ MonoBehaviour:
   magazineSize: 0
   reloadTime: 1.5
   reserveMagazines: 0
+  initiallyUnlocked: 1
+  unlockPrice: 0
+  minimumUnlockRound: 1
   projectileSpeed: 45
   projectileGravity: 18
   projectileLifetime: 4

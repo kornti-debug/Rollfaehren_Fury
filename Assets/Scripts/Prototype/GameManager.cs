@@ -34,7 +34,9 @@ namespace RollfaehrenFury.Prototype
         private int money;
         private int round = 1;
         private float perRoundHealFraction;
-        private int healPerKill;
+        private float healPerKill;
+        private float healPerKillCapPerCrossing;
+        private float healPerKillUsedThisCrossing;
         private bool killStreakEnabled;
         private int killStreakEvery = 5;
         private float killStreakSpeedMultiplier = 1.4f;
@@ -161,7 +163,9 @@ namespace RollfaehrenFury.Prototype
             IsPaused = false;
             IsInsideShop = false;
             perRoundHealFraction = 0f;
-            healPerKill = 0;
+            healPerKill = 0f;
+            healPerKillCapPerCrossing = 0f;
+            healPerKillUsedThisCrossing = 0f;
             killStreakEnabled = false;
             killStreakCount = 0;
             ferryHealth?.ResetHealth();
@@ -170,6 +174,7 @@ namespace RollfaehrenFury.Prototype
                 ferryHealth?.SetMaxHealth(testFerryMaxHealth, true);
             }
             shopManager?.ResetPurchases();
+            augmentSystem?.ResetRun();
             enemySpawner?.ResetAugments();
             enemySpawner?.StopRound(true);
             weaponSystem?.ResetAllWeapons(); // fresh run: clear weapon upgrades/augment buffs + full ammo (afterwards refill only via the shop)
@@ -205,9 +210,18 @@ namespace RollfaehrenFury.Prototype
             money += Mathf.Max(0, reward);
 
             // Bilge Pump augment: each kill patches a little ferry health.
-            if (healPerKill > 0)
+            if (healPerKill > 0f && ferryHealth != null)
             {
-                ferryHealth?.Heal(healPerKill);
+                float remaining = healPerKillCapPerCrossing > 0f
+                    ? Mathf.Max(0f, healPerKillCapPerCrossing - healPerKillUsedThisCrossing)
+                    : healPerKill;
+                float requested = Mathf.Min(healPerKill, remaining);
+                if (requested > 0f)
+                {
+                    float before = ferryHealth.CurrentHealth;
+                    ferryHealth.Heal(requested);
+                    healPerKillUsedThisCrossing += ferryHealth.CurrentHealth - before;
+                }
             }
 
             // Adrenaline augment: every Nth kill grants a short movement-speed burst.
@@ -347,9 +361,10 @@ namespace RollfaehrenFury.Prototype
             perRoundHealFraction += Mathf.Max(0f, fraction);
         }
 
-        public void AddHealPerKill(int amount)
+        public void AddHealPerKill(float amount, float capPerCrossing)
         {
-            healPerKill += Mathf.Max(0, amount);
+            healPerKill += Mathf.Max(0f, amount);
+            healPerKillCapPerCrossing += Mathf.Max(0f, capPerCrossing);
         }
 
         public void EnableKillStreakSpeed(int everyKills, float speedMultiplier, float duration)
@@ -409,6 +424,7 @@ namespace RollfaehrenFury.Prototype
 
             State = PrototypeGameState.Playing;
             IsShopOverlayOpen = false;
+            healPerKillUsedThisCrossing = 0f;
             SetPlayerInput(true, true);
             hud?.ShowGameplay();
             enemySpawner?.BeginRound(round, this);
