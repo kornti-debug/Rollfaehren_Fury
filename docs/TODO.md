@@ -128,6 +128,9 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add shop UI.
 - [x] Add visible chained shop unlocks: Harpoon -> Pistol -> Shotgun ->
   Assault Rifle, with predecessor, round, and price gates.
+- [ ] Verify weapon unlock progression in Play Mode: Harpoon-only start,
+  locked hotkeys/scroll, round 2/3/4 gates, exact prices, immediate equip, and
+  new-run reset.
 - [x] Add first upgrade: weapon damage.
 - [x] Add second upgrade: ferry health.
 - [x] Add third upgrade: fire rate.

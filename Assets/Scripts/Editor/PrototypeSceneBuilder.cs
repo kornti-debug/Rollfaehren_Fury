@@ -98,6 +98,32 @@ namespace RollfaehrenFury.Editor
             BuildPrototypeScene();
         }
 
+        [MenuItem("Rollfaehren Fury/Configure Weapon Unlock Progression")]
+        public static void ConfigureWeaponUnlockProgression()
+        {
+            ConfigureWeaponProgressionAssets();
+
+            Scene scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            WeaponSystem weaponSystem = Object.FindFirstObjectByType<WeaponSystem>();
+            if (weaponSystem == null)
+            {
+                Debug.LogError("Main.unity is missing WeaponSystem.");
+                return;
+            }
+
+            SetInt(weaponSystem, "startWeaponIndex", 0);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Weapon unlock progression configured without rebuilding Main.unity.");
+        }
+
+        public static void ConfigureWeaponUnlockProgressionFromCommandLine()
+        {
+            ConfigureWeaponUnlockProgression();
+        }
+
         [MenuItem("Rollfaehren Fury/Upgrade Ferry Round Flow Scene")]
         public static void UpgradeFerryRoundFlowScene()
         {
@@ -721,16 +747,27 @@ namespace RollfaehrenFury.Editor
             WeaponDefinition pistol = EnsureWeaponDefinition(
                 "Assets/Weapons/Pistol.asset", "Pistol", WeaponFireMode.Hitscan,
                 25f, 300f, 0.2f, 0.45f, 1, 0f);
+            ConfigureWeaponAmmo(pistol, false, 6, 1.2f, 4);
+            ConfigureWeaponProgression(pistol, false, 60, 2);
+
             WeaponDefinition shotgun = EnsureWeaponDefinition(
                 "Assets/Weapons/Shotgun.asset", "Shotgun", WeaponFireMode.Spread,
-                11f, 85f, 0.75f, 0f, 8, 12f);
+                13f, 190f, 0.75f, 0f, 10, 20f);
+            ConfigureWeaponAmmo(shotgun, false, 4, 2.2f, 8);
+            ConfigureWeaponProgression(shotgun, false, 110, 3);
+
             WeaponDefinition harpoon = EnsureWeaponDefinition(
                 "Assets/Weapons/Harpoon.asset", "Harpoon", WeaponFireMode.Projectile,
-                120f, 300f, 1.4f, 0f, 1, 0f,
+                140f, 300f, 1.4f, 0f, 1, 0f,
                 45f, 18f, 4f);
+            ConfigureWeaponAmmo(harpoon, false, 0, 1.5f, 0);
+            ConfigureWeaponProgression(harpoon, true, 0, 1);
+
             WeaponDefinition assaultRifle = EnsureWeaponDefinition(
                 "Assets/Weapons/Flamethrower.asset", "Assault Rifle", WeaponFireMode.Hitscan,
                 18f, 280f, 0.1f, 0.5f, 1, 1f);
+            ConfigureWeaponAmmo(assaultRifle, true, 20, 2f, 1);
+            ConfigureWeaponProgression(assaultRifle, false, 170, 4);
 
             GameObject weaponsParent = FindChild(camera.transform, "Weapons");
             if (weaponsParent != null)
@@ -756,7 +793,7 @@ namespace RollfaehrenFury.Editor
             SetObject(weaponSystem, "fireCamera", camera);
             SetObject(weaponSystem, "ignoredRoot", playerController.transform);
             SetObjectList(weaponSystem, "weapons", new Object[] { harpoonWeapon, pistolWeapon, shotgunWeapon, assaultRifleWeapon });
-            SetInt(weaponSystem, "startWeaponIndex", 1);
+            SetInt(weaponSystem, "startWeaponIndex", 0);
             return weaponSystem;
         }
 
@@ -809,6 +846,64 @@ namespace RollfaehrenFury.Editor
             SetFloat(definition, "projectileGravity", projectileGravity);
             SetFloat(definition, "projectileLifetime", projectileLifetime);
             return definition;
+        }
+
+        private static void ConfigureWeaponProgressionAssets()
+        {
+            ConfigureWeaponProgression(
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Weapons/Harpoon.asset"),
+                true,
+                0,
+                1);
+            ConfigureWeaponProgression(
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Weapons/Pistol.asset"),
+                false,
+                60,
+                2);
+            ConfigureWeaponProgression(
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Weapons/Shotgun.asset"),
+                false,
+                110,
+                3);
+            ConfigureWeaponProgression(
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Weapons/Flamethrower.asset"),
+                false,
+                170,
+                4);
+        }
+
+        private static void ConfigureWeaponAmmo(
+            WeaponDefinition definition,
+            bool automatic,
+            int magazineSize,
+            float reloadTime,
+            int reserveMagazines)
+        {
+            if (definition == null)
+            {
+                return;
+            }
+
+            SetBool(definition, "automatic", automatic);
+            SetInt(definition, "magazineSize", magazineSize);
+            SetFloat(definition, "reloadTime", reloadTime);
+            SetInt(definition, "reserveMagazines", reserveMagazines);
+        }
+
+        private static void ConfigureWeaponProgression(
+            WeaponDefinition definition,
+            bool initiallyUnlocked,
+            int unlockPrice,
+            int minimumUnlockRound)
+        {
+            if (definition == null)
+            {
+                return;
+            }
+
+            SetBool(definition, "initiallyUnlocked", initiallyUnlocked);
+            SetInt(definition, "unlockPrice", unlockPrice);
+            SetInt(definition, "minimumUnlockRound", minimumUnlockRound);
         }
 
         private static Transform[] EnsureSpawnPoints(Transform ferry)
