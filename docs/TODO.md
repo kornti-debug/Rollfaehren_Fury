@@ -187,6 +187,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Restore Fraunz as the visible player model at the correct ferry-deck height.
 - [x] Keep the player model static while the team creates its own animation work.
 - [ ] Later: connect team-authored idle/walking animation.
+- [x] Deck mirror for first-person animation visibility: `DeckMirrorSetup` (`Tools > Rollfaehren Fury > Setup Deck Mirror`) builds a selfie-camera → RenderTexture → deck-quad rig so the player can watch their own character animate. `MirrorInteractable` lists the run's active augments on `E` (reads `AugmentSystem.AcquiredAugments`, reset on New Game).
+- [ ] Verify the deck mirror in Unity: run the setup tool, position the "Deck Mirror" on the deck, confirm the animated captain shows in it, and that `E` toggles the active-augment list (and the list clears on New Game).
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.
