@@ -16,15 +16,14 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Falling below this world Y (into the river) is instant game over. Water surface sits ~7.3 and the deck ~9.6, so ~6 means the player is in the water.")]
         [SerializeField] private float fallDeathHeight = 6f;
         [SerializeField] private bool lockCursorOnPlay = true;
-        [SerializeField] private bool animateCharacter;
 
         private static readonly int IsWalkingId = Animator.StringToHash("IsWalking");
         private static readonly int IsIdleId = Animator.StringToHash("IsIdle");
-        private static readonly int IsJumpingId = Animator.StringToHash("IsJumping"); // Already defined here!
+        private static readonly int IsJumpingId = Animator.StringToHash("IsJumping");
         private static readonly int WalkingStateId = Animator.StringToHash("Base Layer.Armature|WalkCycle");
-        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|Idle");
+        private static readonly int IdleStateId = Animator.StringToHash("Base Layer.Armature|IdleCrossing");
         private static readonly string WalkingStateName = "Base Layer.Armature|WalkCycle";
-        private static readonly string IdleStateName = "Base Layer.Armature|Idle";
+        private static readonly string IdleStateName = "Base Layer.Armature|IdleCrossing";
 
         private CharacterController controller;
         private float pitch;
@@ -59,8 +58,7 @@ namespace RollfaehrenFury.Prototype
             controller = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
 
-            if (animateCharacter)
-            {
+            
                 if (animator == null)
                 {
                     Debug.LogWarning($"[{name}] Character animation is enabled, but no child Animator was found.", this);
@@ -68,16 +66,10 @@ namespace RollfaehrenFury.Prototype
                 else
                 {
                     ConfigureAnimator();
-                    CacheAnimatorParameters();
+                    // CacheAnimatorParameters();
                     Debug.Log($"[{name}] Character animation is enabled with controller '{animator.runtimeAnimatorController?.name ?? "<none>"}'. " +
                               $"States: idle='{IdleStateName}', walk='{WalkingStateName}'. Parameters: IsWalking={animatorHasIsWalking}, IsIdle={animatorHasIsIdle}, IsJumping={animatorHasIsJumping}.", this);
                 }
-            }
-            else if (animator != null)
-            {
-                Debug.Log($"[{name}] Character animation is disabled; child Animator '{animator.name}' will stay static.", this);
-                animator = null;
-            }
 
             if (cameraRoot == null)
             {
@@ -376,27 +368,15 @@ namespace RollfaehrenFury.Prototype
         {
             if (animator == null)
             {
+                Debug.Log("Animator is null");
                 return;
             }
 
             bool isMoving = moveInput.sqrMagnitude > 0.001f;
-
-            if (animatorHasIsWalking)
-            {
-                animator.SetBool(IsWalkingId, isMoving);
-            }
-
-            if (animatorHasIsIdle)
-            {
-                animator.SetBool(IsIdleId, !isMoving);
-            }
-
-            // Added: Update the IsJumping parameter on the Animator
-            if (animatorHasIsJumping)
-            {
-                animator.SetBool(IsJumpingId, isJumping);
-            }
-
+            animator.SetBool(IsWalkingId, isMoving);
+            animator.SetBool(IsIdleId, !isMoving);
+            animator.SetBool(IsJumpingId, isJumping);
+            
             int targetStateId = isMoving ? WalkingStateId : IdleStateId;
             if (isMoving != lastLoggedIsMoving || targetStateId != lastLoggedTargetStateId)
             {
@@ -405,7 +385,7 @@ namespace RollfaehrenFury.Prototype
                 lastLoggedTargetStateId = targetStateId;
             }
 
-//            PlayAnimationState(targetStateId, !isMoving);
+            PlayAnimationState(targetStateId, !isMoving);
             animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
         }
 
