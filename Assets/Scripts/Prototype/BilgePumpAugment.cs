@@ -6,11 +6,12 @@ namespace RollfaehrenFury.Prototype
     [CreateAssetMenu(menuName = "Rollfaehren Fury/Augments/Bilge Pump", fileName = "BilgePumpAugment")]
     public sealed class BilgePumpAugment : AugmentDefinition
     {
-        [SerializeField, Min(0)] private int healPerKill = 1;
+        [SerializeField, Min(0f)] private float healPerKill = 0.5f;
+        [SerializeField, Min(0f)] private float maxHealPerCrossing = 10f;
 
         public override void Apply(AugmentContext context)
         {
-            context?.GameManager?.AddHealPerKill(healPerKill);
+            context?.GameManager?.AddHealPerKill(healPerKill, maxHealPerCrossing);
         }
     }
 }

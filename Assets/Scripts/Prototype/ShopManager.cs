@@ -279,7 +279,7 @@ namespace RollfaehrenFury.Prototype
         {
             switch (kind)
             {
-                case UpgradeKind.Damage: weapon.MultiplyDamage(1.25f); break;
+                case UpgradeKind.Damage: weapon.MultiplyDamage(1.2f); break;
                 case UpgradeKind.FireRate: weapon.MultiplyCooldown(0.82f); break;
                 case UpgradeKind.MagazineSize: weapon.AddMagazineSize(MagazineIncreaseFor(weapon)); break;
                 case UpgradeKind.ReserveCapacity: weapon.AddReserveMagazines(1); break;
@@ -323,7 +323,7 @@ namespace RollfaehrenFury.Prototype
         {
             switch (kind)
             {
-                case UpgradeKind.Damage: return "Damage +25%";
+                case UpgradeKind.Damage: return "Damage +20%";
                 case UpgradeKind.FireRate: return "Fire Rate";
                 case UpgradeKind.MagazineSize: return $"Magazine +{MagazineIncreaseFor(weapon)}";
                 case UpgradeKind.ReserveCapacity: return "Reserve +1 mag";
@@ -349,7 +349,16 @@ namespace RollfaehrenFury.Prototype
 
         private static int KindMaxLevel(UpgradeKind kind)
         {
-            return kind == UpgradeKind.Ricochet ? 1 : 3;
+            switch (kind)
+            {
+                case UpgradeKind.Ricochet:
+                    return 1;
+                case UpgradeKind.MagazineSize:
+                case UpgradeKind.ReserveCapacity:
+                    return 3;
+                default:
+                    return 5;
+            }
         }
 
         private static int MagazineIncreaseFor(Weapon weapon)

@@ -97,7 +97,8 @@ Planned systems and responsibilities:
   Purchasing ownership equips the weapon immediately and replaces the unlock
   node with Damage, Fire Rate, Magazine Size, Reserve Capacity, Reload/Refill,
   or Harpoon Ricochet upgrades. Magazine and reserve capacity have three
-  levels; refill is repeatable and restores the upgraded cap.
+  levels; damage, fire rate, and reload have five; refill is repeatable and
+  restores the upgraded cap.
   Spending goes through `GameManager.TrySpendMoney`; locked weapons cannot be
   upgraded.
 - `ShopInteractable` (Track C): vending-machine interaction available while
@@ -115,7 +116,7 @@ Planned systems and responsibilities:
   `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
-- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (heal per kill), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; the kill-triggered ones route through `GameManager.RegisterEnemyKilled`. The shop popup no longer appears at round end — shopping is the automat, round end is the augment draft.
+- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Definitions are repeatable by default and can be explicitly unique; acquired unique definitions are removed from later drafts and reset on New Game. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (unique, 0.5 heal per kill capped at 10 actual HP per crossing), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
 - `FerryController`: moves a kinematic ferry between two dock transforms,
   follows a sampled cubic route aligned to each dock's forward direction,
   carries the player through matching translation and rotation, reports

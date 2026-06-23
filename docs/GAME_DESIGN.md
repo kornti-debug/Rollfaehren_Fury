@@ -141,11 +141,19 @@ Prototype shop:
 - Show the chained weapon unlocks and per-weapon upgrade tree.
 - Keep locked weapon requirements visible.
 - Allow buying multiple affordable upgrades during preparation.
+- Damage, fire-rate, and reload can reach five levels, allowing a focused
+  single-weapon build. Damage adds `20%` multiplicatively per level.
 - Ammo weapons can permanently expand their loaded magazine and spare-magazine
   capacity up to three times, or pay for a repeatable refill to restore the
   current capacity.
 - Magazine growth is weapon-specific: Pistol `+2`, Shotgun `+1`, and Assault
   Rifle `+5` rounds per level. Reserve Capacity adds one spare magazine.
+
+Augment rules:
+
+- Augments are repeatable unless explicitly marked unique.
+- Bilge Pump is unique per run and restores `0.5` ferry HP per kill, capped at
+  `10` HP actually restored during each crossing.
 
 ## MVP Boundaries
 

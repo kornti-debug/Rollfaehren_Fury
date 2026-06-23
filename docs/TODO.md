@@ -148,8 +148,13 @@ This list is the working task board for the prototype. Keep it practical and upd
   Magazine (Pistol `+2`, Shotgun `+1`, Assault Rifle `+5`) and Reserve Capacity
   (`+1` spare magazine), each capped at three levels. Newly added capacity is
   filled immediately; Refill Ammo remains a repeatable `$20` purchase.
-- [x] Weapon Damage upgrade is now a **percentage** (+25%/buy) instead of flat +10, so it scales every weapon evenly (no more per-pellet blow-up on the shotgun). Harpoon base damage 120 → 140 (one-shots fish through ~round 6).
-- [x] Node-tree shop: `ShopManager` now builds a per-weapon upgrade tree at runtime (click a weapon node → lines branch to its upgrade nodes). Per weapon: Damage (+25%/level, escalating cost), Fire Rate; ammo weapons also Magazine Size, Reserve Capacity, Faster Reload, and Refill Ammo; Harpoon gets Ricochet. Replaces the flat catalog shop; the old `UpgradeDefinition` assets are now dormant.
+- [x] Weapon Damage upgrade is percentage-based (`+20%` per purchase) instead
+  of flat damage, so it scales every weapon consistently without excessive
+  per-pellet growth on the Shotgun.
+- [x] Node-tree shop: `ShopManager` builds a per-weapon upgrade tree at runtime.
+  Damage, Fire Rate, and Faster Reload reach level 5; Magazine Size and Reserve
+  Capacity reach level 3; Harpoon Ricochet reaches level 1; Refill is
+  repeatable. The old `UpgradeDefinition` catalog is dormant.
 - [ ] Verify ammo-capacity purchases in Unity: locked weapons expose no
   upgrades, magazine/reserve purchases fill their added capacity, larger
   magazines also enlarge each spare magazine, refill restores the upgraded
@@ -159,10 +164,18 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
-- [x] Shop: Close/Exit button in the automat overlay; each upgrade max 3 buys, Querschläger 1.
+- [x] Shop: Close/Exit button in the automat overlay; core weapon upgrades
+  allow 5 buys, ammo capacity 3, and Querschläger/Ricochet 1.
 - [x] Track C: round-end augment draft (1 of 3) replaces the round-end shop popup; picking advances the round.
 - [x] Track C augments v1: Tailwind, Repair Kit, The Swarm, Bruisers (+ EnemySpawner count/health multipliers, crossing speedup, per-round heal, reset on new game).
-- [x] Track C augments v2 (added to the pool at runtime): Bilge Pump (heal per kill), Reload Fury (+50% damage 10s after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+40% move speed 5s every 5th kill). Kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
+- [x] Track C augments v2 (added to the pool at runtime): Bilge Pump (unique;
+  heal `0.5` per kill, maximum `10` actual HP per crossing), Reload Fury (+50%
+  damage 10s after each reload), Rapid Reload (−30% reload on all weapons),
+  Adrenaline (+40% move speed 5s every 5th kill). Augments are repeatable unless
+  explicitly unique, and acquired unique choices reset on New Game.
+- [ ] Verify specialization and Bilge Pump in Unity: core upgrades stop at
+  level 5, ammo capacity stops at level 3, Bilge Pump is not offered twice,
+  and it restores no more than 10 HP during one crossing.
 - [ ] Verify augments in Unity: survive a round → draft shows the new augments → pick → effect applies (heal-on-kill, post-reload damage, faster reload, kill-streak speed).
 - [ ] Later: mechanic-heavy augments (mines, gulls, oil slick, shield...) + the spec's master weapon upgrades.
 - [ ] Track C: round-end augment draft (1 of 3) — replaces the round-end shop popup. (Next.)
