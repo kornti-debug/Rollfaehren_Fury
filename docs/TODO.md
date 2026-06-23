@@ -126,6 +126,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add round completion reward.
 - [x] Add money display.
 - [x] Add shop UI.
+- [x] Add visible chained shop unlocks: Harpoon -> Pistol -> Shotgun ->
+  Assault Rifle, with predecessor, round, and price gates.
 - [x] Add first upgrade: weapon damage.
 - [x] Add second upgrade: ferry health.
 - [x] Add third upgrade: fire rate.

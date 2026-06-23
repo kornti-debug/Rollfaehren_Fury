@@ -91,7 +91,13 @@ Planned systems and responsibilities:
 - `SwarmMovement`: implemented — boids flocking auto-attached to each `SimpleEnemy` at runtime; blends separation/alignment/cohesion with a seek toward the ferry (2D for Surface enemies, 3D for Flying). `EnemySpawner` spawns continuous swarms with an intercept-lead origin ahead of and beside the moving ferry, constrained to the water bounds, and ramps difficulty per round: swarm size grows (`baseSwarmMin/Max` + `swarmSizePerRound`, capped) while the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored at `minSwarmInterval`); round 1 is extra-gentle (`firstRoundIntervalFactor`) so it is beatable with the harpoon/pistol. `SimpleHUD` shows the bottom-right weapon panel (RPM + ammo), animated HP/crossing bars, and a centered reload bar that appears only while reloading; `RoundStartConsole` shows a billboard "Start Crossing" label above the lever.
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
 - `UpgradeDefinition` (Track B): the original polymorphic ScriptableObject upgrade system (`WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, `RicochetUpgrade`, plus the runtime ammo set). The node-tree `ShopManager` no longer uses it (it applies upgrades to weapons directly), so these classes/assets are currently dormant — kept for reference, prune when convenient.
-- `ShopManager` (node-tree shop): implemented — builds a per-weapon upgrade tree at runtime under the Shop Panel. The player clicks a weapon node and connecting line `Image`s branch out to that weapon's upgrade nodes. Every weapon offers Damage (+25%/level) and Fire Rate; ammo weapons also get Faster Reload + Refill Ammo (`Weapon.RefillAmmo`, tops the magazine + reserve to the current cap, disabled when full); the Harpoon gets Ricochet (wired through `Projectile` so the thrown harpoon chains to the nearest enemy). Leveled upgrades use an escalating cost and apply to that specific weapon via `WeaponSystem.WeaponAt`; spending goes through `GameManager.TrySpendMoney`. No `UpgradeDefinition` assets or scene wiring needed.
+- `ShopManager` (node-tree shop): implemented — keeps all weapon nodes visible.
+  Owned weapons show their existing upgrade branches; locked weapons show one
+  unlock node with predecessor, minimum-round, and price requirements.
+  Purchasing ownership equips the weapon immediately and replaces the unlock
+  node with Damage, Fire Rate, Reload/Refill, or Harpoon Ricochet upgrades.
+  Spending goes through `GameManager.TrySpendMoney`; locked weapons cannot be
+  upgraded.
 - `ShopInteractable` (Track C): vending-machine interaction available while
   inside the shared shop during `Preparation`; it uses the shared
   `Player/Interact` action.

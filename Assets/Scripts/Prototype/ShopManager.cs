@@ -13,7 +13,7 @@ namespace RollfaehrenFury.Prototype
     /// </summary>
     public sealed class ShopManager : MonoBehaviour
     {
-        private enum UpgradeKind { Damage, FireRate, Reload, Refill, Ricochet }
+        private enum UpgradeKind { Unlock, Damage, FireRate, Reload, Refill, Ricochet }
 
         [SerializeField] private GameManager gameManager;
         [SerializeField] private WeaponSystem weaponSystem;
@@ -33,6 +33,7 @@ namespace RollfaehrenFury.Prototype
         private const float UpgradeNodeSpacing = 46f;
         private static readonly Vector2 WeaponNodeSize = new Vector2(155f, 40f);
         private static readonly Vector2 UpgradeNodeSize = new Vector2(176f, 38f);
+        private static readonly Vector2 UnlockNodeSize = new Vector2(230f, 64f);
 
         private readonly Dictionary<(int target, UpgradeKind kind), int> levels = new Dictionary<(int, UpgradeKind), int>();
         private readonly List<Button> weaponNodes = new List<Button>();
@@ -58,13 +59,20 @@ namespace RollfaehrenFury.Prototype
         public void OpenShop()
         {
             EnsureBuilt();
-            RefreshTree();
+            if (built && weaponSystem != null && weaponSystem.WeaponCount > 0)
+            {
+                SelectTarget(Mathf.Clamp(selectedTarget, 0, weaponSystem.WeaponCount - 1));
+            }
         }
 
         public void ResetPurchases()
         {
             levels.Clear();
-            RefreshTree();
+            selectedTarget = 0;
+            if (built)
+            {
+                SelectTarget(0);
+            }
         }
 
         // The old flat-list buttons (now hidden) still reference this through their serialized
@@ -150,8 +158,13 @@ namespace RollfaehrenFury.Prototype
                 }
 
                 Vector2 pos = new Vector2(UpgradeColumnX, ColumnY(i, count, UpgradeNodeSpacing));
-                ((RectTransform)upgradeSlots[i].transform).anchoredPosition = pos;
-                SetLine(lines[i], fromEdge, new Vector2(pos.x - UpgradeNodeSize.x * 0.5f, pos.y));
+                Vector2 nodeSize = currentKinds[i] == UpgradeKind.Unlock
+                    ? UnlockNodeSize
+                    : UpgradeNodeSize;
+                RectTransform slotRect = (RectTransform)upgradeSlots[i].transform;
+                slotRect.anchoredPosition = pos;
+                slotRect.sizeDelta = nodeSize;
+                SetLine(lines[i], fromEdge, new Vector2(pos.x - nodeSize.x * 0.5f, pos.y));
             }
 
             HighlightSelectedNode();
@@ -162,12 +175,19 @@ namespace RollfaehrenFury.Prototype
         {
             int money = gameManager != null ? gameManager.Money : 0;
             Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(selectedTarget) : null;
+            RefreshWeaponNodes();
 
             for (int i = 0; i < currentKinds.Count && i < upgradeSlots.Count; i++)
             {
                 UpgradeKind kind = currentKinds[i];
                 Button slot = upgradeSlots[i];
                 Text label = slot.GetComponentInChildren<Text>();
+
+                if (kind == UpgradeKind.Unlock)
+                {
+                    RefreshUnlockSlot(slot, label, weapon, money);
+                    continue;
+                }
 
                 if (kind == UpgradeKind.Refill)
                 {
@@ -210,6 +230,12 @@ namespace RollfaehrenFury.Prototype
             }
 
             UpgradeKind kind = currentKinds[slot];
+            if (kind == UpgradeKind.Unlock)
+            {
+                BuyWeaponUnlock(weapon);
+                return;
+            }
+
             if (kind == UpgradeKind.Refill)
             {
                 if (weapon.IsAmmoFull || !gameManager.TrySpendMoney(refillCost))
@@ -255,6 +281,12 @@ namespace RollfaehrenFury.Prototype
             Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(target) : null;
             if (weapon == null)
             {
+                yield break;
+            }
+
+            if (!weaponSystem.IsWeaponUnlocked(target))
+            {
+                yield return UpgradeKind.Unlock;
                 yield break;
             }
 
@@ -344,11 +376,99 @@ namespace RollfaehrenFury.Prototype
                 Image image = weaponNodes[i].GetComponent<Image>();
                 if (image != null)
                 {
-                    image.color = i == selectedTarget
-                        ? new Color(0.18f, 0.42f, 0.70f, 0.95f)
-                        : new Color(0.10f, 0.14f, 0.20f, 0.90f);
+                    bool unlocked = weaponSystem != null && weaponSystem.IsWeaponUnlocked(i);
+                    if (i == selectedTarget)
+                    {
+                        image.color = unlocked
+                            ? new Color(0.18f, 0.42f, 0.70f, 0.95f)
+                            : new Color(0.58f, 0.38f, 0.10f, 0.95f);
+                    }
+                    else
+                    {
+                        image.color = unlocked
+                            ? new Color(0.10f, 0.14f, 0.20f, 0.90f)
+                            : new Color(0.16f, 0.16f, 0.18f, 0.90f);
+                    }
                 }
             }
+        }
+
+        private void RefreshWeaponNodes()
+        {
+            for (int i = 0; i < weaponNodes.Count; i++)
+            {
+                Button node = weaponNodes[i];
+                Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(i) : null;
+                if (node == null || weapon == null)
+                {
+                    continue;
+                }
+
+                Text label = node.GetComponentInChildren<Text>();
+                if (label != null)
+                {
+                    label.text = weaponSystem.IsWeaponUnlocked(i)
+                        ? weapon.DisplayName
+                        : $"{weapon.DisplayName}\nLOCKED";
+                }
+            }
+
+            HighlightSelectedNode();
+        }
+
+        private void RefreshUnlockSlot(Button slot, Text label, Weapon weapon, int money)
+        {
+            WeaponDefinition definition = weapon != null ? weapon.Definition : null;
+            if (definition == null || weaponSystem == null || gameManager == null)
+            {
+                slot.interactable = false;
+                if (label != null)
+                {
+                    label.text = "Unavailable";
+                }
+
+                return;
+            }
+
+            bool prerequisiteOwned = selectedTarget == 0 || weaponSystem.IsWeaponUnlocked(selectedTarget - 1);
+            bool canUnlock = weaponSystem.CanUnlockWeapon(selectedTarget, gameManager.Round);
+            slot.interactable = canUnlock && money >= definition.UnlockPrice;
+
+            if (label == null)
+            {
+                return;
+            }
+
+            string requirement = string.Empty;
+            if (!prerequisiteOwned)
+            {
+                Weapon prerequisite = weaponSystem.WeaponAt(selectedTarget - 1);
+                string prerequisiteName = prerequisite != null ? prerequisite.DisplayName : "previous weapon";
+                requirement = $"\nRequires {prerequisiteName}";
+            }
+
+            label.text =
+                $"Unlock {weapon.DisplayName}\n${definition.UnlockPrice} | Round {definition.MinimumUnlockRound}{requirement}";
+        }
+
+        private void BuyWeaponUnlock(Weapon weapon)
+        {
+            WeaponDefinition definition = weapon.Definition;
+            if (definition == null
+                || !weaponSystem.CanUnlockWeapon(selectedTarget, gameManager.Round)
+                || !gameManager.TrySpendMoney(definition.UnlockPrice))
+            {
+                RefreshTree();
+                return;
+            }
+
+            if (!weaponSystem.TryUnlockWeapon(selectedTarget))
+            {
+                Debug.LogError($"Weapon '{weapon.DisplayName}' passed shop validation but could not be unlocked.", this);
+                return;
+            }
+
+            SelectTarget(selectedTarget);
         }
 
         private Button CreateNode(Button template, Transform parent, string objectName, string label, Vector2 pos, Vector2 size)
