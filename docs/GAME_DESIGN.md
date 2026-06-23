@@ -42,9 +42,10 @@ sideways across the full river or stop beyond a jetty on land.
 
 The current MVP uses `Assets/Scenes/Bootstrap.unity` as the first build scene,
 `Assets/Scenes/Menu.unity` for New Game, Settings, and Quit, and
-`Assets/Scenes/Main.unity` for gameplay. The shared `ShopInterior.unity` loads
-additively during preparation. Pause, augment, and game over remain overlays or
-states owned by Main.
+`Assets/Scenes/Main.unity` for gameplay. Settings include Master, Music, SFX,
+and mouse-sensitivity sliders shared between Menu and the gameplay pause
+screen. The shared `ShopInterior.unity` loads additively during preparation.
+Pause, augment, and game over remain overlays or states owned by Main.
 
 ## Player Fantasy
 
@@ -160,6 +161,9 @@ Prototype shop:
   single-weapon build. Damage adds `20%` multiplicatively per level.
 - Ammo weapons can buy `Extra Magazine +1` up to three times, or pay for a
   repeatable refill to restore the current capacity.
+- Use the authored four-tab / four-card UGUI layout rather than the retired
+  generated node graph. Harpoon hides unused ammo cards and uses Ricochet as
+  its special upgrade.
 
 Augment rules:
 
@@ -187,6 +191,6 @@ Do not block the MVP on:
 - Final ferry model
 - Complex enemy animation
 - Perfect balancing
-- Full UI polish
+- Final UI polish beyond the authored prototype layouts
 - More than one weapon
 - Cargo, until the ferry-only loop is stable

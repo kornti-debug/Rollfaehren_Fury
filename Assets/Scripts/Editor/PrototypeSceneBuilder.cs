@@ -1266,36 +1266,12 @@ namespace RollfaehrenFury.Editor
 
         private static ShopManager EnsureShopManager(GameManager gameManager)
         {
-            UpgradeDefinition[] catalog =
-            {
-                EnsureUpgrade<WeaponDamageUpgrade>("Assets/Upgrades/WeaponDamage.asset", "Damage +10", "More weapon damage.", 10, 3,
-                    upgrade => SetFloat(upgrade, "amount", 10f)),
-                EnsureUpgrade<FireRateUpgrade>("Assets/Upgrades/FireRate.asset", "Fire Rate +18%", "Faster fire rate.", 10, 3,
-                    upgrade => SetFloat(upgrade, "cooldownMultiplier", 0.82f)),
-                EnsureUpgrade<FerryHealthUpgrade>("Assets/Upgrades/FerryHealth.asset", "Repair + Max HP", "Heal and raise ferry max health.", 10, 3,
-                    upgrade => SetFloat(upgrade, "amount", 25f)),
-                EnsureUpgrade<RicochetUpgrade>("Assets/Upgrades/Ricochet.asset", "Querschlaeger (Master)", "Shots ricochet to the nearest enemy.", 30, 1,
-                    upgrade => SetInt(upgrade, "bounces", 1)),
-            };
-
             ShopManager shopManager = EnsureComponent<ShopManager>(gameManager.gameObject);
             SetObject(shopManager, "gameManager", gameManager);
-            SetObjectList(shopManager, "catalog", catalog);
-
-            Button[] shopButtons = new Button[catalog.Length];
-            for (int i = 0; i < shopButtons.Length; i++)
-            {
-                Button button = FindSceneButton($"Shop Upgrade Button {i}");
-                shopButtons[i] = button;
-                if (button != null)
-                {
-                    button.onClick.RemoveAllListeners();
-                    UnityEventTools.AddIntPersistentListener(button.onClick, shopManager.Buy, i);
-                    EditorUtility.SetDirty(button);
-                }
-            }
-
-            SetObjectList(shopManager, "buttons", shopButtons);
+            SetObject(shopManager, "weaponSystem", Object.FindFirstObjectByType<WeaponSystem>());
+            SetObjectList(shopManager, "weaponTabs", FindSceneButtons("Weapon Tab ", 4));
+            SetObjectList(shopManager, "upgradeCards", FindSceneButtons("Upgrade Card ", 4));
+            SetObject(shopManager, "refillButton", FindSceneButton("Refill Ammo Button"));
             SetObject(gameManager, "shopManager", shopManager);
             return shopManager;
         }
@@ -1639,6 +1615,15 @@ namespace RollfaehrenFury.Editor
             GameplayMenuInput pauseInput = EnsureComponent<GameplayMenuInput>(inputObject);
             SetObject(pauseInput, "gameManager", gameManager);
 
+            if (hud != null && hud.GetComponent<UiLayoutMarker>() != null)
+            {
+                Transform existingPause = hud.transform.Find("Pause Panel");
+                Transform existingSettings = hud.transform.Find("Pause Settings Panel");
+                SetObject(pauseInput, "pausePanel", existingPause != null ? existingPause.gameObject : null);
+                SetObject(pauseInput, "settingsPanel", existingSettings != null ? existingSettings.gameObject : null);
+                return;
+            }
+
             Transform oldPause = hud.transform.Find("Pause Panel");
             if (oldPause != null)
             {
@@ -1748,6 +1733,11 @@ namespace RollfaehrenFury.Editor
         private static SimpleHUD EnsureHud()
         {
             GameObject canvasObject = GameObject.Find("Rollfaehren Fury Prototype HUD");
+            if (canvasObject != null && canvasObject.GetComponent<UiLayoutMarker>() != null)
+            {
+                return EnsureComponent<SimpleHUD>(canvasObject);
+            }
+
             if (canvasObject != null)
             {
                 Object.DestroyImmediate(canvasObject);
@@ -1900,6 +1890,17 @@ namespace RollfaehrenFury.Editor
             }
 
             return null;
+        }
+
+        private static Button[] FindSceneButtons(string prefix, int count)
+        {
+            Button[] buttons = new Button[count];
+            for (int i = 0; i < count; i++)
+            {
+                buttons[i] = FindSceneButton($"{prefix}{i}");
+            }
+
+            return buttons;
         }
 
         private static Text CreateText(Transform parent, string name, string text, Vector2 anchoredPosition, Vector2 size, int fontSize, TextAnchor alignment, TextAnchor anchor = TextAnchor.UpperLeft)
