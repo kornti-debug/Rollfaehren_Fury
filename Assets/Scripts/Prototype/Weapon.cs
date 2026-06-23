@@ -62,6 +62,8 @@ namespace RollfaehrenFury.Prototype
         /// <summary>True when the magazine and reserve are both topped up (or the weapon is unlimited).</summary>
         public bool IsAmmoFull { get { EnsureStats(); return magazineSize <= 0 || (currentAmmo >= magazineSize && currentReserve >= maxReserve); } }
         public bool IsReloading => isReloading;
+        /// <summary>True while this is the selected weapon — used to show/hide its first-person model.</summary>
+        public bool IsEquipped => isEquipped;
 
         /// <summary>0 at reload start, 1 when the magazine is ready again (1 while not reloading).</summary>
         public float ReloadProgress01
