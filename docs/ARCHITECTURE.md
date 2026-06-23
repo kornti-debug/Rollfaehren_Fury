@@ -152,6 +152,7 @@ Planned systems and responsibilities:
 - The player's hidden controller capsule owns the camera, movement, weapons,
   and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose. Falling below `SimpleFPSController.fallDeathHeight` (into the river) calls `GameManager.TriggerGameOver`, so leaving the ferry ends the run.
 - `Cargo`: later destructible cargo with reward value.
+- Deck mirror (`MirrorInteractable` + the `DeckMirrorSetup` editor tool): a selfie-style camera mounted on the ferry renders the player into a RenderTexture shown — horizontally flipped, so it reads like a mirror — on a deck quad, making the otherwise-unseen first-person character animations visible. Pressing `Player/Interact` in front of it toggles a panel listing the run's active augments (`AugmentSystem.AcquiredAugments`, grouped with counts). `Tools > Rollfaehren Fury > Setup Deck Mirror` builds + wires the camera, RenderTexture, material, quad, and UI. Pure readout — it changes no game state.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
 prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
