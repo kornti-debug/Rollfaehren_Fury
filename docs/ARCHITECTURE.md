@@ -73,9 +73,18 @@ Planned systems and responsibilities:
 - `GameplayMenuInput`: owns the in-game pause overlay. Cancel/Esc closes an
   open shop first, opens or resumes pause, and navigates back from pause settings.
 - `HealthSystem`: max health, current health, damage, death event.
-- `WeaponSystem`: implemented (Track A) — owns the player's weapons and the firing input (`Player/Attack`), switches the active weapon (digit keys / scroll), reloads on `R`, and forwards fire/hit events so HUD and audio do not care which weapon is active. Automatic weapons keep firing while the button is held; semi-auto weapons fire one shot per press. Exposes ammo / reload state for the HUD.
+- `WeaponSystem`: implemented (Track A) — owns the player's weapons, per-run
+  ownership state, and the firing input (`Player/Attack`). Fixed digit slots
+  refuse locked weapons, scroll skips them, and unlocking equips the new
+  weapon immediately. It reloads on `R` and forwards fire/hit/change/unlock
+  events so HUD, viewmodels, shop, and audio do not care which weapon is
+  active.
 - `Weapon`: implemented — data-driven runtime weapon. Reads a `WeaponDefinition` and fires by fire mode (hitscan / spread / projectile). Keeps runtime copies of the stats, so upgrades never mutate the shared asset. Owns the magazine + reserve: each shot consumes a round, an empty magazine (or pressing `R`) starts a timed reload that draws from the reserve, and firing the last round auto-reloads. The reload only advances while the weapon is equipped, so switching weapons pauses it instead of finishing it in the background. Magazine size 0 means unlimited ammo (no reload, no reserve). `RefillAmmo` restores magazine + reserve; runtime upgrade hooks adjust magazine size, reserve, and reload time.
-- `WeaponDefinition`: implemented — ScriptableObject of weapon stats (fire mode, damage, range, cooldown, aim assist, pellets, spread angle, automatic flag, magazine size, reload time, reserve magazines). Assets live in `Assets/Weapons/` (Pistol — semi-auto, 6 rds + 8 spare mags; Shotgun — semi-auto, 4 rds + 8; Harpoon — unlimited; Assault Rifle — automatic, 20 rds + 6; the rifle still uses the `Flamethrower.asset` file/GUID to preserve scene references). Ammo refills to full at the start of a run and otherwise only through the shop.
+- `WeaponDefinition`: implemented — ScriptableObject of combat stats plus
+  progression metadata (`InitiallyUnlocked`, unlock price, minimum round).
+  Assets live in `Assets/Weapons/`; the rifle still uses the
+  `Flamethrower.asset` file/GUID to preserve scene references. Runtime upgrades
+  never mutate these shared assets.
 - `WeaponTracer`: implemented — placeholder shot visual. Pooled `LineRenderer`s draw a brief muzzle→hit line so hitscan/spread shots are visible while there are no weapon/projectile assets. The HUD also shows the active weapon name + slot, updated on switch.
 - `Projectile`: implemented — a thrown projectile that flies a gravity parabola, raycasts its own path to hit `Health`, then despawns (placeholder cube + trail). Spawned by `Weapon` for `WeaponFireMode.Projectile` (the Harpoon).
 - `WeaponVisuals`: implemented — per-weapon first-person visual layer. Reacts to `Weapon` events to show the model only while equipped, play a muzzle flash + recoil on fire, an impact effect at the hit point, fire/reload sounds, and a procedural reload dip (optional mag-drop) synced to the reload timer. Purely cosmetic — no gameplay logic. Models/FX come from the imported `Assets/Easy Weapons` art (its own scripts removed; materials converted to URP). The editor tool `WeaponViewmodelSetup` (`Tools > Rollfaehren Fury > Setup Weapon Viewmodels`) instantiates the Pistol/Shotgun/M4 models under the fire camera, forces their textured URP material on, and wires `WeaponVisuals` (cosmetic-only: colliders stripped, Ignore Raycast layer). The Harpoon has no gun model.
