@@ -106,14 +106,14 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add round-based spawn scaling.
 - [x] Align enemy spawn points with the terrain river surface.
 - [x] Add separate fish and pigeon enemy profiles with surface/flying movement.
-- [x] Add weighted round unlocks: fish from round 1, pigeons from round 2.
+- [x] Weighted enemy profiles via per-profile `firstRound`; both fish and pigeons now spawn from round 1 with equal `spawnWeight` (0.5/0.5, so a 50/50 random mix). (Pigeons were round-2; moved to round 1 since per-round difficulty now comes from swarm-size growth, not enemy variety.)
 - [x] Replace full spawn rings with ferry-relative forward attack arcs.
 - [x] Reject spawn points behind the ferry after hierarchy/model changes.
 - [x] Lock fish spawning and movement to world Y `7`.
 - [x] Pace enemy spawns across 5%-90% of ferry crossing progress.
 - [x] Raise fish/pigeon speed moderately for the moving-ferry encounter.
 - [x] Attach the looping flight Animator to the pigeon prefab.
-- [ ] Verify round 1 fish-only spawning and round 2 weighted pigeon spawning.
+- [ ] Verify round 1 spawns a mixed fish/pigeon stream (~50/50, random), single enemies per swarm, and that birds dive onto the ferry.
 - [x] Swarm flocking (`SwarmMovement`, boids) auto-attached to enemies; cluster spawns with varied size.
 - [x] Intercept-lead spawn: swarms spawn ahead + to the side of the moving ferry (computed lead) so they reach its flank instead of trailing behind; spawns constrained to the water-surface bounds.
 - [x] Single absolute enemy speed (`enemyBaseSpeed`); continuous swarm stream is now the normal spawn behavior (crossing-paced/flood-test path removed).
@@ -185,6 +185,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Restore Fraunz as the visible player model at the correct ferry-deck height.
 - [x] Keep the player model static while the team creates its own animation work.
 - [ ] Later: connect team-authored idle/walking animation.
+- [x] Deck mirror for first-person animation visibility: `DeckMirrorSetup` (`Tools > Rollfaehren Fury > Setup Deck Mirror`) builds a selfie-camera → RenderTexture → deck-quad rig so the player can watch their own character animate. `MirrorInteractable` lists the run's active augments on `E` (reads `AugmentSystem.AcquiredAugments`, reset on New Game).
+- [ ] Verify the deck mirror in Unity: run the setup tool, position the "Deck Mirror" on the deck, confirm the animated captain shows in it, and that `E` toggles the active-augment list (and the list clears on New Game).
 - [x] Prototype shore placeholders.
 - [x] Start environment terrain branch.
 - [x] Add URP-safe temporary river water material.

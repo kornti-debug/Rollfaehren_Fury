@@ -20,7 +20,12 @@ namespace RollfaehrenFury.Prototype
 
         private readonly List<AugmentDefinition> offered = new List<AugmentDefinition>();
         private readonly HashSet<AugmentDefinition> acquiredUnique = new HashSet<AugmentDefinition>();
+        private readonly List<AugmentDefinition> acquired = new List<AugmentDefinition>();
         private bool extraAugmentsAdded;
+
+        /// <summary>Every augment picked this run, in pick order (a repeatable augment appears once per pick).
+        /// Used by the deck mirror's active-augment readout. Cleared on a new run via <see cref="ResetRun"/>.</summary>
+        public IReadOnlyList<AugmentDefinition> AcquiredAugments => acquired;
 
         private void Awake()
         {
@@ -122,6 +127,7 @@ namespace RollfaehrenFury.Prototype
             {
                 AugmentDefinition selected = offered[index];
                 selected.Apply(new AugmentContext(gameManager, spawner));
+                acquired.Add(selected);
                 if (!selected.IsRepeatable)
                 {
                     acquiredUnique.Add(selected);
@@ -134,6 +140,7 @@ namespace RollfaehrenFury.Prototype
         public void ResetRun()
         {
             acquiredUnique.Clear();
+            acquired.Clear();
             offered.Clear();
         }
     }

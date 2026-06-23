@@ -20,7 +20,7 @@ namespace RollfaehrenFury.Prototype
 
         [Header("Flying Dive (birds)")]
         [Tooltip("Flying enemies commit to a dive at the ferry once within this HORIZONTAL distance (m). Until then they cruise at spawn altitude.")]
-        [SerializeField, Min(0f)] private float diveRange = 14f;
+        [SerializeField, Min(0f)] private float diveRange = 16f;
         [Tooltip("Speed multiplier while diving. 1 = exactly the cruising/fish speed; >1 = a faster plunge.")]
         [SerializeField, Min(1f)] private float diveSpeedMultiplier = 1.4f;
 
@@ -36,6 +36,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private float contactEffectDuration = 1.25f;
         [SerializeField] private UnityEvent reachedFerry = new UnityEvent();
         [SerializeField] private UnityEvent diedFromDamage = new UnityEvent();
+        [SerializeField] private String attackAnimationId = "IsAttacking";
 
         private FerryDamageTarget ferryTarget;
         private GameManager gameManager;
@@ -45,6 +46,7 @@ namespace RollfaehrenFury.Prototype
         private bool hasHitFerry;
         private float activeMoveSpeed;
         private bool isDiving;
+        private Animator animator;
 
         public event Action<SimpleEnemy> Removed;
 
@@ -67,6 +69,7 @@ namespace RollfaehrenFury.Prototype
             health = GetComponent<Health>();
             activeMoveSpeed = moveSpeed;
             health.Died += HandleDied;
+            animator = GetComponent<Animator>();
 
             if (useSwarmMovement)
             {
@@ -162,6 +165,10 @@ namespace RollfaehrenFury.Prototype
             if (horizontalDistance <= Mathf.Max(0f, diveRange))
             {
                 isDiving = true;
+                if (attackAnimationId != null && animator != null)
+                {
+                    animator.SetBool(attackAnimationId, true);
+                }
             }
         }
 

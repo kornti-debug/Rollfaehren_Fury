@@ -75,7 +75,7 @@ Reward condition:
 Current enemy types:
 
 1. Fish spawn at river-surface points and approach horizontally from round 1.
-2. Pigeons spawn high and cruise in level at the fish's speed, then dive onto the ferry once within attack range; they join the mix from round 2.
+2. Pigeons spawn high and cruise in level at the fish's speed, then dive onto the ferry once within attack range; they are in the mix from round 1, mixed with the fish by an equal spawn weight (~50/50, random).
 3. Later: boss fish, boss pigeons, bats, vampires, or small boats.
 
 During a crossing, enemies spawn ahead and beside the moving ferry rather than
