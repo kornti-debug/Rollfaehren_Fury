@@ -80,7 +80,9 @@ Planned systems and responsibilities:
   both Menu and gameplay pause settings panels.
 - `SimpleHUD`: authored UGUI Canvas in `Main.unity`. It updates serialized
   texts, bars, prompts, shop, augment, and game-over panels instead of creating
-  runtime UI objects.
+  runtime UI objects. The current HUD layout keeps round, ferry health,
+  crossing progress, and money together in the top-left status block, with
+  weapon/ammo details in the bottom-right block.
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: implemented (Track A) — owns the player's weapons, per-run
   ownership state, and the firing input (`Player/Attack`). Fixed digit slots
@@ -162,9 +164,9 @@ Planned systems and responsibilities:
 - `Cargo`: later destructible cargo with reward value.
 - Deck mirror (`MirrorInteractable` + the `DeckMirrorSetup` editor tool): a selfie-style camera mounted on the ferry renders the player into a RenderTexture shown — horizontally flipped, so it reads like a mirror — on a deck quad, making the otherwise-unseen first-person character animations visible. Pressing `Player/Interact` in front of it toggles a panel listing the run's active augments (`AugmentSystem.AcquiredAugments`, grouped with counts). `Tools > Rollfaehren Fury > Setup Deck Mirror` builds + wires the camera, RenderTexture, material, quad, and UI. Pure readout — it changes no game state.
 - `UiOverhaulBuilder`: editor-only repair/build tool. `Rollfaehren Fury >
-  Build Ferry Hazard UI` creates reusable theme prefabs, rebuilds the Menu/Main
-  UI once, wires serialized references, and marks the Canvas with
-  `UiLayoutMarker`.
+  Build Ferry Hazard UI` creates reusable theme prefabs, removes known generated
+  UI roots from Menu/Main canvases, recreates one clean layout, wires serialized
+  references, and marks the Canvas with `UiLayoutMarker`.
 - `UiLayoutMarker`: protects manually authored Canvas roots. Prototype scene
   builders should repair references around a marked Canvas and must not delete
   or recreate it.

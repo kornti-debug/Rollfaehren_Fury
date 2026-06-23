@@ -11,6 +11,7 @@ namespace RollfaehrenFury.Prototype
 
         private InputAction cancelAction;
         private bool isPaused;
+        private bool isChangingScene;
 
         private void Awake()
         {
@@ -41,7 +42,7 @@ namespace RollfaehrenFury.Prototype
                 cancelAction.Disable();
             }
 
-            if (isPaused)
+            if (isPaused && !isChangingScene)
             {
                 Time.timeScale = 1f;
                 gameManager?.SetPaused(false);
@@ -51,7 +52,7 @@ namespace RollfaehrenFury.Prototype
 
         public void ReturnToMenu()
         {
-            Time.timeScale = 1f;
+            BeginSceneChange();
             SceneFlow.LoadMenu();
         }
 
@@ -71,7 +72,7 @@ namespace RollfaehrenFury.Prototype
 
         public void RestartRun()
         {
-            Time.timeScale = 1f;
+            BeginSceneChange();
             SceneFlow.StartNewGame();
         }
 
@@ -99,8 +100,17 @@ namespace RollfaehrenFury.Prototype
 
         public void QuitGame()
         {
-            Time.timeScale = 1f;
+            BeginSceneChange();
             SceneFlow.QuitGame();
+        }
+
+        private void BeginSceneChange()
+        {
+            isChangingScene = true;
+            isPaused = false;
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         private void HandleCancel(InputAction.CallbackContext context)

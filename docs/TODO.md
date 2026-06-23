@@ -25,6 +25,7 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add initial gameplay Cancel/Esc navigation.
 - [x] Replace direct gameplay Esc return with a pause-controller flow.
 - [ ] Verify Resume, New Game, Settings, Main Menu, and Quit pause buttons.
+- [ ] Verify Main Menu remains clickable after using Pause -> Main Menu.
 - [ ] Verify menu and pause settings persist through `PlayerPrefs` and apply live.
 - [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
 - [x] Add game over state.
@@ -279,7 +280,14 @@ This list is the working task board for the prototype. Keep it practical and upd
   manually edited UI layouts.
 - [x] Add `GameSettings` and `SettingsPanelController` for persistent volume and
   mouse-sensitivity settings.
+- [x] Compact gameplay HUD direction: top-left combines round, ferry health,
+  crossing progress, and money; bottom-right stays weapon/ammo-only.
+- [x] UI builder cleanup direction: `Build Ferry Hazard UI` removes known
+  generated roots before rebuilding, preventing duplicate HUD/shop panels.
+- [x] Shop close direction: use a top-right `X` for the preparation shop overlay.
 - [ ] Verify the new UI at `1920x1080`, `1600x900`, and `1280x720`.
+- [ ] Verify no duplicate `Gameplay Panel`, `Shop Panel`, or `Close Shop Button`
+  remains after rerunning `Build Ferry Hazard UI`.
 - [ ] Verify keyboard/controller navigation through menu, pause, shop, and
   augment draft.
 - [ ] Verify Wwise hover/click feedback still fires on all buttons and sliders.

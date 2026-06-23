@@ -21,6 +21,24 @@ namespace RollfaehrenFury.Editor
         private const string ProjectInputActionsPath = "Assets/InputSystem_Actions.inputactions";
         private const string UiPrefabFolder = "Assets/UI/Prefabs";
         private const string FontPath = "Assets/UI/Fonts/BarlowSemiCondensed-SemiBold.ttf";
+        private static readonly string[] MenuGeneratedRoots =
+        {
+            "Menu Background",
+            "Menu Readability Scrim",
+            "Main Panel",
+            "Settings Panel"
+        };
+
+        private static readonly string[] GameplayGeneratedRoots =
+        {
+            "Gameplay Panel",
+            "Shop Panel",
+            "Pause Panel",
+            "Pause Settings Panel",
+            "Augment Draft Panel",
+            "Game Over Panel",
+            "Close Shop Button"
+        };
 
         [MenuItem("Rollfaehren Fury/Build Ferry Hazard UI")]
         public static void BuildAll()
@@ -58,9 +76,11 @@ namespace RollfaehrenFury.Editor
 
                 canvasObject = CreateCanvas("Main Menu Canvas");
                 EnsureComponent<UiLayoutMarker>(canvasObject);
-                BuildMenuCanvas(canvasObject.transform);
             }
 
+            DestroyGeneratedSceneObjects(MenuGeneratedRoots);
+            ClearGeneratedRoots(canvasObject.transform, MenuGeneratedRoots);
+            BuildMenuCanvas(canvasObject.transform);
             MainMenuController controller = EnsureMenuController();
             WireMainMenu(canvasObject.transform, controller);
             EnsureEventSystem();
@@ -86,9 +106,11 @@ namespace RollfaehrenFury.Editor
 
                 canvasObject = CreateCanvas("Rollfaehren Fury Prototype HUD");
                 EnsureComponent<UiLayoutMarker>(canvasObject);
-                BuildGameplayCanvas(canvasObject.transform);
             }
 
+            DestroyGeneratedSceneObjects(GameplayGeneratedRoots);
+            ClearGeneratedRoots(canvasObject.transform, GameplayGeneratedRoots);
+            BuildGameplayCanvas(canvasObject.transform);
             SimpleHUD hud = EnsureComponent<SimpleHUD>(canvasObject);
             ShopManager shopManager = gameManager != null ? EnsureComponent<ShopManager>(gameManager.gameObject) : null;
             GameplayMenuInput pauseInput = EnsureGameplayMenuInput(gameManager);
@@ -120,7 +142,7 @@ namespace RollfaehrenFury.Editor
             GameObject scrim = CreateFullRect(canvas, "Menu Readability Scrim", UiTheme.WithAlpha(UiTheme.Hull, 0.78f));
             scrim.GetComponent<Image>().raycastTarget = false;
 
-            GameObject mainPanel = CreatePanel(canvas, "Main Panel", new Vector2(90f, -150f), new Vector2(520f, 560f), TextAnchor.UpperLeft);
+            GameObject mainPanel = CreatePanel(canvas, "Main Panel", Vector2.zero, new Vector2(560f, 600f), TextAnchor.MiddleCenter);
             AddHeader(mainPanel.transform, "Title", "ROLLFAEHREN\nFURY", new Vector2(24f, -26f), new Vector2(472f, 142f), 58);
             CreateText(mainPanel.transform, "Subtitle", "Protect the ferry. Survive the crossing.", new Vector2(24f, -176f), new Vector2(460f, 44f), 24, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
             CreateButton(mainPanel.transform, "New Game Button", "NEW GAME", new Vector2(24f, -258f), new Vector2(360f, 58f), out _);
@@ -137,17 +159,13 @@ namespace RollfaehrenFury.Editor
             GameObject gameplayPanel = CreateFullRect(canvas, "Gameplay Panel", Color.clear);
             gameplayPanel.GetComponent<Image>().raycastTarget = false;
 
-            GameObject topLeft = CreatePanel(gameplayPanel.transform, "Status Block", new Vector2(22f, -22f), new Vector2(330f, 142f), TextAnchor.UpperLeft);
-            CreateText(topLeft.transform, "Round Text", "ROUND 1", new Vector2(18f, -12f), new Vector2(280f, 30f), 24, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
-            CreateText(topLeft.transform, "Ferry Health Text", "FERRY 100 / 100", new Vector2(18f, -48f), new Vector2(280f, 26f), 19, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
-            CreateBar(topLeft.transform, "Ferry Health Bar", new Vector2(18f, -88f), new Vector2(282f, 18f), UiTheme.Success, out _);
-
-            GameObject progress = CreatePanel(gameplayPanel.transform, "Crossing Block", new Vector2(0f, -22f), new Vector2(420f, 76f), TextAnchor.UpperCenter);
-            CreateText(progress.transform, "Crossing Text", "CROSSING 0%", new Vector2(0f, -10f), new Vector2(360f, 26f), 20, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.UpperCenter);
-            CreateBar(progress.transform, "Crossing Bar", new Vector2(0f, -46f), new Vector2(360f, 16f), UiTheme.Progress, out _);
-
-            GameObject moneyBlock = CreatePanel(gameplayPanel.transform, "Money Block", new Vector2(-22f, -22f), new Vector2(170f, 64f), TextAnchor.UpperRight);
-            CreateText(moneyBlock.transform, "Money Text", "$0", Vector2.zero, new Vector2(138f, 42f), 30, TextAnchor.MiddleCenter, UiTheme.Warning, TextAnchor.MiddleCenter);
+            GameObject topLeft = CreatePanel(gameplayPanel.transform, "Status Block", new Vector2(22f, -22f), new Vector2(360f, 190f), TextAnchor.UpperLeft);
+            CreateText(topLeft.transform, "Round Text", "ROUND 1", new Vector2(18f, -12f), new Vector2(190f, 30f), 24, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
+            CreateText(topLeft.transform, "Money Text", "$0", new Vector2(-18f, -12f), new Vector2(120f, 30f), 24, TextAnchor.MiddleRight, UiTheme.Warning, TextAnchor.UpperRight);
+            CreateText(topLeft.transform, "Ferry Health Text", "FERRY 100 / 100", new Vector2(18f, -56f), new Vector2(300f, 24f), 18, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
+            CreateBar(topLeft.transform, "Ferry Health Bar", new Vector2(18f, -86f), new Vector2(304f, 16f), UiTheme.Success, out _);
+            CreateText(topLeft.transform, "Crossing Text", "CROSSING 0%", new Vector2(18f, -122f), new Vector2(300f, 24f), 18, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
+            CreateBar(topLeft.transform, "Crossing Bar", new Vector2(18f, -152f), new Vector2(304f, 16f), UiTheme.Progress, out _);
 
             GameObject weaponBlock = CreatePanel(gameplayPanel.transform, "Weapon Block", new Vector2(-22f, 22f), new Vector2(360f, 112f), TextAnchor.LowerRight);
             CreateText(weaponBlock.transform, "Weapon Stats Text", "HARPOON\n25 DMG | 60 RPM\nAMMO UNLIMITED", new Vector2(18f, -14f), new Vector2(320f, 86f), 20, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
@@ -198,15 +216,15 @@ namespace RollfaehrenFury.Editor
                 CreateButton(grid.transform, $"Upgrade Card {i}", "UPGRADE", new Vector2(x, y), new Vector2(300f, 210f), out _);
             }
 
+            CreateButton(frame.transform, "Close Shop Button", "X", new Vector2(-32f, -24f), new Vector2(52f, 52f), out _, TextAnchor.UpperRight);
             CreateButton(frame.transform, "Refill Ammo Button", "REFILL AMMO", new Vector2(340f, 34f), new Vector2(300f, 58f), out _);
             CreateButton(frame.transform, "Next Round Button", "NEXT ROUND", new Vector2(-360f, 34f), new Vector2(260f, 58f), out _);
-            CreateButton(frame.transform, "Close Shop Button", "CLOSE", new Vector2(-76f, 34f), new Vector2(220f, 58f), out _);
         }
 
         private static void BuildPausePanels(Transform canvas)
         {
             GameObject pause = CreateFullRect(canvas, "Pause Panel", UiTheme.WithAlpha(Color.black, 0.58f));
-            GameObject column = CreatePanel(pause.transform, "Pause Command Panel", new Vector2(96f, 0f), new Vector2(420f, 560f), TextAnchor.MiddleLeft);
+            GameObject column = CreatePanel(pause.transform, "Pause Command Panel", Vector2.zero, new Vector2(440f, 560f), TextAnchor.MiddleCenter);
             CreateText(column.transform, "Pause Title", "PAUSED", new Vector2(24f, -28f), new Vector2(350f, 56f), 40, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
             CreateButton(column.transform, "Pause Resume Button", "RESUME", new Vector2(24f, -116f), new Vector2(330f, 56f), out _);
             CreateButton(column.transform, "Pause New Game Button", "NEW GAME", new Vector2(24f, -186f), new Vector2(330f, 56f), out _);
@@ -261,7 +279,7 @@ namespace RollfaehrenFury.Editor
             CreateSliderRow(parent, "Music Volume Row", "MUSIC", new Vector2(0f, -210f), out Slider music, out Text musicValue);
             CreateSliderRow(parent, "SFX Volume Row", "SFX", new Vector2(0f, -290f), out Slider sfx, out Text sfxValue);
             CreateSliderRow(parent, "Sensitivity Row", "MOUSE", new Vector2(0f, -370f), out Slider sensitivity, out Text sensitivityValue);
-            CreateButton(parent, backButtonName, "BACK", new Vector2(0f, 58f), new Vector2(260f, 58f), out _);
+            CreateButton(parent, backButtonName, "BACK", new Vector2(0f, 34f), new Vector2(260f, 58f), out _, TextAnchor.LowerCenter);
 
             SettingsPanelController controller = EnsureComponent<SettingsPanelController>(parent.gameObject);
             SetObject(controller, "masterVolumeSlider", master);
@@ -299,8 +317,6 @@ namespace RollfaehrenFury.Editor
         {
             Transform gameplay = canvas.Find("Gameplay Panel");
             Transform status = gameplay?.Find("Status Block");
-            Transform crossing = gameplay?.Find("Crossing Block");
-            Transform money = gameplay?.Find("Money Block");
             Transform weapon = gameplay?.Find("Weapon Block");
             Transform reload = gameplay?.Find("Reload Bar Root");
 
@@ -308,9 +324,9 @@ namespace RollfaehrenFury.Editor
             SetObject(hud, "roundText", FindText(status, "Round Text"));
             SetObject(hud, "ferryHealthText", FindText(status, "Ferry Health Text"));
             SetObject(hud, "ferryHealthFill", FindImage(status, "Ferry Health Bar/Fill"));
-            SetObject(hud, "crossingText", FindText(crossing, "Crossing Text"));
-            SetObject(hud, "crossingFill", FindImage(crossing, "Crossing Bar/Fill"));
-            SetObject(hud, "moneyText", FindText(money, "Money Text"));
+            SetObject(hud, "crossingText", FindText(status, "Crossing Text"));
+            SetObject(hud, "crossingFill", FindImage(status, "Crossing Bar/Fill"));
+            SetObject(hud, "moneyText", FindText(status, "Money Text"));
             SetObject(hud, "weaponStatsText", FindText(weapon, "Weapon Stats Text"));
             SetObject(hud, "messageText", FindText(gameplay, "Message Text"));
             SetObject(hud, "warningText", FindText(gameplay, "Warning Text"));
@@ -453,6 +469,53 @@ namespace RollfaehrenFury.Editor
             Object.DestroyImmediate(instance);
         }
 
+        private static void ClearGeneratedRoots(Transform canvas, string[] rootNames)
+        {
+            if (canvas == null || rootNames == null)
+            {
+                return;
+            }
+
+            foreach (string rootName in rootNames)
+            {
+                bool removedAny;
+                do
+                {
+                    removedAny = false;
+                    Transform child = canvas.Find(rootName);
+                    if (child != null)
+                    {
+                        Object.DestroyImmediate(child.gameObject);
+                        removedAny = true;
+                    }
+                }
+                while (removedAny);
+            }
+        }
+
+        private static void DestroyGeneratedSceneObjects(string[] objectNames)
+        {
+            if (objectNames == null)
+            {
+                return;
+            }
+
+            HashSet<string> names = new HashSet<string>(objectNames);
+            foreach (Transform transform in Object.FindObjectsByType<Transform>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                if (transform == null
+                    || !transform.gameObject.scene.IsValid()
+                    || !names.Contains(transform.name))
+                {
+                    continue;
+                }
+
+                Object.DestroyImmediate(transform.gameObject);
+            }
+        }
+
         private static GameObject CreateCanvas(string name)
         {
             GameObject canvasObject = new GameObject(name);
@@ -542,7 +605,14 @@ namespace RollfaehrenFury.Editor
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
         }
 
-        private static Text CreateButton(Transform parent, string name, string label, Vector2 anchoredPosition, Vector2 size, out Button button)
+        private static Text CreateButton(
+            Transform parent,
+            string name,
+            string label,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            out Button button,
+            TextAnchor anchor = TextAnchor.UpperLeft)
         {
             GameObject buttonObject = new GameObject(name);
             if (parent != null)
@@ -560,12 +630,12 @@ namespace RollfaehrenFury.Editor
             ColorBlock colors = button.colors;
             colors.normalColor = UiTheme.River;
             colors.highlightedColor = UiTheme.WarningDark;
-            colors.selectedColor = UiTheme.WarningDark;
+            colors.selectedColor = UiTheme.Progress;
             colors.pressedColor = UiTheme.Warning;
             colors.disabledColor = UiTheme.WithAlpha(UiTheme.HullSoft, 0.56f);
             button.colors = colors;
             EnsureComponent<WwiseUIButtonAudio>(buttonObject);
-            ConfigureRect(buttonObject.GetComponent<RectTransform>(), TextAnchor.UpperLeft, anchoredPosition, size);
+            ConfigureRect(buttonObject.GetComponent<RectTransform>(), anchor, anchoredPosition, size);
 
             Text buttonText = CreateText(buttonObject.transform, "Label", label, Vector2.zero, new Vector2(size.x - 30f, size.y - 10f), 22, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.MiddleCenter);
             buttonText.fontStyle = FontStyle.Bold;
