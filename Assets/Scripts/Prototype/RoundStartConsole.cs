@@ -85,11 +85,19 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            // Gentle hover bob.
-            float bob = Mathf.Sin(Time.time * 2f) * 0.15f;
-            floatingLabel.transform.localPosition = new Vector3(0f, labelBaseHeight + bob, 0f);
+            // 1. Calculate World Position
+            // Using the collider's bounds ensures the label centers over the actual geometry, 
+            // ignoring weird mesh pivot points.
+            Collider col = GetComponent<Collider>();
+            Vector3 centerPos = col != null ? col.bounds.center : transform.position;
 
-            // Billboard toward the camera so the label always faces the player.
+            // 2. Apply gentle hover bob
+            float bob = Mathf.Sin(Time.time * 2f) * 0.15f;
+
+            // 3. Set absolute WORLD position to ignore parent scale and rotation completely
+            floatingLabel.transform.position = centerPos + Vector3.up * (labelBaseHeight + bob);
+
+            // 4. Billboard toward the camera
             if (labelCamera == null)
             {
                 labelCamera = Camera.main != null ? Camera.main : FindFirstObjectByType<Camera>();
@@ -98,7 +106,7 @@ namespace RollfaehrenFury.Prototype
             if (labelCamera != null)
             {
                 floatingLabel.transform.rotation = Quaternion.LookRotation(
-                    labelCamera.transform.forward,
+                    floatingLabel.transform.position - labelCamera.transform.position,
                     labelCamera.transform.up);
             }
         }
@@ -109,8 +117,17 @@ namespace RollfaehrenFury.Prototype
 
             floatingLabel = new GameObject("Start Crossing Label");
             floatingLabel.transform.SetParent(transform, false);
-            floatingLabel.transform.localPosition = new Vector3(0f, labelBaseHeight, 0f);
-            floatingLabel.transform.localScale = Vector3.one * 0.01f;
+            
+            // 1. Counteract the parent's scale to guarantee a consistent world size.
+            // Note: 0.01f on a 320px width canvas creates a 3.2-meter wide label. 
+            // 0.0025f reduces it to a much more standard 0.8-meter UI prompt.
+            Vector3 targetWorldScale = Vector3.one * 0.0025f; 
+            Vector3 parentScale = transform.lossyScale;
+            floatingLabel.transform.localScale = new Vector3(
+                targetWorldScale.x / parentScale.x,
+                targetWorldScale.y / parentScale.y,
+                targetWorldScale.z / parentScale.z
+            );
 
             Canvas canvas = floatingLabel.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
@@ -142,7 +159,6 @@ namespace RollfaehrenFury.Prototype
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            // Render the label on top of scene geometry so the boat/props never clip it.
             Material overlayMaterial = new Material(Shader.Find("UI/Default"));
             overlayMaterial.SetInt("unity_GUIZTestMode", (int)UnityEngine.Rendering.CompareFunction.Always);
             backgroundImage.material = overlayMaterial;

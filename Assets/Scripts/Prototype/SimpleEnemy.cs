@@ -20,9 +20,9 @@ namespace RollfaehrenFury.Prototype
 
         [Header("Flying Dive (birds)")]
         [Tooltip("Flying enemies commit to a dive at the ferry once within this HORIZONTAL distance (m). Until then they cruise at spawn altitude.")]
-        [SerializeField, Min(0f)] private float diveRange = 16f;
+        [SerializeField, Min(0f)] private float diveRange = 25f;
         [Tooltip("Speed multiplier while diving. 1 = exactly the cruising/fish speed; >1 = a faster plunge.")]
-        [SerializeField, Min(1f)] private float diveSpeedMultiplier = 1.4f;
+        [SerializeField, Min(1f)] private float diveSpeedMultiplier = 1.6f;
 
         [Header("Rear Catch-up (small)")]
         [Tooltip("Enemies behind the ferry slowly ramp their speed up so they don't fall behind forever. Kept gentle.")]
