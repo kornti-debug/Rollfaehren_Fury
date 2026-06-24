@@ -44,6 +44,7 @@ namespace RollfaehrenFury.Editor
         public static void BuildAll()
         {
             EnsureFolders();
+            UiIconGenerator.EnsureIcons();
             CreateThemePrefabs();
             BuildMenuScene();
             BuildMainSceneUi();
@@ -202,24 +203,26 @@ namespace RollfaehrenFury.Editor
             }
 
             GameObject summary = CreatePanel(frame.transform, "Weapon Summary", new Vector2(340f, -132f), new Vector2(430f, 516f), TextAnchor.UpperLeft);
-            Image accent = CreateBlock(summary.transform, "Selected Weapon Accent", new Vector2(18f, -24f), new Vector2(10f, 120f), UiTheme.Warning, TextAnchor.UpperLeft);
+            Image accent = CreateBlock(summary.transform, "Selected Weapon Accent", new Vector2(18f, -24f), new Vector2(10f, 412f), UiTheme.Warning, TextAnchor.UpperLeft);
             accent.raycastTarget = false;
             CreateText(summary.transform, "Selected Weapon Name", "HARPOON", new Vector2(42f, -22f), new Vector2(340f, 42f), 32, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
-            CreateText(summary.transform, "Selected Weapon Stats", "25 damage | 60 RPM\nUnlimited ammunition", new Vector2(42f, -84f), new Vector2(340f, 96f), 22, TextAnchor.UpperLeft, UiTheme.Muted, TextAnchor.UpperLeft);
-            CreateText(summary.transform, "Selected Weapon Requirement", "OWNED", new Vector2(42f, -214f), new Vector2(340f, 60f), 24, TextAnchor.MiddleLeft, UiTheme.Warning, TextAnchor.UpperLeft);
+            CreateWeaponStatRow(summary.transform, "Damage Stat Row", new Vector2(42f, -88f), UiIconGenerator.Load("damage"), "DAMAGE");
+            CreateWeaponStatRow(summary.transform, "Fire Rate Stat Row", new Vector2(42f, -150f), UiIconGenerator.Load("fire-rate"), "FIRE RATE");
+            CreateWeaponStatRow(summary.transform, "Reload Stat Row", new Vector2(42f, -212f), UiIconGenerator.Load("reload"), "RELOAD");
+            CreateWeaponStatRow(summary.transform, "Reserve Stat Row", new Vector2(42f, -274f), UiIconGenerator.Load("magazine"), "RESERVE");
+            CreateWeaponStatRow(summary.transform, "Special Stat Row", new Vector2(42f, -336f), UiIconGenerator.Load("ricochet"), "RICOCHET");
+            CreateText(summary.transform, "Selected Weapon Requirement", "OWNED", new Vector2(42f, -442f), new Vector2(340f, 44f), 20, TextAnchor.MiddleLeft, UiTheme.Warning, TextAnchor.UpperLeft);
 
             GameObject grid = CreatePanel(frame.transform, "Upgrade Grid", new Vector2(-32f, -132f), new Vector2(660f, 470f), TextAnchor.UpperRight);
             for (int i = 0; i < 4; i++)
             {
                 float x = 20f + (i % 3) * 210f;
                 float y = i < 3 ? -24f : -224f;
-                Text cardText = CreateButton(grid.transform, $"Upgrade Card {i}", "UPGRADE", new Vector2(x, y), new Vector2(200f, 180f), out _);
-                cardText.fontSize = 18;
+                CreateUpgradeCard(grid.transform, $"Upgrade Card {i}", new Vector2(x, y), new Vector2(200f, 180f));
             }
 
             CreateButton(frame.transform, "Close Shop Button", "X", new Vector2(-32f, -24f), new Vector2(52f, 52f), out _, TextAnchor.UpperRight);
-            Text refillText = CreateButton(grid.transform, "Refill Ammo Button", "REFILL\nAMMO", new Vector2(230f, -224f), new Vector2(200f, 180f), out _);
-            refillText.fontSize = 18;
+            CreateUpgradeCard(grid.transform, "Refill Ammo Button", new Vector2(230f, -224f), new Vector2(200f, 180f));
             CreateButton(frame.transform, "Next Round Button", "NEXT ROUND", new Vector2(0f, 34f), new Vector2(260f, 58f), out _, TextAnchor.LowerCenter);
         }
 
@@ -249,15 +252,7 @@ namespace RollfaehrenFury.Editor
             for (int i = 0; i < 3; i++)
             {
                 float x = -420f + i * 420f;
-                CreateButton(frame.transform, $"Augment Draft Button {i}", "AUGMENT", new Vector2(x, -148f), new Vector2(340f, 310f), out Button button, TextAnchor.UpperCenter);
-                Text label = button.GetComponentInChildren<Text>();
-                if (label != null)
-                {
-                    label.fontSize = 21;
-                    label.supportRichText = true;
-                    label.horizontalOverflow = HorizontalWrapMode.Wrap;
-                    label.verticalOverflow = VerticalWrapMode.Overflow;
-                }
+                CreateAugmentCard(frame.transform, $"Augment Draft Button {i}", new Vector2(x, -148f), new Vector2(340f, 310f));
             }
 
             augment.SetActive(false);
@@ -367,7 +362,7 @@ namespace RollfaehrenFury.Editor
             List<Object> cards = new List<Object>();
             for (int i = 0; i < 4; i++)
             {
-                Button card = FindButton(canvas, $"Upgrade Card {i}");
+                UpgradeCardView card = FindComponent<UpgradeCardView>(canvas, $"Upgrade Card {i}");
                 if (card != null)
                 {
                     cards.Add(card);
@@ -378,11 +373,22 @@ namespace RollfaehrenFury.Editor
             SetObject(shopManager, "weaponSystem", weaponSystem);
             SetObjectList(shopManager, "weaponTabs", tabs.ToArray());
             SetObjectList(shopManager, "upgradeCards", cards.ToArray());
-            SetObject(shopManager, "refillButton", FindButton(canvas, "Refill Ammo Button"));
+            SetObject(shopManager, "refillCard", FindComponent<UpgradeCardView>(canvas, "Refill Ammo Button"));
             SetObject(shopManager, "selectedWeaponNameText", FindText(canvas, "Shop Panel/Shop Frame/Weapon Summary/Selected Weapon Name"));
-            SetObject(shopManager, "selectedWeaponStatsText", FindText(canvas, "Shop Panel/Shop Frame/Weapon Summary/Selected Weapon Stats"));
             SetObject(shopManager, "selectedWeaponRequirementText", FindText(canvas, "Shop Panel/Shop Frame/Weapon Summary/Selected Weapon Requirement"));
             SetObject(shopManager, "selectedWeaponAccent", FindImage(canvas, "Shop Panel/Shop Frame/Weapon Summary/Selected Weapon Accent"));
+            SetObject(shopManager, "damageStatRow", FindComponent<WeaponStatRowView>(canvas, "Damage Stat Row"));
+            SetObject(shopManager, "fireRateStatRow", FindComponent<WeaponStatRowView>(canvas, "Fire Rate Stat Row"));
+            SetObject(shopManager, "reloadStatRow", FindComponent<WeaponStatRowView>(canvas, "Reload Stat Row"));
+            SetObject(shopManager, "reserveStatRow", FindComponent<WeaponStatRowView>(canvas, "Reserve Stat Row"));
+            SetObject(shopManager, "specialStatRow", FindComponent<WeaponStatRowView>(canvas, "Special Stat Row"));
+            SetObject(shopManager, "unlockIcon", UiIconGenerator.Load("unlock"));
+            SetObject(shopManager, "damageIcon", UiIconGenerator.Load("damage"));
+            SetObject(shopManager, "fireRateIcon", UiIconGenerator.Load("fire-rate"));
+            SetObject(shopManager, "reloadIcon", UiIconGenerator.Load("reload"));
+            SetObject(shopManager, "magazineIcon", UiIconGenerator.Load("magazine"));
+            SetObject(shopManager, "ricochetIcon", UiIconGenerator.Load("ricochet"));
+            SetObject(shopManager, "refillIcon", UiIconGenerator.Load("refill"));
         }
 
         private static void WirePause(Transform canvas, GameplayMenuInput pauseInput, GameManager gameManager)
@@ -411,11 +417,12 @@ namespace RollfaehrenFury.Editor
                 return;
             }
 
-            Button[] draftButtons = new Button[3];
-            for (int i = 0; i < draftButtons.Length; i++)
+            AugmentCardView[] draftCards = new AugmentCardView[3];
+            for (int i = 0; i < draftCards.Length; i++)
             {
-                Button button = FindButton(canvas, $"Augment Draft Button {i}");
-                draftButtons[i] = button;
+                AugmentCardView card = FindComponent<AugmentCardView>(canvas, $"Augment Draft Button {i}");
+                draftCards[i] = card;
+                Button button = card != null ? card.Button : null;
                 if (button != null)
                 {
                     button.onClick.RemoveAllListeners();
@@ -424,8 +431,14 @@ namespace RollfaehrenFury.Editor
                 }
             }
 
-            SetObjectList(augmentSystem, "draftButtons", draftButtons);
+            SetObjectList(augmentSystem, "draftCards", draftCards);
             SetObject(augmentSystem, "gameManager", gameManager);
+            SetObject(augmentSystem, "ferryIcon", UiIconGenerator.Load("ferry"));
+            SetObject(augmentSystem, "weaponIcon", UiIconGenerator.Load("damage"));
+            SetObject(augmentSystem, "playerIcon", UiIconGenerator.Load("player"));
+            SetObject(augmentSystem, "economyIcon", UiIconGenerator.Load("money"));
+            SetObject(augmentSystem, "enemiesIcon", UiIconGenerator.Load("enemies"));
+            SetObject(augmentSystem, "worldIcon", UiIconGenerator.Load("world"));
         }
 
         private static void WireGameOver(Transform canvas, GameManager gameManager)
@@ -447,7 +460,8 @@ namespace RollfaehrenFury.Editor
             CreatePrefabIfMissing("PrimaryButton.prefab", () => CreateButton(null, "Primary Button", "PRIMARY", Vector2.zero, new Vector2(300f, 58f), out _).transform.parent.gameObject);
             CreatePrefabIfMissing("SecondaryButton.prefab", () => CreateButton(null, "Secondary Button", "SECONDARY", Vector2.zero, new Vector2(300f, 58f), out _).transform.parent.gameObject);
             CreatePrefabIfMissing("WeaponTab.prefab", () => CreateButton(null, "Weapon Tab", "WEAPON", Vector2.zero, new Vector2(244f, 82f), out _).transform.parent.gameObject);
-            CreatePrefabIfMissing("UpgradeCard.prefab", () => CreateButton(null, "Upgrade Card", "UPGRADE", Vector2.zero, new Vector2(300f, 210f), out _).transform.parent.gameObject);
+            CreateOrReplacePrefab("UpgradeCard.prefab", () => CreateUpgradeCard(null, "Upgrade Card", Vector2.zero, new Vector2(300f, 210f)).gameObject);
+            CreateOrReplacePrefab("AugmentCard.prefab", () => CreateAugmentCard(null, "Augment Card", Vector2.zero, new Vector2(340f, 310f)).gameObject);
             CreatePrefabIfMissing("SettingsSliderRow.prefab", () =>
             {
                 GameObject row = CreatePanel(null, "Settings Slider Row", Vector2.zero, new Vector2(580f, 54f), TextAnchor.MiddleCenter);
@@ -456,6 +470,14 @@ namespace RollfaehrenFury.Editor
             });
             CreatePrefabIfMissing("StatRow.prefab", () => CreateText(null, "Stat Row", "STAT  VALUE", Vector2.zero, new Vector2(320f, 32f), 20, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.MiddleCenter).gameObject);
             CreatePrefabIfMissing("WarningHeader.prefab", () => CreateText(null, "Warning Header", "WARNING", Vector2.zero, new Vector2(480f, 52f), 34, TextAnchor.MiddleCenter, UiTheme.Warning, TextAnchor.MiddleCenter).gameObject);
+        }
+
+        private static void CreateOrReplacePrefab(string fileName, System.Func<GameObject> factory)
+        {
+            string path = $"{UiPrefabFolder}/{fileName}";
+            GameObject instance = factory();
+            PrefabUtility.SaveAsPrefabAsset(instance, path);
+            Object.DestroyImmediate(instance);
         }
 
         private static void CreatePrefabIfMissing(string fileName, System.Func<GameObject> factory)
@@ -649,6 +671,162 @@ namespace RollfaehrenFury.Editor
             Text buttonText = CreateText(buttonObject.transform, "Label", label, Vector2.zero, new Vector2(size.x - 30f, size.y - 10f), 22, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.MiddleCenter);
             buttonText.fontStyle = FontStyle.Bold;
             return buttonText;
+        }
+
+        private static UpgradeCardView CreateUpgradeCard(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size)
+        {
+            GameObject card = CreateCardRoot(parent, name, anchoredPosition, size, out Button button);
+            Image icon = CreateIcon(card.transform, "Icon", new Vector2(14f, -12f), new Vector2(32f, 32f), TextAnchor.UpperLeft);
+            Text title = CreateText(card.transform, "Title", "UPGRADE", new Vector2(54f, -10f), new Vector2(size.x - 68f, 42f), 17, TextAnchor.UpperLeft, UiTheme.Foam, TextAnchor.UpperLeft);
+            title.fontStyle = FontStyle.Bold;
+
+            Text current = CreateText(card.transform, "Current Value", "CURRENT", new Vector2(-50f, -78f), new Vector2(72f, 30f), 17, TextAnchor.MiddleRight, UiTheme.Foam, TextAnchor.UpperCenter);
+            Text arrow = CreateText(card.transform, "Arrow", "\u2192", new Vector2(0f, -78f), new Vector2(24f, 30f), 18, TextAnchor.MiddleCenter, UiTheme.Muted, TextAnchor.UpperCenter);
+            Text next = CreateText(card.transform, "Next Value", "NEXT", new Vector2(50f, -78f), new Vector2(72f, 30f), 17, TextAnchor.MiddleLeft, UiTheme.Success, TextAnchor.UpperCenter);
+            Text level = CreateText(card.transform, "Level", "LV 0 / 5", new Vector2(12f, 12f), new Vector2(92f, 26f), 15, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.LowerLeft);
+
+            GameObject costRoot = new GameObject("Cost");
+            costRoot.transform.SetParent(card.transform, false);
+            ConfigureRect(EnsureComponent<RectTransform>(costRoot), TextAnchor.LowerRight, new Vector2(-12f, 12f), new Vector2(82f, 28f));
+            Image costIcon = CreateIcon(costRoot.transform, "Money Icon", Vector2.zero, new Vector2(22f, 22f), TextAnchor.MiddleLeft);
+            costIcon.sprite = UiIconGenerator.Load("money");
+            costIcon.color = UiTheme.Warning;
+            Text cost = CreateText(costRoot.transform, "Cost Text", "$0", Vector2.zero, new Vector2(56f, 26f), 17, TextAnchor.MiddleRight, UiTheme.Warning, TextAnchor.MiddleRight);
+            cost.fontStyle = FontStyle.Bold;
+
+            UpgradeCardView view = EnsureComponent<UpgradeCardView>(card);
+            SetObject(view, "button", button);
+            SetObject(view, "icon", icon);
+            SetObject(view, "titleText", title);
+            SetObject(view, "currentValueText", current);
+            SetObject(view, "arrowText", arrow);
+            SetObject(view, "nextValueText", next);
+            SetObject(view, "levelText", level);
+            SetObject(view, "costRoot", costRoot);
+            SetObject(view, "costIcon", costIcon);
+            SetObject(view, "costText", cost);
+            return view;
+        }
+
+        private static WeaponStatRowView CreateWeaponStatRow(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Sprite sprite,
+            string label)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            ConfigureRect(EnsureComponent<RectTransform>(row), TextAnchor.UpperLeft, anchoredPosition, new Vector2(350f, 46f));
+            Image background = EnsureComponent<Image>(row);
+            background.color = UiTheme.WithAlpha(UiTheme.River, 0.28f);
+            background.raycastTarget = false;
+
+            Image icon = CreateIcon(row.transform, "Icon", new Vector2(8f, 0f), new Vector2(28f, 28f), TextAnchor.MiddleLeft);
+            icon.sprite = sprite;
+            Text labelText = CreateText(row.transform, "Label", label, new Vector2(44f, 0f), new Vector2(92f, 30f), 15, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.MiddleLeft);
+            Text current = CreateText(row.transform, "Current Value", "0", new Vector2(-134f, 0f), new Vector2(92f, 30f), 17, TextAnchor.MiddleRight, UiTheme.Foam, TextAnchor.MiddleRight);
+            Text arrow = CreateText(row.transform, "Arrow", string.Empty, new Vector2(-102f, 0f), new Vector2(24f, 30f), 16, TextAnchor.MiddleCenter, UiTheme.Muted, TextAnchor.MiddleRight);
+            Text preview = CreateText(row.transform, "Preview Value", string.Empty, new Vector2(-8f, 0f), new Vector2(90f, 30f), 17, TextAnchor.MiddleRight, UiTheme.Success, TextAnchor.MiddleRight);
+
+            WeaponStatRowView view = EnsureComponent<WeaponStatRowView>(row);
+            SetObject(view, "icon", icon);
+            SetObject(view, "labelText", labelText);
+            SetObject(view, "currentValueText", current);
+            SetObject(view, "arrowText", arrow);
+            SetObject(view, "previewValueText", preview);
+            return view;
+        }
+
+        private static AugmentCardView CreateAugmentCard(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size)
+        {
+            GameObject card = CreateCardRoot(parent, name, anchoredPosition, size, out Button button, TextAnchor.UpperCenter);
+            Image categoryIcon = CreateIcon(card.transform, "Category Icon", new Vector2(24f, -22f), new Vector2(32f, 32f), TextAnchor.UpperLeft);
+            Text category = CreateText(card.transform, "Category", "WORLD", new Vector2(66f, -22f), new Vector2(160f, 30f), 16, TextAnchor.MiddleLeft, UiTheme.Muted, TextAnchor.UpperLeft);
+            category.fontStyle = FontStyle.Bold;
+            Text title = CreateText(card.transform, "Title", "AUGMENT", new Vector2(24f, -78f), new Vector2(size.x - 48f, 46f), 28, TextAnchor.MiddleLeft, UiTheme.Foam, TextAnchor.UpperLeft);
+            title.fontStyle = FontStyle.Bold;
+            Text benefit = CreateText(card.transform, "Benefit", "Positive effect", new Vector2(24f, -144f), new Vector2(size.x - 48f, 72f), 21, TextAnchor.UpperLeft, UiTheme.Success, TextAnchor.UpperLeft);
+            Text drawback = CreateText(card.transform, "Drawback", "Tradeoff", new Vector2(24f, -226f), new Vector2(size.x - 48f, 56f), 18, TextAnchor.UpperLeft, UiTheme.Siren, TextAnchor.UpperLeft);
+
+            GameObject uniqueBadge = new GameObject("Unique Badge");
+            uniqueBadge.transform.SetParent(card.transform, false);
+            ConfigureRect(EnsureComponent<RectTransform>(uniqueBadge), TextAnchor.UpperRight, new Vector2(-18f, -18f), new Vector2(76f, 28f));
+            Image badgeBackground = EnsureComponent<Image>(uniqueBadge);
+            badgeBackground.color = UiTheme.Warning;
+            badgeBackground.raycastTarget = false;
+            Text badgeText = CreateText(uniqueBadge.transform, "Label", "UNIQUE", Vector2.zero, new Vector2(68f, 24f), 13, TextAnchor.MiddleCenter, UiTheme.Hull, TextAnchor.MiddleCenter);
+            badgeText.fontStyle = FontStyle.Bold;
+            uniqueBadge.SetActive(false);
+
+            AugmentCardView view = EnsureComponent<AugmentCardView>(card);
+            SetObject(view, "button", button);
+            SetObject(view, "categoryIcon", categoryIcon);
+            SetObject(view, "categoryText", category);
+            SetObject(view, "titleText", title);
+            SetObject(view, "benefitText", benefit);
+            SetObject(view, "drawbackText", drawback);
+            SetObject(view, "uniqueBadge", uniqueBadge);
+            return view;
+        }
+
+        private static GameObject CreateCardRoot(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            out Button button,
+            TextAnchor anchor = TextAnchor.UpperLeft)
+        {
+            GameObject card = new GameObject(name);
+            if (parent != null)
+            {
+                card.transform.SetParent(parent, false);
+            }
+
+            ConfigureRect(EnsureComponent<RectTransform>(card), anchor, anchoredPosition, size);
+            Image image = EnsureComponent<Image>(card);
+            image.color = UiTheme.River;
+            Outline outline = EnsureComponent<Outline>(card);
+            outline.effectColor = UiTheme.Warning;
+            outline.effectDistance = new Vector2(2f, -2f);
+            button = EnsureComponent<Button>(card);
+            ConfigureButtonColors(button);
+            EnsureComponent<WwiseUIButtonAudio>(card);
+            return card;
+        }
+
+        private static Image CreateIcon(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            TextAnchor anchor)
+        {
+            Image image = CreateBlock(parent, name, anchoredPosition, size, Color.white, anchor);
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        private static void ConfigureButtonColors(Button button)
+        {
+            button.transition = Selectable.Transition.ColorTint;
+            ColorBlock colors = button.colors;
+            colors.normalColor = UiTheme.River;
+            colors.highlightedColor = UiTheme.WarningDark;
+            colors.selectedColor = UiTheme.Progress;
+            colors.pressedColor = UiTheme.Warning;
+            colors.disabledColor = UiTheme.WithAlpha(UiTheme.HullSoft, 0.56f);
+            button.colors = colors;
         }
 
         private static Image CreateBar(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, Color fillColor, out Image fill)
@@ -846,6 +1024,12 @@ namespace RollfaehrenFury.Editor
             return child != null ? child.GetComponent<Image>() : null;
         }
 
+        private static T FindComponent<T>(Transform root, string path) where T : Component
+        {
+            Transform child = FindDeep(root, path);
+            return child != null ? child.GetComponent<T>() : null;
+        }
+
         private static GameObject Child(Transform root, string path)
         {
             Transform child = FindDeep(root, path);
@@ -912,6 +1096,7 @@ namespace RollfaehrenFury.Editor
         {
             EnsureFolder("Assets", "UI");
             EnsureFolder("Assets/UI", "Prefabs");
+            EnsureFolder("Assets/UI", "Icons");
         }
 
         private static void EnsureFolder(string parent, string child)

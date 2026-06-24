@@ -14,5 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.BruisersAugment
   displayName: Bruisers
   description: Half enemies, 2x HP.
+  category: 4
+  benefitText: 50% fewer enemies spawn.
+  drawbackText: Enemies have 2x HP.
+  unique: 0
   countMultiplier: 0.5
   healthMultiplier: 2

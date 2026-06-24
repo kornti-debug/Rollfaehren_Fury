@@ -158,6 +158,10 @@ This list is the working task board for the prototype. Keep it practical and upd
   weapons show one unlock card with predecessor, round, and price requirements.
   Damage, Fire Rate, and Faster Reload reach level 5; Extra Magazine reaches
   level 3; Harpoon Ricochet reaches level 1; Refill is repeatable.
+- [x] Structure shop cards into icon/title, current-to-next value, level, and
+  amber cost regions instead of one plain text label.
+- [x] Preview the affected weapon stat in the center summary when an available
+  upgrade card is hovered or selected.
 - [ ] Verify ammo purchases in Unity: locked weapons expose no upgrades,
   Extra Magazine adds one complete spare reload, refill restores the upgraded
   cap, and New Game restores definition defaults.
@@ -291,11 +295,15 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Center Menu and Pause command columns, subtitles, and buttons.
 - [x] Center Augment Draft cards and Game Over command buttons inside their
   frames.
+- [x] Add category icons plus separate benefit, drawback, and unique labels to
+  augment draft cards.
 - [ ] Verify the new UI at `1920x1080`, `1600x900`, and `1280x720`.
 - [ ] Verify no duplicate `Gameplay Panel`, `Shop Panel`, or `Close Shop Button`
   remains after rerunning `Build Ferry Hazard UI`.
 - [ ] Verify keyboard/controller navigation through menu, pause, shop, and
   augment draft.
+- [ ] Verify shop hover/selection previews clear correctly, displayed prices
+  match purchases, and all augment benefits/drawbacks fit their cards.
 - [ ] Verify Wwise hover/click feedback still fires on all buttons and sliders.
 - [ ] Add a gameplay screenshot as the future full-screen menu background.
 

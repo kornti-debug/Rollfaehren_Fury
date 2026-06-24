@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WarChestAugment
   displayName: War Chest
   description: Instant $75.
+  category: 3
+  benefitText: Gain $75 immediately.
+  drawbackText: ''
+  unique: 0
   money: 75

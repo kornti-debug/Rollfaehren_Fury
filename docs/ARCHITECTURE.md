@@ -105,8 +105,11 @@ Planned systems and responsibilities:
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
 - `UpgradeDefinition` (Track B): the original polymorphic ScriptableObject upgrade system (`WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, `RicochetUpgrade`, plus the runtime ammo set). The card-based `ShopManager` no longer uses it (it applies upgrades to weapons directly), so these classes/assets are currently dormant — kept for reference, prune when convenient.
 - `ShopManager` (card shop): implemented — binds serialized weapon tabs,
-  summary labels, four persistent upgrade-card slots, and a refill button from
-  the authored HUD Canvas. Owned weapons show their relevant card set; locked
+  structured `UpgradeCardView` slots, `WeaponStatRowView` summary rows, and a
+  refill card from the authored HUD Canvas. Cards separate icon/title,
+  current-to-next values, level, and price. Hover or EventSystem selection
+  previews the affected value in the center summary without changing runtime
+  weapon stats. Owned weapons show their relevant card set; locked
   weapons replace the cards with one unlock card containing predecessor,
   minimum-round, and price requirements. Purchasing ownership equips the weapon
   immediately and refreshes the card set. Extra Magazine has three levels;
@@ -128,7 +131,7 @@ Planned systems and responsibilities:
   `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
-- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Definitions are repeatable by default and can be explicitly unique; acquired unique definitions are removed from later drafts and reset on New Game. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (unique, 0.5 heal per kill capped at 10 actual HP per crossing), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
+- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Definitions include presentation metadata for category, benefit, optional drawback, and uniqueness. `AugmentCardView` renders those as separate icon and text regions, making mixed choices such as Swarm and Bruisers explicit. Definitions are repeatable by default and can be explicitly unique; acquired unique definitions are removed from later drafts and reset on New Game. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (unique, 0.5 heal per kill capped at 10 actual HP per crossing), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
 - `FerryController`: moves a kinematic ferry between two dock transforms,
   follows a sampled cubic route aligned to each dock's forward direction,
   carries the player through matching translation and rotation, reports
@@ -168,9 +171,10 @@ Planned systems and responsibilities:
 - `UiOverhaulBuilder`: editor-only repair/build tool. `Rollfaehren Fury >
   Build Ferry Hazard UI` creates reusable theme prefabs, removes known generated
   UI roots from Menu/Main canvases, recreates one clean layout, wires serialized
-  references, and marks the Canvas with `UiLayoutMarker`. The generated shop
-  layout keeps funds in the centered header area, a top-right close button, and
-  five compact action slots in the upgrade frame.
+  references, generates the tintable line-icon sprite set, and marks the Canvas
+  with `UiLayoutMarker`. The generated shop layout keeps funds in the centered
+  header area, a top-right close button, five structured action slots, and a
+  fixed weapon-stat preview area.
 - `UiLayoutMarker`: protects manually authored Canvas roots. Prototype scene
   builders should repair references around a marked Canvas and must not delete
   or recreate it.

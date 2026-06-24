@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.TailwindAugment
   displayName: Tailwind
   description: Ferry crosses 15% faster.
+  category: 0
+  benefitText: Ferry crosses 15% faster.
+  drawbackText: ''
+  unique: 0
   crossingFactor: 0.85

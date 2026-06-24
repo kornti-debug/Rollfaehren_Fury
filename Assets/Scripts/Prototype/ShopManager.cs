@@ -22,12 +22,25 @@ namespace RollfaehrenFury.Prototype
 
         [Header("Authored Shop UI")]
         [SerializeField] private List<Button> weaponTabs = new List<Button>();
-        [SerializeField] private List<Button> upgradeCards = new List<Button>();
-        [SerializeField] private Button refillButton;
+        [SerializeField] private List<UpgradeCardView> upgradeCards = new List<UpgradeCardView>();
+        [SerializeField] private UpgradeCardView refillCard;
         [SerializeField] private Text selectedWeaponNameText;
-        [SerializeField] private Text selectedWeaponStatsText;
         [SerializeField] private Text selectedWeaponRequirementText;
         [SerializeField] private Image selectedWeaponAccent;
+        [SerializeField] private WeaponStatRowView damageStatRow;
+        [SerializeField] private WeaponStatRowView fireRateStatRow;
+        [SerializeField] private WeaponStatRowView reloadStatRow;
+        [SerializeField] private WeaponStatRowView reserveStatRow;
+        [SerializeField] private WeaponStatRowView specialStatRow;
+
+        [Header("Upgrade Icons")]
+        [SerializeField] private Sprite unlockIcon;
+        [SerializeField] private Sprite damageIcon;
+        [SerializeField] private Sprite fireRateIcon;
+        [SerializeField] private Sprite reloadIcon;
+        [SerializeField] private Sprite magazineIcon;
+        [SerializeField] private Sprite ricochetIcon;
+        [SerializeField] private Sprite refillIcon;
 
         [Header("Economy")]
         [SerializeField, Min(1f)] private float costGrowthPerPurchase = 1.7f;
@@ -39,6 +52,7 @@ namespace RollfaehrenFury.Prototype
 
         private bool uiBound;
         private int selectedTarget;
+        private UpgradeKind? previewKind;
 
         private void Awake()
         {
@@ -91,21 +105,23 @@ namespace RollfaehrenFury.Prototype
 
             for (int i = 0; i < upgradeCards.Count; i++)
             {
-                Button card = upgradeCards[i];
-                if (card == null)
+                UpgradeCardView card = upgradeCards[i];
+                if (card == null || card.Button == null)
                 {
                     continue;
                 }
 
                 int captured = i;
-                card.onClick.RemoveAllListeners();
-                card.onClick.AddListener(() => BuyUpgradeSlot(captured));
+                card.Button.onClick.RemoveAllListeners();
+                card.Button.onClick.AddListener(() => BuyUpgradeSlot(captured));
+                card.PreviewEntered += () => PreviewUpgradeSlot(captured);
+                card.PreviewExited += () => ClearPreview(captured);
             }
 
-            if (refillButton != null)
+            if (refillCard != null && refillCard.Button != null)
             {
-                refillButton.onClick.RemoveAllListeners();
-                refillButton.onClick.AddListener(BuyRefill);
+                refillCard.Button.onClick.RemoveAllListeners();
+                refillCard.Button.onClick.AddListener(BuyRefill);
             }
         }
 
@@ -117,6 +133,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             selectedTarget = target;
+            previewKind = null;
             currentKinds.Clear();
             currentKinds.AddRange(GetKindsFor(target));
             RefreshTree();
@@ -142,7 +159,7 @@ namespace RollfaehrenFury.Prototype
             int money = gameManager != null ? gameManager.Money : 0;
             for (int i = 0; i < upgradeCards.Count; i++)
             {
-                Button card = upgradeCards[i];
+                UpgradeCardView card = upgradeCards[i];
                 if (card == null)
                 {
                     continue;
@@ -197,24 +214,19 @@ namespace RollfaehrenFury.Prototype
         {
             SetText(selectedWeaponNameText, weapon.DisplayName);
 
-            string ammo = weapon.HasInfiniteAmmo
-                ? "Unlimited ammunition"
-                : $"{weapon.MagazineSize} loaded | {weapon.ReserveMagazineCapacity} spare magazines";
-            SetText(
-                selectedWeaponStatsText,
-                $"{weapon.DamageDisplay} damage | {weapon.ShotsPerSecond * 60f:0} RPM\n{ammo}");
-
             string requirement = unlocked ? "OWNED" : BuildUnlockRequirement(weapon);
             SetText(selectedWeaponRequirementText, requirement);
             if (selectedWeaponAccent != null)
             {
                 selectedWeaponAccent.color = unlocked ? UiTheme.Success : UiTheme.Warning;
             }
+
+            UpgradeKind? activePreview = ValidPreviewKind(weapon, unlocked);
+            SetStatRows(weapon, activePreview);
         }
 
-        private void RefreshCard(Button card, Weapon weapon, UpgradeKind kind, int money)
+        private void RefreshCard(UpgradeCardView card, Weapon weapon, UpgradeKind kind, int money)
         {
-            Text label = card.GetComponentInChildren<Text>();
             Image background = card.GetComponent<Image>();
 
             if (kind == UpgradeKind.Unlock)
@@ -224,9 +236,19 @@ namespace RollfaehrenFury.Prototype
                                  && definition != null
                                  && weaponSystem.CanUnlockWeapon(selectedTarget, gameManager.Round);
                 int unlockCost = definition != null ? definition.UnlockPrice : 0;
-                card.interactable = canUnlock && money >= unlockCost;
-                SetText(label, $"UNLOCK\n{BuildUnlockRequirement(weapon)}\n${unlockCost}");
-                SetCardColor(background, card.interactable, false);
+                bool unlockInteractable = canUnlock && money >= unlockCost;
+                card.SetContent(
+                    unlockIcon,
+                    UiTheme.Warning,
+                    "UNLOCK WEAPON",
+                    BuildUnlockRequirement(weapon),
+                    string.Empty,
+                    "LOCKED",
+                    $"${unlockCost}",
+                    true,
+                    unlockInteractable,
+                    false);
+                SetCardColor(background, unlockInteractable, false);
                 return;
             }
 
@@ -234,33 +256,50 @@ namespace RollfaehrenFury.Prototype
             int max = KindMaxLevel(kind);
             int cost = EffectiveCost(kind, level);
             bool maxed = level >= max;
-            card.interactable = !maxed && money >= cost;
-
-            string value = UpgradeValueText(weapon, kind);
-            string footer = maxed ? $"MAX {level}/{max}" : $"LV {level}/{max}   ${cost}";
-            SetText(label, $"{KindLabel(kind)}\n{value}\n{footer}");
-            SetCardColor(background, card.interactable, maxed);
+            bool interactable = !maxed && money >= cost;
+            UpgradeValues(weapon, kind, out string currentValue, out string nextValue);
+            card.SetContent(
+                IconFor(kind),
+                AccentFor(kind),
+                KindLabel(kind),
+                currentValue,
+                maxed ? string.Empty : nextValue,
+                maxed ? "MAX" : $"LV {level} / {max}",
+                $"${cost}",
+                !maxed,
+                interactable,
+                maxed);
+            SetCardColor(background, interactable, maxed);
         }
 
         private void RefreshRefill(Weapon weapon, bool unlocked, int money)
         {
-            if (refillButton == null)
+            if (refillCard == null)
             {
                 return;
             }
 
             bool visible = unlocked && !weapon.HasInfiniteAmmo;
-            refillButton.gameObject.SetActive(visible);
+            refillCard.gameObject.SetActive(visible);
             if (!visible)
             {
                 return;
             }
 
             bool full = weapon.IsAmmoFull;
-            refillButton.interactable = !full && money >= refillCost;
-            SetText(
-                refillButton.GetComponentInChildren<Text>(),
-                full ? "REFILL AMMO  |  FULL" : $"REFILL AMMO  |  ${refillCost}");
+            bool interactable = !full && money >= refillCost;
+            refillCard.SetContent(
+                refillIcon,
+                UiTheme.Progress,
+                "REFILL AMMO",
+                $"AMMO {weapon.CurrentAmmo}/{weapon.MagazineSize}",
+                full ? "FULL" : $"RESERVE {weapon.ReserveAmmo}/{weapon.MaxReserveAmmo}",
+                full ? "FULL" : "SUPPLY",
+                $"${refillCost}",
+                !full,
+                interactable,
+                full);
+            SetCardColor(refillCard.GetComponent<Image>(), interactable, full);
         }
 
         private void BuyUpgradeSlot(int slot)
@@ -410,22 +449,189 @@ namespace RollfaehrenFury.Prototype
             }
         }
 
-        private static string UpgradeValueText(Weapon weapon, UpgradeKind kind)
+        private static void UpgradeValues(
+            Weapon weapon,
+            UpgradeKind kind,
+            out string currentValue,
+            out string nextValue)
         {
             switch (kind)
             {
                 case UpgradeKind.Damage:
-                    return $"{weapon.DamageDisplay}  >  {FormatDamage(weapon, weapon.Damage * 1.2f)}";
+                    currentValue = weapon.DamageDisplay;
+                    nextValue = FormatDamage(weapon, weapon.Damage * 1.2f);
+                    return;
                 case UpgradeKind.FireRate:
-                    return $"{weapon.ShotsPerSecond * 60f:0}  >  {60f / (weapon.FireCooldown * 0.82f):0} RPM";
+                    currentValue = $"{weapon.ShotsPerSecond * 60f:0} RPM";
+                    nextValue = $"{60f / (weapon.FireCooldown * 0.82f):0} RPM";
+                    return;
                 case UpgradeKind.ReserveCapacity:
-                    return $"{weapon.ReserveMagazineCapacity}  >  {weapon.ReserveMagazineCapacity + 1} SPARES";
+                    currentValue = $"{weapon.ReserveMagazineCapacity} MAGS";
+                    nextValue = $"{weapon.ReserveMagazineCapacity + 1} MAGS";
+                    return;
                 case UpgradeKind.Reload:
-                    return $"{weapon.ReloadDuration:0.00}  >  {weapon.ReloadDuration * 0.82f:0.00} SEC";
+                    currentValue = $"{weapon.ReloadDuration:0.00} SEC";
+                    nextValue = $"{weapon.ReloadDuration * 0.82f:0.00} SEC";
+                    return;
                 case UpgradeKind.Ricochet:
-                    return $"{weapon.RicochetBounces}  >  {weapon.RicochetBounces + 1} BOUNCE";
+                    currentValue = $"{weapon.RicochetBounces} BOUNCE";
+                    nextValue = $"{weapon.RicochetBounces + 1} BOUNCE";
+                    return;
                 default:
-                    return string.Empty;
+                    currentValue = string.Empty;
+                    nextValue = string.Empty;
+                    return;
+            }
+        }
+
+        private void PreviewUpgradeSlot(int slot)
+        {
+            if (slot < 0 || slot >= currentKinds.Count || weaponSystem == null)
+            {
+                return;
+            }
+
+            UpgradeKind kind = currentKinds[slot];
+            Weapon weapon = weaponSystem.WeaponAt(selectedTarget);
+            if (weapon == null
+                || kind == UpgradeKind.Unlock
+                || GetLevel(selectedTarget, kind) >= KindMaxLevel(kind))
+            {
+                return;
+            }
+
+            previewKind = kind;
+            RefreshSummary(weapon, weaponSystem.IsWeaponUnlocked(selectedTarget));
+        }
+
+        private void ClearPreview(int slot)
+        {
+            if (!previewKind.HasValue
+                || slot < 0
+                || slot >= currentKinds.Count
+                || currentKinds[slot] != previewKind.Value)
+            {
+                return;
+            }
+
+            previewKind = null;
+            Weapon weapon = weaponSystem != null ? weaponSystem.WeaponAt(selectedTarget) : null;
+            if (weapon != null)
+            {
+                RefreshSummary(weapon, weaponSystem.IsWeaponUnlocked(selectedTarget));
+            }
+        }
+
+        private UpgradeKind? ValidPreviewKind(Weapon weapon, bool unlocked)
+        {
+            if (!unlocked || weapon == null || !previewKind.HasValue)
+            {
+                return null;
+            }
+
+            UpgradeKind kind = previewKind.Value;
+            return kind != UpgradeKind.Unlock
+                   && GetLevel(selectedTarget, kind) < KindMaxLevel(kind)
+                ? kind
+                : null;
+        }
+
+        private void SetStatRows(Weapon weapon, UpgradeKind? preview)
+        {
+            string previewDamage = preview == UpgradeKind.Damage
+                ? FormatDamage(weapon, weapon.Damage * 1.2f)
+                : null;
+            string previewRate = preview == UpgradeKind.FireRate
+                ? $"{60f / (weapon.FireCooldown * 0.82f):0} RPM"
+                : null;
+            string previewReload = preview == UpgradeKind.Reload
+                ? $"{weapon.ReloadDuration * 0.82f:0.00} SEC"
+                : null;
+            string previewReserve = preview == UpgradeKind.ReserveCapacity
+                ? $"{weapon.ReserveMagazineCapacity + 1} MAGS"
+                : null;
+            string previewSpecial = preview == UpgradeKind.Ricochet
+                ? $"{weapon.RicochetBounces + 1} BOUNCE"
+                : null;
+
+            damageStatRow?.SetContent(
+                damageIcon,
+                AccentFor(UpgradeKind.Damage),
+                "DAMAGE",
+                weapon.DamageDisplay,
+                previewDamage);
+            fireRateStatRow?.SetContent(
+                fireRateIcon,
+                AccentFor(UpgradeKind.FireRate),
+                "FIRE RATE",
+                $"{weapon.ShotsPerSecond * 60f:0} RPM",
+                previewRate);
+            reloadStatRow?.SetContent(
+                reloadIcon,
+                AccentFor(UpgradeKind.Reload),
+                "RELOAD",
+                weapon.HasInfiniteAmmo ? "N/A" : $"{weapon.ReloadDuration:0.00} SEC",
+                previewReload);
+            reserveStatRow?.SetContent(
+                magazineIcon,
+                AccentFor(UpgradeKind.ReserveCapacity),
+                "RESERVE",
+                weapon.HasInfiniteAmmo ? "UNLIMITED" : $"{weapon.ReserveMagazineCapacity} MAGS",
+                previewReserve);
+
+            if (specialStatRow != null)
+            {
+                bool showSpecial = weapon.DisplayName == "Harpoon";
+                specialStatRow.gameObject.SetActive(showSpecial);
+                if (showSpecial)
+                {
+                    specialStatRow.SetContent(
+                        ricochetIcon,
+                        AccentFor(UpgradeKind.Ricochet),
+                        "RICOCHET",
+                        $"{weapon.RicochetBounces} BOUNCE",
+                        previewSpecial);
+                }
+            }
+        }
+
+        private Sprite IconFor(UpgradeKind kind)
+        {
+            switch (kind)
+            {
+                case UpgradeKind.Unlock:
+                    return unlockIcon;
+                case UpgradeKind.Damage:
+                    return damageIcon;
+                case UpgradeKind.FireRate:
+                    return fireRateIcon;
+                case UpgradeKind.Reload:
+                    return reloadIcon;
+                case UpgradeKind.ReserveCapacity:
+                    return magazineIcon;
+                case UpgradeKind.Ricochet:
+                    return ricochetIcon;
+                default:
+                    return null;
+            }
+        }
+
+        private static Color AccentFor(UpgradeKind kind)
+        {
+            switch (kind)
+            {
+                case UpgradeKind.Damage:
+                    return UiTheme.Siren;
+                case UpgradeKind.FireRate:
+                    return UiTheme.Progress;
+                case UpgradeKind.Reload:
+                    return UiTheme.Success;
+                case UpgradeKind.ReserveCapacity:
+                    return UiTheme.Foam;
+                case UpgradeKind.Ricochet:
+                    return UiTheme.Warning;
+                default:
+                    return UiTheme.Warning;
             }
         }
 
