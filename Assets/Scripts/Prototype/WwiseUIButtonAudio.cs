@@ -78,9 +78,7 @@ namespace RollfaehrenFury.Prototype
                 return WwiseAudioRuntime.Instance.gameObject;
             }
 
-            return MenuWwiseAudio.Instance != null
-                ? MenuWwiseAudio.Instance.gameObject
-                : gameObject;
+            return WwiseInitializerRuntime.Emitter;
         }
     }
 }

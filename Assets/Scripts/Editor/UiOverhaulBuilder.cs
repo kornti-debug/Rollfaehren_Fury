@@ -62,6 +62,7 @@ namespace RollfaehrenFury.Editor
         public static void RepairMenuAudioFromCommandLine()
         {
             Scene scene = EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
+            EnsureMenuCamera();
             EnsureMenuWwiseAudio();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, MenuScenePath);
@@ -941,7 +942,12 @@ namespace RollfaehrenFury.Editor
         {
             GameObject audioObject = FindSceneObject("Menu Wwise Audio") ?? new GameObject("Menu Wwise Audio");
             RemoveLegacySceneInitializer(audioObject);
-            EnsureComponent<AkGameObj>(audioObject);
+            AkGameObj legacyEmitter = audioObject.GetComponent<AkGameObj>();
+            if (legacyEmitter != null)
+            {
+                Object.DestroyImmediate(legacyEmitter);
+            }
+
             MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(audioObject);
             SetString(menuAudio, "mainBankName", "MainSoundBank");
             EditorUtility.SetDirty(audioObject);
@@ -961,6 +967,7 @@ namespace RollfaehrenFury.Editor
         {
             GameObject cameraObject = FindSceneObject("Menu Camera") ?? new GameObject("Menu Camera");
             Camera camera = EnsureComponent<Camera>(cameraObject);
+            EnsureComponent<AkAudioListener>(cameraObject);
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = UiTheme.Hull;
             camera.transform.position = new Vector3(0f, 0f, -10f);

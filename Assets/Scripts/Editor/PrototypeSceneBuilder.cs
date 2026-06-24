@@ -310,6 +310,7 @@ namespace RollfaehrenFury.Editor
 
             GameObject cameraObject = new GameObject("Menu Camera");
             Camera camera = EnsureComponent<Camera>(cameraObject);
+            EnsureComponent<AkAudioListener>(cameraObject);
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.035f, 0.07f, 0.11f);
             camera.transform.position = new Vector3(0f, 0f, -10f);
@@ -326,7 +327,6 @@ namespace RollfaehrenFury.Editor
             MainMenuController controller = EnsureComponent<MainMenuController>(controllerObject);
 
             GameObject menuAudioObject = new GameObject("Menu Wwise Audio");
-            EnsureComponent<AkGameObj>(menuAudioObject);
             MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(menuAudioObject);
             SetString(menuAudio, "mainBankName", "MainSoundBank");
 

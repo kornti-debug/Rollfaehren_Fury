@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace RollfaehrenFury.Prototype
 {
-    [RequireComponent(typeof(AkGameObj))]
     public sealed class MenuWwiseAudio : MonoBehaviour
     {
         [SerializeField] private string mainBankName = "MainSoundBank";
@@ -35,10 +34,11 @@ namespace RollfaehrenFury.Prototype
                 yield return null;
             }
 
-            AkGameObj emitter = GetComponent<AkGameObj>();
-            if (emitter != null && !emitter.GameObjIsRegistered())
+            GameObject emitter = WwiseInitializerRuntime.Emitter;
+            while (emitter == null || !WwiseInitializerRuntime.IsEmitterRegistered())
             {
-                emitter.Register();
+                yield return null;
+                emitter = WwiseInitializerRuntime.Emitter;
             }
 
             AkBankManager.LoadBank(mainBankName, false, false);
@@ -47,7 +47,7 @@ namespace RollfaehrenFury.Prototype
 
             ready = true;
             GameSettings.ApplyAudio();
-            titleMusicPlayingId = Post(WwiseAudioNames.PlayTitleMusic, gameObject);
+            titleMusicPlayingId = Post(WwiseAudioNames.PlayTitleMusic, emitter);
         }
 
         private void OnDestroy()
@@ -81,7 +81,11 @@ namespace RollfaehrenFury.Prototype
                 titleMusicPlayingId = AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
             }
 
-            AkUnitySoundEngine.PostEvent(WwiseAudioNames.StopTitleMusic, gameObject);
+            GameObject emitter = WwiseInitializerRuntime.Emitter;
+            if (emitter != null && WwiseInitializerRuntime.IsEmitterRegistered())
+            {
+                AkUnitySoundEngine.PostEvent(WwiseAudioNames.StopTitleMusic, emitter);
+            }
         }
 
         public static uint Post(string eventName, GameObject emitter)
@@ -94,7 +98,10 @@ namespace RollfaehrenFury.Prototype
                 return AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
             }
 
-            return AkUnitySoundEngine.PostEvent(eventName, emitter);
+            GameObject persistentEmitter = WwiseInitializerRuntime.Emitter;
+            return persistentEmitter != null && WwiseInitializerRuntime.IsEmitterRegistered()
+                ? AkUnitySoundEngine.PostEvent(eventName, persistentEmitter)
+                : AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
         }
     }
 }

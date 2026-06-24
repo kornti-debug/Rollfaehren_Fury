@@ -181,11 +181,14 @@ Moving, Intense, and Shop music share the same baseline.
 
 Runtime ownership:
 
-- `WwiseInitializerRuntime` guarantees one separate persistent
-  `Wwise Initializer` across Bootstrap, Menu, and Main.
+- `WwiseInitializerRuntime` guarantees one persistent `Wwise Runtime` object
+  across Bootstrap, Menu, and Main. It owns both `AkInitializer` and the
+  registered non-spatial emitter used by title music and menu UI.
 - `Menu Wwise Audio/MenuWwiseAudio` loads `MainSoundBank`, plays/stops the
-  looping title music, and acts as the registered emitter for menu UI
-  hover/click Events. It does not own an `AkInitializer`.
+  looping title music, and manages menu bank lifetime without owning a Wwise
+  emitter or initializer.
+- `Menu Camera` owns the default `AkAudioListener`, so title music and UI
+  Events are audible before gameplay creates its player-camera listener.
 - `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
   `OutdoorSoundBank`; the previous `AkBank` component is removed to prevent
   duplicate loading.

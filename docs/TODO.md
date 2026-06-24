@@ -241,6 +241,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Sequence shop door open/close audio around additive scene transitions.
 - [x] Fix Bootstrap/Menu Wwise lifecycle so title music and UI sounds recover
   after returning from gameplay without duplicate `AkInitializer` errors.
+- [x] Move title/UI playback to the persistent Wwise emitter and add a default
+  listener to the Menu Camera.
 - [x] Keep both shop directions ordered as door open, transition, then door
   close at the destination.
 - [x] Center the reload progress fill inside its HUD frame.
