@@ -81,10 +81,7 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            if (coordinator.ExitShop())
-            {
-                WwiseAudioRuntime.Post(WwiseAudioNames.PlayDoorOpen, gameObject);
-            }
+            coordinator.ExitShop(gameObject);
         }
 
         private void SetPrompt(bool active)
