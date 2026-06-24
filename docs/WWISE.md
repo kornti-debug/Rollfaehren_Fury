@@ -181,6 +181,9 @@ Moving, Intense, and Shop music share the same baseline.
 
 Runtime ownership:
 
+- `Menu Wwise Audio/MenuWwiseAudio` initializes Wwise in `Menu.unity`, loads
+  `MainSoundBank`, plays/stops the looping title music, and acts as the emitter
+  for menu UI hover/click Events.
 - `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
   `OutdoorSoundBank`; the previous `AkBank` component is removed to prevent
   duplicate loading.
@@ -188,14 +191,17 @@ Runtime ownership:
 - `Ferry_Root/FerryAudio` owns standing water, moving wake, engine, steering,
   and `BoatSpeed`.
 - `PlayerFootsteps` sets `SurfaceType` before posting `Play_Steps`.
-- `PrototypeAudioEvents` maps weapon fire, enemy hits, ferry contact, and the
-  round-complete Harald line to authored Event names.
+- `PrototypeAudioEvents` maps weapon fire, active-weapon reload start, enemy
+  hits, ferry contact, and the round-complete Harald line to authored Event
+  names. Shotgun reload uses its dedicated Event; Pistol and Assault Rifle use
+  the shared gun-reload Event.
 - `EnemyMovementAudio` owns per-enemy fish/pigeon movement loops.
 - `WwiseUIButtonAudio` posts non-spatial hover and click feedback from
   gameplay, pause, augment, game-over, and shop buttons. Runtime-created shop
   nodes inherit it from their button template.
-- `ShopScenePortal` and `ShopInteriorExit` post `Play_RC_Door_Open` only when
-  their additive transition is accepted. Door-close audio remains unwired.
+- `ShopSceneCoordinator` sequences spatial door audio around additive
+  transitions: open at the current door, delay briefly, teleport/load or
+  unload, then close at the destination door.
 - `IndoorSoundBank` remains empty, but its shop-entry load and shop-exit unload
   lifecycle is wired for later room tone, dialogue, and reverb content.
 
@@ -204,9 +210,9 @@ guarded by `WwiseAudioRuntime.IsReady`, so a missing local bank prevents audio
 without breaking gameplay.
 
 The footstep Switch Container explicitly maps `Wood`, `Gravel`, and `Grass`
-to their matching Random Containers. Unity currently uses the `Wood` tag or
-the ferry/jetty/shop hierarchy names for Wood and falls back to Gravel for all
-other walkable surfaces. Grass remains authored for possible later use.
+to their matching Random Containers. Unity uses the `Wood` tag or the
+ferry/jetty/shop hierarchy names for Wood, the dominant terrain layer named
+`NewLayer 4` for Grass, and Gravel for every other terrain or unknown surface.
 
 Music switch changes use a short restart of the active background-music
 playing ID. This makes Docked, Moving, Shop, Mid, and Intense changes audible

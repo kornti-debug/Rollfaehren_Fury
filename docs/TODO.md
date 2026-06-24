@@ -236,6 +236,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Import initial UI hover/click and shop-door sounds.
 - [x] Author looping title-screen music plus separate shotgun fire, shotgun
   reload, and shared gun-reload Events and assign them to SoundBanks.
+- [x] Add menu-local title music and menu UI audio lifecycle.
+- [x] Wire separate Shotgun fire/reload and shared Pistol/Rifle reload Events.
+- [x] Sequence shop door open/close audio around additive scene transitions.
+- [x] Detect `NewLayer 4` as Grass footsteps while Wood-tagged objects remain
+  Wood and all other terrain layers use Gravel.
 - [ ] Collect and import UI purchase, back, and error sounds.
 - [x] Import assault-rifle fire, enemy/ferry contact, background, shop,
   victory, and defeat audio.

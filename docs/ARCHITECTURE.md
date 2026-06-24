@@ -144,13 +144,18 @@ Planned systems and responsibilities:
   and playing-ID stop helpers. `IndoorSoundBank` loads only while
   `GameManager.IsInsideShop`; music switch changes restart the current music
   playing ID with a short fade so long source segments change immediately.
+- `MenuWwiseAudio`: menu-local Wwise initializer and bank owner. It loads
+  `MainSoundBank`, applies saved volume settings, plays the looping title
+  music, stops it before New Game, and supplies a registered emitter for menu
+  UI feedback.
 - `FerryAudio`: owns ferry standing-water, moving-wake, engine, and steering
   playback. It follows `FerryController.IsCrossing` and drives the
   `BoatSpeed` RTPC from `0` to `100`.
 - `PlayerFootsteps`: reads the controller's movement, grounded, and sprint
   state, raycasts the current walking surface, sets `SurfaceType` to Wood,
   Gravel, or Grass, and posts `Play_Steps` at walk/sprint intervals.
-- `PrototypeAudioEvents`: maps the active weapon to its authored fire Event,
+- `PrototypeAudioEvents`: maps the active weapon to its authored fire and
+  reload Events,
   posts fish/pigeon hit Events on the enemy emitter, posts enemy/ferry contact
   Events on the ferry emitter, and plays Harald after a completed crossing.
 - `EnemyMovementAudio`: is attached to spawned enemies by `EnemySpawner` and
@@ -161,9 +166,9 @@ Planned systems and responsibilities:
   UI. Pointer hover and controller selection share one guarded hover post;
   pointer click and submit share one guarded click post. The editor-authored
   menu, pause, shop, augment, and game-over controls all carry this component.
-- `ShopScenePortal` / `ShopInteriorExit`: use the portal or exit object as a
-  spatial door emitter and post `Play_RC_Door_Open` only after
-  `ShopSceneCoordinator` accepts the transition.
+- `ShopScenePortal` / `ShopInteriorExit`: pass their spatial door emitters to
+  `ShopSceneCoordinator`, which sequences open/close Events around the
+  additive transition so emitters remain valid and audible.
 - The player's hidden controller capsule owns the camera, movement, weapons,
   and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose. Falling below `SimpleFPSController.fallDeathHeight` (into the river) calls `GameManager.TriggerGameOver`, so leaving the ferry ends the run.
 - `Cargo`: later destructible cargo with reward value.

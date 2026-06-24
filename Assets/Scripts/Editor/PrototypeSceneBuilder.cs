@@ -325,6 +325,12 @@ namespace RollfaehrenFury.Editor
             GameObject controllerObject = new GameObject("Main Menu Controller");
             MainMenuController controller = EnsureComponent<MainMenuController>(controllerObject);
 
+            GameObject menuAudioObject = new GameObject("Menu Wwise Audio");
+            EnsureComponent<AkInitializer>(menuAudioObject);
+            EnsureComponent<AkGameObj>(menuAudioObject);
+            MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(menuAudioObject);
+            SetString(menuAudio, "mainBankName", "MainSoundBank");
+
             GameObject mainPanel = CreateUiPanel(canvasObject.transform, "Main Panel", TextAnchor.MiddleCenter, Vector2.zero, new Vector2(680f, 500f));
             Image mainBackground = EnsureComponent<Image>(mainPanel);
             mainBackground.color = new Color(0.03f, 0.05f, 0.07f, 0.88f);
@@ -1142,6 +1148,7 @@ namespace RollfaehrenFury.Editor
             SetFloat(footsteps, "surfaceProbeRadius", 0.18f);
             SetString(footsteps, "defaultSurface", "Gravel");
             SetString(footsteps, "woodTag", "Wood");
+            SetStringArray(footsteps, "grassTerrainLayerNames", new[] { "NewLayer 4" });
             EnsureWoodSurfaceTags();
 
             GameObject wwiseGlobal = FindSceneObjectIncludingInactive("WwiseGlobal");
@@ -2167,6 +2174,25 @@ namespace RollfaehrenFury.Editor
                 serializedObject.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(target);
             }
+        }
+
+        private static void SetStringArray(Object target, string propertyName, string[] values)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property == null || !property.isArray)
+            {
+                return;
+            }
+
+            property.arraySize = values != null ? values.Length : 0;
+            for (int i = 0; values != null && i < values.Length; i++)
+            {
+                property.GetArrayElementAtIndex(i).stringValue = values[i];
+            }
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
         }
 
         private static void SetEnum(Object target, string propertyName, int value)
