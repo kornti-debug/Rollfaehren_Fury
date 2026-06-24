@@ -80,11 +80,13 @@ Authored content currently tracked in the repository:
   footstep containers
 - Random/sequence containers for ferry, fish, pigeons, weapons, doors, and UI
 - Events for footsteps, voice, ferry loops, fish/pigeon movement and hits,
-  harpoon, pistol, shotgun, assault rifle, doors, and UI
+  harpoon, pistol, separate shotgun fire/reload, shared gun reload, doors, and UI
 - Ferry-contact effects for fish and pigeons
 - A `BackgroundMusic` Music Switch Container driven by `GameState`, with
   `CombatIntensity` selecting the moving-ferry music
 - Dedicated victory and defeat Music Segments
+- A looping `TitleScreenMusic_Loop` playlist controlled by dedicated Play/Stop
+  Events
 - `BoatSpeed` game parameter for ferry engine pitch
 - Shared distance-volume/low-pass attenuation
 - User-defined SoundBanks: `MainSoundBank`, `OutdoorSoundBank`, and
@@ -129,7 +131,9 @@ ignore policy.
 - `Play_EnemyFishHit`
 - `Play_HarpoonFired`
 - `Play_PistolFired`
-- `Play_ShotgunFiredAndReload`
+- `Play_ShotgunFired`
+- `Play_ShotgunReload`
+- `Play_GunReload`
 - `Play_FallingOffWilhelmScream`
 - `Play_RC_UI_Hover`
 - `Play_RC_UI_Click`
@@ -141,10 +145,9 @@ ignore policy.
 - `Play_BackgroundMusic` / `Stop_BackgroundMusic`
 - `Play_VictoryMusic` / `Stop_VictoryMusic`
 - `Play_DefeatMusic` / `Stop_DefeatMusic`
+- `Play_TitleScreenMusic` / `Stop_TitleScreenMusic`
 
-These names remain available while authoring. Before Unity wiring, split
-combined actions such as `Play_ShotgunFiredAndReload` and adopt the final event
-names in `AUDIO_COLLECTION.md`.
+The retired combined `Play_ShotgunFiredAndReload` Event has been removed.
 
 The stable Unity-facing footstep event is `Play_Steps`, which targets
 `SC_Footsteps`. Unity must set `SurfaceType` before posting it.
@@ -165,9 +168,9 @@ The first Unity integration uses these game syncs:
 - `BoatSpeed`: RTPC from `0` to `100`
 
 Weapons and enemy sounds use 3D positioning with `Attn_Medium_40m`. Ferry
-loops use the existing long-distance ferry attenuation. The current combined
-`Play_ShotgunFiredAndReload` Event is intentionally retained for the first
-functional integration pass.
+loops use the existing long-distance ferry attenuation. Shotgun fire and
+reload are separate Events; `Play_GunReload` is shared by the Pistol and
+Assault Rifle until dedicated reload recordings are added.
 
 The first in-game listening pass confirmed the main weapon, ferry, enemy,
 voice, and UI Events. Its latest authored level adjustments are kept as a

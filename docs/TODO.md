@@ -234,6 +234,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Complete creator, source URL, license, and edit fields in `docs/AUDIO_SOURCES.csv`.
 - [x] Collect and import gravel and grass footsteps.
 - [x] Import initial UI hover/click and shop-door sounds.
+- [x] Author looping title-screen music plus separate shotgun fire, shotgun
+  reload, and shared gun-reload Events and assign them to SoundBanks.
 - [ ] Collect and import UI purchase, back, and error sounds.
 - [x] Import assault-rifle fire, enemy/ferry contact, background, shop,
   victory, and defeat audio.

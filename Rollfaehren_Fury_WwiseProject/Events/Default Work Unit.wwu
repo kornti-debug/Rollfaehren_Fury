@@ -174,17 +174,6 @@
 						</Action>
 					</ChildrenList>
 				</Event>
-				<Event Name="Play_ShotgunFiredAndReload" ID="{056AB1FC-8197-42E2-AC36-B12EEBA58029}">
-					<ChildrenList>
-						<Action Name="" ID="{CA49617D-6D8C-409A-8E41-2E7A09B2C257}" ShortID="162787849">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="ShotgunFiredAndReload" ID="{A16DB7D4-E761-46D2-84AA-A08620B52171}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-					</ChildrenList>
-				</Event>
 				<Event Name="Play_RC_UI_Hover" ID="{ACA815EF-315C-4D5A-AE7A-E2DEE0BE5ED9}">
 					<ChildrenList>
 						<Action Name="" ID="{03D85E30-E438-4379-95B0-A815AE643819}" ShortID="1054994569">
@@ -374,6 +363,64 @@
 							<ReferenceList>
 								<Reference Name="Target">
 									<ObjectRef Name="BoatWaveMoving" ID="{8D4A01B1-4A26-4A28-AC8C-6EA622B52495}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_TitleScreenMusic" ID="{8E19C70F-F495-4188-B70E-3D314E52C070}">
+					<ChildrenList>
+						<Action Name="" ID="{7CF266C3-1E21-45EA-AFE9-49E55D0C2B5D}" ShortID="64588696">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="TitleScreenMusic_Loop" ID="{3D664799-CD5B-4D82-80E7-AA9CBCB2ED19}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Stop_TitleScreenMusic" ID="{E323CF4A-848F-4B29-A333-9B1EAD519C35}">
+					<ChildrenList>
+						<Action Name="" ID="{27FC9A9E-AD66-4318-8386-59B43C2C9D3A}" ShortID="913910590">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="TitleScreenMusic_Loop" ID="{3D664799-CD5B-4D82-80E7-AA9CBCB2ED19}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_ShotgunFired" ID="{1F7802E4-755C-4BB5-BCE0-96A2427B444A}">
+					<ChildrenList>
+						<Action Name="" ID="{BC07FCC3-3452-4293-A9C8-285418B96C44}" ShortID="314659014">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ShotgunFired" ID="{3181FB12-2F3A-41A4-849C-2FCE810477F4}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_ShotgunReload" ID="{A2FE6CC4-0B2F-46CD-9D39-165AC405B220}">
+					<ChildrenList>
+						<Action Name="" ID="{8915C634-6206-45C5-B683-4AA83E5E29A6}" ShortID="255913770">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ShotgunReload" ID="{42E164F2-8DFF-4A57-B44B-78FD7FC0251B}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_GunReload" ID="{C2012EF5-5DD8-409D-B679-5EB40D7EA45A}">
+					<ChildrenList>
+						<Action Name="" ID="{AB1C2CC3-1920-4A5F-8001-DBF8E532D453}" ShortID="145761739">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="GunReload" ID="{7EAC21BE-33B3-48E5-9DD5-079EE37BE566}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
 								</Reference>
 							</ReferenceList>
 						</Action>
