@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.RepairKitAugment
   displayName: Repair Kit
   description: Heal 5% ferry HP each round.
+  category: 0
+  benefitText: Repair 5% ferry health after each round.
+  drawbackText: ''
+  unique: 0
   healFraction: 0.05

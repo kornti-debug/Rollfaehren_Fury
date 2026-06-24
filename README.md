@@ -10,6 +10,8 @@ Build a small but complete ferry-only vertical slice with placeholder low-poly a
 
 - Bootstrap/menu flow: `Assets/Scenes/Bootstrap.unity` -> `Assets/Scenes/Menu.unity` -> `Assets/Scenes/Main.unity`
 - Shared additive shop interior: `Assets/Scenes/ShopInterior.unity`
+- Authored UGUI interface with ferry hazard-sign styling, pause/settings, HUD,
+  card-based weapon shop, augment draft, and game-over overlay
 - FPS player on a prototype ferry deck
 - Enemies approaching the ferry
 - Enemies damage only the ferry on contact, then disappear
@@ -72,7 +74,7 @@ For Wwise setup details, see [docs/WWISE.md](docs/WWISE.md).
 
 ## Playable MVP Workflow
 
-Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity` and press Play. The menu has `New Game`, `Settings`, and `Quit`. `New Game` loads `Assets/Scenes/Main.unity`.
+Open `Assets/Scenes/Bootstrap.unity` or `Assets/Scenes/Menu.unity` and press Play. The menu has `New Game`, `Settings`, and `Quit`. `New Game` loads `Assets/Scenes/Main.unity`. Settings persist Master, Music, SFX, and mouse sensitivity through `PlayerPrefs`.
 
 Controls:
 
@@ -88,7 +90,7 @@ Controls:
 
 Gameplay input uses subscribed callbacks from the project-wide `Assets/InputSystem_Actions.inputactions` asset.
 
-If scenes get broken while experimenting, run `Rollfaehren Fury > Build Prototype Scene` to regenerate the prototype gameplay scene, `Rollfaehren Fury > Build Bootstrap And Menu Scenes` to regenerate the bootstrap/menu flow, or `Rollfaehren Fury > Build Shared Shop Interior` to rebuild the placeholder shop room.
+If scenes get broken while experimenting, run `Rollfaehren Fury > Build Ferry Hazard UI` to repair the authored Menu/Main UI references, `Rollfaehren Fury > Build Prototype Scene` to repair prototype gameplay objects, `Rollfaehren Fury > Build Bootstrap And Menu Scenes` to regenerate the bootstrap/menu flow, or `Rollfaehren Fury > Build Shared Shop Interior` to rebuild the placeholder shop room. The gameplay scene builder preserves a UI Canvas marked with `UiLayoutMarker`.
 
 ## Team Workflow
 

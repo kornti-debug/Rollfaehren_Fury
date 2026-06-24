@@ -14,7 +14,14 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private GameManager gameManager;
         [SerializeField] private EnemySpawner spawner;
         [SerializeField] private List<AugmentDefinition> pool = new List<AugmentDefinition>();
-        [SerializeField] private List<Button> draftButtons = new List<Button>();
+        [SerializeField] private List<AugmentCardView> draftCards = new List<AugmentCardView>();
+        [Header("Category Icons")]
+        [SerializeField] private Sprite ferryIcon;
+        [SerializeField] private Sprite weaponIcon;
+        [SerializeField] private Sprite playerIcon;
+        [SerializeField] private Sprite economyIcon;
+        [SerializeField] private Sprite enemiesIcon;
+        [SerializeField] private Sprite worldIcon;
         [Tooltip("Add the weapon/utility augments (Bilge Pump, Reload Fury, Rapid Reload, Adrenaline) to the pool at startup.")]
         [SerializeField] private bool addExtraAugments = true;
 
@@ -57,19 +64,33 @@ namespace RollfaehrenFury.Prototype
             bilge.InitRuntime(
                 "Bilge Pump",
                 "Repair 0.5 ferry HP per kill, up to 10 HP each crossing",
-                false);
+                false,
+                AugmentCategory.Ferry,
+                "Repair 0.5 HP per kill, up to 10 HP per crossing");
             pool.Add(bilge);
 
             ReloadFuryAugment fury = ScriptableObject.CreateInstance<ReloadFuryAugment>();
-            fury.InitRuntime("Reload Fury", "+50% weapon damage for 10s after each reload");
+            fury.InitRuntime(
+                "Reload Fury",
+                "+50% weapon damage for 10s after each reload",
+                true,
+                AugmentCategory.Weapon);
             pool.Add(fury);
 
             RapidReloadAugment rapid = ScriptableObject.CreateInstance<RapidReloadAugment>();
-            rapid.InitRuntime("Rapid Reload", "All weapons reload 30% faster");
+            rapid.InitRuntime(
+                "Rapid Reload",
+                "All weapons reload 30% faster",
+                true,
+                AugmentCategory.Weapon);
             pool.Add(rapid);
 
             AdrenalineAugment adrenaline = ScriptableObject.CreateInstance<AdrenalineAugment>();
-            adrenaline.InitRuntime("Adrenaline", "+40% move speed for 5s every 5th kill");
+            adrenaline.InitRuntime(
+                "Adrenaline",
+                "+40% move speed for 5s every 5th kill",
+                true,
+                AugmentCategory.Player);
             pool.Add(adrenaline);
         }
 
@@ -87,16 +108,16 @@ namespace RollfaehrenFury.Prototype
                 }
             }
 
-            for (int i = 0; i < draftButtons.Count; i++)
+            for (int i = 0; i < draftCards.Count; i++)
             {
-                Button button = draftButtons[i];
+                AugmentCardView card = draftCards[i];
 
-                if (button == null || available.Count == 0)
+                if (card == null || available.Count == 0)
                 {
                     offered.Add(null);
-                    if (button != null)
+                    if (card != null)
                     {
-                        button.gameObject.SetActive(false);
+                        card.gameObject.SetActive(false);
                     }
 
                     continue;
@@ -107,16 +128,7 @@ namespace RollfaehrenFury.Prototype
                 available.RemoveAt(pick);
                 offered.Add(chosen);
 
-                button.gameObject.SetActive(true);
-                button.interactable = true;
-
-                Text label = button.GetComponentInChildren<Text>();
-                if (label != null)
-                {
-                    label.text = string.IsNullOrEmpty(chosen.Description)
-                        ? $"<b>{chosen.DisplayName}</b>"
-                        : $"<b>{chosen.DisplayName}</b>\n<size=15><color=#bcc6d0>{chosen.Description}</color></size>";
-                }
+                card.SetContent(chosen, IconFor(chosen.Category), AccentFor(chosen.Category));
             }
         }
 
@@ -142,6 +154,44 @@ namespace RollfaehrenFury.Prototype
             acquiredUnique.Clear();
             acquired.Clear();
             offered.Clear();
+        }
+
+        private Sprite IconFor(AugmentCategory category)
+        {
+            switch (category)
+            {
+                case AugmentCategory.Ferry:
+                    return ferryIcon;
+                case AugmentCategory.Weapon:
+                    return weaponIcon;
+                case AugmentCategory.Player:
+                    return playerIcon;
+                case AugmentCategory.Economy:
+                    return economyIcon;
+                case AugmentCategory.Enemies:
+                    return enemiesIcon;
+                default:
+                    return worldIcon;
+            }
+        }
+
+        private static Color AccentFor(AugmentCategory category)
+        {
+            switch (category)
+            {
+                case AugmentCategory.Ferry:
+                    return UiTheme.Progress;
+                case AugmentCategory.Weapon:
+                    return UiTheme.Siren;
+                case AugmentCategory.Player:
+                    return UiTheme.Success;
+                case AugmentCategory.Economy:
+                    return UiTheme.Warning;
+                case AugmentCategory.Enemies:
+                    return UiTheme.WarningDark;
+                default:
+                    return UiTheme.Muted;
+            }
         }
     }
 }

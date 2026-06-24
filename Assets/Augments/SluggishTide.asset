@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.SluggishTideAugment
   displayName: Sluggish Tide
   description: Enemies move 20% slower.
+  category: 4
+  benefitText: Enemies move 20% slower.
+  drawbackText: ''
+  unique: 0
   speedMultiplier: 0.8

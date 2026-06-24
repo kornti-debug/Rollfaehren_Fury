@@ -48,6 +48,16 @@ namespace RollfaehrenFury.Prototype
         public WeaponDefinition Definition => definition;
         public string DisplayName => definition != null ? definition.DisplayName : name;
         public float Damage => currentDamage;
+        public string DamageDisplay
+        {
+            get
+            {
+                int pellets = definition != null ? definition.PelletsPerShot : 1;
+                return pellets > 1
+                    ? $"{currentDamage:0.#} \u00d7 {pellets}"
+                    : $"{currentDamage:0.#}";
+            }
+        }
         public float FireCooldown => currentCooldown;
         public float ShotsPerSecond => currentCooldown <= 0f ? 0f : 1f / currentCooldown;
         public bool IsAutomatic => definition != null && definition.Automatic;
@@ -61,6 +71,8 @@ namespace RollfaehrenFury.Prototype
         public int ReserveAmmo { get { EnsureStats(); return magazineSize <= 0 ? -1 : currentReserve; } }
         public int MaxReserveAmmo { get { EnsureStats(); return maxReserve; } }
         public int ReserveMagazineCapacity { get { EnsureStats(); return reserveMagazineCapacity; } }
+        public float ReloadDuration { get { EnsureStats(); return reloadDuration; } }
+        public int RicochetBounces => ricochetBounces;
         /// <summary>True when the magazine and reserve are both topped up (or the weapon is unlimited).</summary>
         public bool IsAmmoFull { get { EnsureStats(); return magazineSize <= 0 || (currentAmmo >= magazineSize && currentReserve >= maxReserve); } }
         public bool IsReloading => isReloading;

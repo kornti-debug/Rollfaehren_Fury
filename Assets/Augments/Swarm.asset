@@ -14,5 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.SwarmAugment
   displayName: The Swarm
   description: 2x enemies, half HP.
+  category: 4
+  benefitText: Enemies have half HP.
+  drawbackText: 2x enemy count.
+  unique: 0
   countMultiplier: 2
   healthMultiplier: 0.5

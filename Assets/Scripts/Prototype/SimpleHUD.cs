@@ -15,6 +15,10 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Image crossingFill;
         [SerializeField] private Text weaponStatsText;
         [SerializeField] private Text messageText;
+        [SerializeField] private Text warningText;
+        [SerializeField] private GameObject reloadBarRoot;
+        [SerializeField] private Image reloadBarFill;
+        [SerializeField] private Text reloadBarLabel;
 
         [Header("Shop")]
         [SerializeField] private GameObject shopPanel;
@@ -31,31 +35,36 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private Text gameOverText;
 
         private GameManager gameManager;
-        private Text warningText;
         private float warningHideTime;
         private float healthFillTarget = 1f;
         private float crossingFillTarget;
-        private GameObject reloadBarRoot;
-        private Image reloadBarFill;
-        private Text reloadBarLabel;
+        private RectTransform ferryHealthFillRect;
+        private RectTransform crossingFillRect;
+        private RectTransform reloadBarFillRect;
 
         private void Awake()
         {
-            BuildImprovedHud();
+            ferryHealthFillRect = PrepareFillRect(ferryHealthFill);
+            crossingFillRect = PrepareFillRect(crossingFill);
+            reloadBarFillRect = PrepareFillRect(reloadBarFill);
+            SetActive(reloadBarRoot, false);
+            SetActive(warningText != null ? warningText.gameObject : null, false);
         }
 
         private void Update()
         {
-            if (warningText != null && warningText.gameObject.activeSelf && Time.unscaledTime >= warningHideTime)
+            if (warningText != null
+                && warningText.gameObject.activeSelf
+                && Time.unscaledTime >= warningHideTime)
             {
                 warningText.gameObject.SetActive(false);
             }
 
-            AnimateBar(ferryHealthFill, healthFillTarget);
-            AnimateBar(crossingFill, crossingFillTarget);
+            float currentHealthFill = AnimateBar(ferryHealthFillRect, healthFillTarget);
+            AnimateBar(crossingFillRect, crossingFillTarget);
             if (ferryHealthFill != null)
             {
-                ferryHealthFill.color = HealthColor(ferryHealthFill.fillAmount);
+                ferryHealthFill.color = HealthColor(currentHealthFill);
             }
         }
 
@@ -64,60 +73,55 @@ namespace RollfaehrenFury.Prototype
             gameManager = manager;
         }
 
-        public void SetStats(float ferryHealth, float ferryMaxHealth, int money, int round, float crossingProgress, string weaponName, int weaponIndex, int weaponCount, float weaponDamage, float shotsPerSecond, int ammoInMagazine, int magazineSize, int reserveAmmo, bool infiniteAmmo, bool isReloading, float reloadProgress)
+        public void SetStats(
+            float ferryHealth,
+            float ferryMaxHealth,
+            int money,
+            int round,
+            float crossingProgress,
+            string weaponName,
+            int weaponIndex,
+            int weaponCount,
+            string weaponDamage,
+            float shotsPerSecond,
+            int ammoInMagazine,
+            int magazineSize,
+            int reserveAmmo,
+            bool infiniteAmmo,
+            bool isReloading,
+            float reloadProgress)
         {
-            if (ferryHealthText != null)
-            {
-                ferryHealthText.text = $"Ferry: {Mathf.CeilToInt(ferryHealth)} / {Mathf.CeilToInt(ferryMaxHealth)}";
-            }
+            SetText(
+                ferryHealthText,
+                $"FERRY  {Mathf.CeilToInt(ferryHealth)} / {Mathf.CeilToInt(ferryMaxHealth)}");
+            healthFillTarget = ferryMaxHealth <= 0f
+                ? 0f
+                : Mathf.Clamp01(ferryHealth / ferryMaxHealth);
 
-            healthFillTarget = ferryMaxHealth <= 0f ? 0f : Mathf.Clamp01(ferryHealth / ferryMaxHealth);
-
-            if (moneyText != null)
-            {
-                moneyText.text = $"Money: ${money}";
-            }
-
-            if (roundText != null)
-            {
-                roundText.text = $"Round {round}";
-            }
+            SetText(moneyText, $"${money}");
+            SetText(roundText, $"ROUND {round}");
 
             int percent = Mathf.RoundToInt(Mathf.Clamp01(crossingProgress) * 100f);
-            if (crossingText != null)
-            {
-                crossingText.text = $"Crossing: {percent}%";
-            }
-
+            SetText(crossingText, $"CROSSING  {percent}%");
             crossingFillTarget = Mathf.Clamp01(crossingProgress);
 
             if (weaponStatsText != null)
             {
-                string slot = weaponCount > 1 ? $" [{weaponIndex}/{weaponCount}]" : string.Empty;
-                string ammo;
-                if (infiniteAmmo)
-                {
-                    ammo = "Ammo ∞";
-                }
-                else
-                {
-                    string mag = isReloading ? "Reloading" : $"Ammo {Mathf.Max(0, ammoInMagazine)}/{magazineSize}";
-                    ammo = $"{mag}   Reserve {Mathf.Max(0, reserveAmmo)}";
-                }
-
-                weaponStatsText.text = $"{weaponName}{slot}  {weaponDamage:0} dmg | {shotsPerSecond * 60f:0} RPM\n{ammo}";
+                string slot = weaponCount > 1 ? $"  [{weaponIndex}/{weaponCount}]" : string.Empty;
+                string ammo = infiniteAmmo
+                    ? "AMMO  UNLIMITED"
+                    : isReloading
+                        ? $"RELOADING  |  RESERVE {Mathf.Max(0, reserveAmmo)}"
+                        : $"AMMO {Mathf.Max(0, ammoInMagazine)}/{magazineSize}  |  RESERVE {Mathf.Max(0, reserveAmmo)}";
+                weaponStatsText.text =
+                    $"{weaponName.ToUpperInvariant()}{slot}\n{weaponDamage} DMG  |  {shotsPerSecond * 60f:0} RPM\n{ammo}";
             }
 
             bool showReload = isReloading && !infiniteAmmo;
-            if (reloadBarRoot != null)
-            {
-                reloadBarRoot.SetActive(showReload);
-            }
+            SetActive(reloadBarRoot, showReload);
+            SetBarImmediate(reloadBarFillRect, Mathf.Clamp01(reloadProgress));
 
-            if (reloadBarFill != null)
-            {
-                reloadBarFill.fillAmount = Mathf.Clamp01(reloadProgress);
-            }
+            SetText(reloadBarLabel, "RELOADING");
         }
 
         public void ShowGameplay()
@@ -131,21 +135,17 @@ namespace RollfaehrenFury.Prototype
 
         public void ShowShop(int completedRound, int money)
         {
-            ShowShopPanel($"Round {completedRound} survived", money, true);
+            ShowShopPanel($"ROUND {completedRound} SURVIVED", money, true);
         }
 
         public void ShowShopOverlay(int money)
         {
-            ShowShopPanel("Shop", money, false);
+            ShowShopPanel("FERRY SUPPLY OFFICE", money, false);
         }
 
-        /// <summary>Updates just the shop's money label (e.g. after a node-tree purchase) without re-toggling panels.</summary>
         public void SetShopMoney(int money)
         {
-            if (shopMoneyText != null)
-            {
-                shopMoneyText.text = $"Money: ${money}";
-            }
+            SetText(shopMoneyText, $"AVAILABLE FUNDS  ${money}");
         }
 
         private void ShowShopPanel(string title, int money, bool showNextRound)
@@ -154,17 +154,8 @@ namespace RollfaehrenFury.Prototype
             SetActive(shopPanel, true);
             SetActive(gameOverPanel, false);
             SetActive(augmentDraftPanel, false);
-
-            if (shopTitleText != null)
-            {
-                shopTitleText.text = title;
-            }
-
-            if (shopMoneyText != null)
-            {
-                shopMoneyText.text = $"Money: ${money}";
-            }
-
+            SetText(shopTitleText, title);
+            SetShopMoney(money);
             SetActive(nextRoundButton, showNextRound);
             SetActive(closeShopButton, !showNextRound);
         }
@@ -183,19 +174,12 @@ namespace RollfaehrenFury.Prototype
             SetActive(shopPanel, false);
             SetActive(gameOverPanel, true);
             SetActive(augmentDraftPanel, false);
-
-            if (gameOverText != null)
-            {
-                gameOverText.text = $"Ferry destroyed\nReached round {round}\nMoney: ${money}";
-            }
+            SetText(gameOverText, $"FERRY LOST\nROUND {round}  |  ${money}");
         }
 
         public void ShowMessage(string message)
         {
-            if (messageText != null)
-            {
-                messageText.text = message;
-            }
+            SetText(messageText, message);
         }
 
         public void ShowWarning(string message, float duration)
@@ -210,182 +194,6 @@ namespace RollfaehrenFury.Prototype
             warningHideTime = Time.unscaledTime + Mathf.Max(0.1f, duration);
         }
 
-        // Restructures the builder-generated HUD at runtime: weapon stats move to a
-        // bottom-right panel, and a top-center swarm-warning banner is added. The top-left
-        // status panel (health / money / round / crossing) is left where it is.
-        private void BuildImprovedHud()
-        {
-            RectTransform root = transform as RectTransform;
-            if (root == null)
-            {
-                return;
-            }
-
-            // Idempotent: never build the runtime panels twice on the same HUD.
-            if (root.Find("Weapon HUD") != null)
-            {
-                return;
-            }
-
-            // Compact + subtle card background behind the top-left status cluster.
-            if (gameplayPanel != null)
-            {
-                gameplayPanel.transform.localScale = Vector3.one * 0.72f;
-                Image statusBackground = gameplayPanel.GetComponent<Image>();
-                if (statusBackground == null)
-                {
-                    statusBackground = gameplayPanel.AddComponent<Image>();
-                }
-
-                statusBackground.color = new Color(0.04f, 0.06f, 0.09f, 0.5f);
-                statusBackground.raycastTarget = false;
-            }
-
-            // A Filled Image needs a sprite, or fillAmount is silently ignored (bar always full).
-            MakeFillable(ferryHealthFill);
-            MakeFillable(crossingFill);
-
-            // Give the bars a clear "empty" colour so the lost/remaining part reads off the bar.
-            TintBarBackground(ferryHealthFill, new Color(0.14f, 0.14f, 0.16f, 0.85f));
-            TintBarBackground(crossingFill, new Color(0.14f, 0.14f, 0.16f, 0.85f));
-
-            // Money gets its own top-right card.
-            if (moneyText != null)
-            {
-                GameObject moneyPanel = new GameObject("Money HUD", typeof(RectTransform), typeof(Image));
-                moneyPanel.transform.SetParent(root, false);
-                RectTransform moneyRect = moneyPanel.GetComponent<RectTransform>();
-                moneyRect.anchorMin = moneyRect.anchorMax = moneyRect.pivot = new Vector2(1f, 1f);
-                moneyRect.anchoredPosition = new Vector2(-28f, -28f);
-                moneyRect.sizeDelta = new Vector2(280f, 64f);
-
-                Image moneyBackground = moneyPanel.GetComponent<Image>();
-                moneyBackground.color = new Color(0.04f, 0.06f, 0.09f, 0.5f);
-                moneyBackground.raycastTarget = false;
-
-                moneyText.transform.SetParent(moneyPanel.transform, false);
-                RectTransform moneyTextRect = moneyText.rectTransform;
-                moneyTextRect.anchorMin = Vector2.zero;
-                moneyTextRect.anchorMax = Vector2.one;
-                moneyTextRect.offsetMin = new Vector2(16f, 8f);
-                moneyTextRect.offsetMax = new Vector2(-16f, -8f);
-                moneyText.alignment = TextAnchor.MiddleRight;
-                moneyText.fontSize = 26;
-            }
-
-            if (weaponStatsText != null)
-            {
-                GameObject weaponPanel = new GameObject("Weapon HUD", typeof(RectTransform), typeof(Image));
-                weaponPanel.transform.SetParent(root, false);
-                RectTransform panelRect = weaponPanel.GetComponent<RectTransform>();
-                panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(1f, 0f);
-                panelRect.anchoredPosition = new Vector2(-28f, 28f);
-                panelRect.sizeDelta = new Vector2(440f, 104f);
-
-                Image background = weaponPanel.GetComponent<Image>();
-                background.color = new Color(0.04f, 0.06f, 0.09f, 0.55f);
-                background.raycastTarget = false;
-
-                weaponStatsText.transform.SetParent(weaponPanel.transform, false);
-                RectTransform statsRect = weaponStatsText.rectTransform;
-                statsRect.anchorMin = Vector2.zero;
-                statsRect.anchorMax = Vector2.one;
-                statsRect.offsetMin = new Vector2(16f, 8f);
-                statsRect.offsetMax = new Vector2(-16f, -8f);
-                weaponStatsText.alignment = TextAnchor.MiddleRight;
-                weaponStatsText.fontSize = 24;
-            }
-
-            GameObject warningObject = new GameObject("Swarm Warning", typeof(RectTransform));
-            warningObject.transform.SetParent(root, false);
-            RectTransform warningRect = warningObject.GetComponent<RectTransform>();
-            warningRect.anchorMin = warningRect.anchorMax = warningRect.pivot = new Vector2(0.5f, 1f);
-            warningRect.anchoredPosition = new Vector2(0f, -96f);
-            warningRect.sizeDelta = new Vector2(960f, 64f);
-
-            warningText = warningObject.AddComponent<Text>();
-            warningText.font = ResolveFont();
-            warningText.fontSize = 36;
-            warningText.fontStyle = FontStyle.Bold;
-            warningText.alignment = TextAnchor.MiddleCenter;
-            warningText.color = new Color(1f, 0.35f, 0.2f);
-            warningText.raycastTarget = false;
-            warningObject.SetActive(false);
-
-            BuildReloadBar(root);
-        }
-
-        // A separate reload progress bar that appears centered below the crosshair only while
-        // reloading. It fills left-to-right in proportion to reload progress so the player can
-        // time the next shot.
-        private void BuildReloadBar(RectTransform root)
-        {
-            reloadBarRoot = new GameObject("Reload HUD", typeof(RectTransform), typeof(Image));
-            reloadBarRoot.transform.SetParent(root, false);
-            RectTransform barRect = reloadBarRoot.GetComponent<RectTransform>();
-            barRect.anchorMin = barRect.anchorMax = barRect.pivot = new Vector2(0.5f, 0.5f);
-            barRect.anchoredPosition = new Vector2(0f, -86f);
-            barRect.sizeDelta = new Vector2(320f, 22f);
-
-            Image barBackground = reloadBarRoot.GetComponent<Image>();
-            barBackground.color = new Color(0.05f, 0.06f, 0.09f, 0.85f);
-            barBackground.raycastTarget = false;
-
-            GameObject fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));
-            fillObject.transform.SetParent(reloadBarRoot.transform, false);
-            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = new Vector2(3f, 3f);
-            fillRect.offsetMax = new Vector2(-3f, -3f);
-
-            reloadBarFill = fillObject.GetComponent<Image>();
-            reloadBarFill.color = new Color(1f, 0.72f, 0.18f);
-            reloadBarFill.raycastTarget = false;
-            MakeFillable(reloadBarFill);
-            reloadBarFill.fillAmount = 0f;
-
-            GameObject labelObject = new GameObject("Label", typeof(RectTransform));
-            labelObject.transform.SetParent(reloadBarRoot.transform, false);
-            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = new Vector2(0f, 1f);
-            labelRect.anchorMax = new Vector2(1f, 1f);
-            labelRect.pivot = new Vector2(0.5f, 0f);
-            labelRect.anchoredPosition = new Vector2(0f, 4f);
-            labelRect.sizeDelta = new Vector2(0f, 26f);
-
-            reloadBarLabel = labelObject.AddComponent<Text>();
-            reloadBarLabel.font = ResolveFont();
-            reloadBarLabel.fontSize = 20;
-            reloadBarLabel.fontStyle = FontStyle.Bold;
-            reloadBarLabel.alignment = TextAnchor.MiddleCenter;
-            reloadBarLabel.color = new Color(1f, 0.85f, 0.5f);
-            reloadBarLabel.text = "RELOADING";
-            reloadBarLabel.raycastTarget = false;
-
-            reloadBarRoot.SetActive(false);
-        }
-
-        private Font ResolveFont()
-        {
-            if (weaponStatsText != null && weaponStatsText.font != null)
-            {
-                return weaponStatsText.font;
-            }
-
-            if (messageText != null && messageText.font != null)
-            {
-                return messageText.font;
-            }
-
-            if (ferryHealthText != null && ferryHealthText.font != null)
-            {
-                return ferryHealthText.font;
-            }
-
-            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        }
-
         public void StartNextRound()
         {
             gameManager?.StartNextRound();
@@ -396,64 +204,62 @@ namespace RollfaehrenFury.Prototype
             gameManager?.RestartGame();
         }
 
-        private static void AnimateBar(Image bar, float target)
+        private static float AnimateBar(RectTransform fillRect, float target)
         {
-            if (bar != null)
+            if (fillRect == null)
             {
-                bar.fillAmount = Mathf.MoveTowards(bar.fillAmount, target, Time.unscaledDeltaTime * 1.5f);
+                return Mathf.Clamp01(target);
             }
+
+            float next = Mathf.MoveTowards(
+                fillRect.anchorMax.x,
+                Mathf.Clamp01(target),
+                Time.unscaledDeltaTime * 1.5f);
+            SetBarImmediate(fillRect, next);
+            return next;
         }
 
-        private static void TintBarBackground(Image fill, Color color)
-        {
-            if (fill != null && fill.transform.parent != null)
-            {
-                Image background = fill.transform.parent.GetComponent<Image>();
-                if (background != null)
-                {
-                    background.color = color;
-                }
-            }
-        }
-
-        private static Sprite solidBarSprite;
-
-        // Ensures the bar can actually clip by fillAmount: a Filled Image with no sprite
-        // renders a full quad and ignores fillAmount, so we assign a plain white sprite.
-        private static void MakeFillable(Image bar)
+        private static RectTransform PrepareFillRect(Image bar)
         {
             if (bar == null)
+            {
+                return null;
+            }
+
+            bar.type = Image.Type.Simple;
+            RectTransform rect = bar.rectTransform;
+            rect.anchorMin = Vector2.zero;
+            SetBarImmediate(rect, 1f);
+            return rect;
+        }
+
+        private static void SetBarImmediate(RectTransform fillRect, float value)
+        {
+            if (fillRect == null)
             {
                 return;
             }
 
-            if (bar.sprite == null)
-            {
-                if (solidBarSprite == null)
-                {
-                    Texture2D texture = Texture2D.whiteTexture;
-                    solidBarSprite = Sprite.Create(
-                        texture,
-                        new Rect(0f, 0f, texture.width, texture.height),
-                        new Vector2(0.5f, 0.5f));
-                }
-
-                bar.sprite = solidBarSprite;
-            }
-
-            bar.type = Image.Type.Filled;
-            bar.fillMethod = Image.FillMethod.Horizontal;
-            bar.fillOrigin = (int)Image.OriginHorizontal.Left;
+            Vector2 anchorMax = fillRect.anchorMax;
+            anchorMax.x = Mathf.Clamp01(value);
+            fillRect.anchorMax = anchorMax;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
         }
 
         private static Color HealthColor(float fill)
         {
-            Color low = new Color(0.92f, 0.22f, 0.18f);
-            Color mid = new Color(0.96f, 0.78f, 0.20f);
-            Color high = new Color(0.18f, 0.85f, 0.38f);
             return fill < 0.5f
-                ? Color.Lerp(low, mid, fill * 2f)
-                : Color.Lerp(mid, high, (fill - 0.5f) * 2f);
+                ? Color.Lerp(UiTheme.Siren, UiTheme.Warning, fill * 2f)
+                : Color.Lerp(UiTheme.Warning, UiTheme.Success, (fill - 0.5f) * 2f);
+        }
+
+        private static void SetText(Text label, string value)
+        {
+            if (label != null)
+            {
+                label.text = value;
+            }
         }
 
         private static void SetActive(GameObject target, bool isActive)

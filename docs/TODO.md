@@ -20,11 +20,13 @@ This list is the working task board for the prototype. Keep it practical and upd
 
 - [x] Create bootstrap/menu flow.
 - [x] Add New Game button.
-- [x] Add Settings placeholder.
+- [x] Add Settings menu with Master/Music/SFX volume sliders and mouse sensitivity.
 - [x] Add Quit button.
 - [x] Add initial gameplay Cancel/Esc navigation.
 - [x] Replace direct gameplay Esc return with a pause-controller flow.
 - [ ] Verify Resume, New Game, Settings, Main Menu, and Quit pause buttons.
+- [ ] Verify Main Menu remains clickable after using Pause -> Main Menu.
+- [ ] Verify menu and pause settings persist through `PlayerPrefs` and apply live.
 - [x] Create one-scene game flow in `Assets/Scenes/Main.unity`.
 - [x] Add game over state.
 - [x] Falling off the ferry into the river is instant game over (`SimpleFPSController.fallDeathHeight` → `GameManager.TriggerGameOver`).
@@ -143,24 +145,30 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add next-round difficulty increase.
 - [x] Track B: data-driven `UpgradeSystem` (polymorphic `UpgradeDefinition`) + `ShopManager`; the 3 base upgrades are now assets.
 - [x] Track B: first master upgrade — Pistol Querschläger (ricochet to nearest enemy).
-- [x] Catalog-driven shop: `ShopManager` builds one button per catalog entry at runtime (clones the first button as a template), so upgrades can be added without scene/builder work.
-- [x] Add permanent ammo-capacity nodes to the active node-tree shop: Bigger
-  Magazine (Pistol `+2`, Shotgun `+1`, Assault Rifle `+5`) and Reserve Capacity
-  (`+1` spare magazine), each capped at three levels. Newly added capacity is
-  filled immediately; Refill Ammo remains a repeatable `$20` purchase.
+- [x] Authored shop UI: `ShopManager` binds serialized weapon tabs and upgrade
+  cards instead of generating the visible shop at runtime.
+- [x] Simplify ammo progression to one `Extra Magazine +1` upgrade, capped at
+  three levels. Loaded-magazine growth remains available as a dormant runtime
+  API but is no longer exposed in the shop.
 - [x] Weapon Damage upgrade is percentage-based (`+20%` per purchase) instead
   of flat damage, so it scales every weapon consistently without excessive
   per-pellet growth on the Shotgun.
-- [x] Node-tree shop: `ShopManager` builds a per-weapon upgrade tree at runtime.
-  Damage, Fire Rate, and Faster Reload reach level 5; Magazine Size and Reserve
-  Capacity reach level 3; Harpoon Ricochet reaches level 1; Refill is
-  repeatable. The old `UpgradeDefinition` catalog is dormant.
-- [ ] Verify ammo-capacity purchases in Unity: locked weapons expose no
-  upgrades, magazine/reserve purchases fill their added capacity, larger
-  magazines also enlarge each spare magazine, refill restores the upgraded
+- [x] Card-based weapon shop: owned weapons show persistent Damage, Fire Rate,
+  Reload, Extra Magazine, and Harpoon Ricochet cards as applicable; locked
+  weapons show one unlock card with predecessor, round, and price requirements.
+  Damage, Fire Rate, and Faster Reload reach level 5; Extra Magazine reaches
+  level 3; Harpoon Ricochet reaches level 1; Refill is repeatable.
+- [x] Structure shop cards into icon/title, current-to-next value, level, and
+  amber cost regions instead of one plain text label.
+- [x] Preview the affected weapon stat in the center summary when an available
+  upgrade card is hovered or selected.
+- [ ] Verify ammo purchases in Unity: locked weapons expose no upgrades,
+  Extra Magazine adds one complete spare reload, refill restores the upgraded
   cap, and New Game restores definition defaults.
 - [x] Lower income to match the simpler shop: kill reward 6 → 3 (tunable via `killRewardScale`).
-- [ ] Verify the node-tree shop in Unity: weapon nodes + branching lines render; per-weapon purchases apply; Refill greys out when full; Harpoon ricochet chains. Tune node spacing/line constants in `ShopManager` if the layout looks off.
+- [ ] Verify the card shop in Unity: weapon tabs switch correctly, locked
+  requirements update, per-weapon purchases apply, Refill greys out when full,
+  and Harpoon ricochet chains.
 - [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
@@ -265,6 +273,39 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Run the complete first functional audio Play Mode checklist and tune
   volume, attenuation, loop transitions, and voice limits.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
+
+## UI and UX
+
+- [x] Add ferry hazard UI palette, Barlow Semi Condensed font assets, and
+  reusable UGUI prefabs in `Assets/UI/Prefabs`.
+- [x] Replace runtime-generated HUD/shop/menu visuals with editor-authored
+  Canvas hierarchies in `Menu.unity` and `Main.unity`.
+- [x] Add `UiLayoutMarker` so scene builders repair references without deleting
+  manually edited UI layouts.
+- [x] Add `GameSettings` and `SettingsPanelController` for persistent volume and
+  mouse-sensitivity settings.
+- [x] Compact gameplay HUD direction: top-left combines round, ferry health,
+  crossing progress, and money; bottom-right stays weapon/ammo-only.
+- [x] Use exact-width rectangular HUD bars for ferry health, crossing progress,
+  and reload so low percentages read accurately.
+- [x] UI builder cleanup direction: `Build Ferry Hazard UI` removes known
+  generated roots before rebuilding, preventing duplicate HUD/shop panels.
+- [x] Shop close direction: use a top-right `X`, move available funds to the
+  centered header area, and keep refill ammo as the fifth compact shop card.
+- [x] Center Menu and Pause command columns, subtitles, and buttons.
+- [x] Center Augment Draft cards and Game Over command buttons inside their
+  frames.
+- [x] Add category icons plus separate benefit, drawback, and unique labels to
+  augment draft cards.
+- [ ] Verify the new UI at `1920x1080`, `1600x900`, and `1280x720`.
+- [ ] Verify no duplicate `Gameplay Panel`, `Shop Panel`, or `Close Shop Button`
+  remains after rerunning `Build Ferry Hazard UI`.
+- [ ] Verify keyboard/controller navigation through menu, pause, shop, and
+  augment draft.
+- [ ] Verify shop hover/selection previews clear correctly, displayed prices
+  match purchases, and all augment benefits/drawbacks fit their cards.
+- [ ] Verify Wwise hover/click feedback still fires on all buttons and sliders.
+- [ ] Add a gameplay screenshot as the future full-screen menu background.
 
 ## Presentation
 

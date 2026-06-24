@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.BountyAugment
   displayName: Bounty
   description: +50% money per kill.
+  category: 3
+  benefitText: Earn 50% more money from every kill.
+  drawbackText: ''
+  unique: 0
   rewardMultiplier: 1.5

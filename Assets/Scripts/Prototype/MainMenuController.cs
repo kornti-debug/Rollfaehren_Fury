@@ -15,6 +15,7 @@ namespace RollfaehrenFury.Prototype
 
         private void OnEnable()
         {
+            ResetMenuInputState();
             cancelAction ??= PrototypeInputActions.Find("UI/Cancel");
             if (cancelAction != null)
             {
@@ -51,6 +52,7 @@ namespace RollfaehrenFury.Prototype
 
         public void ShowMain()
         {
+            ResetMenuInputState();
             SetActive(mainPanel, true);
             SetActive(settingsPanel, false);
             SetSelected(firstSelectedButton);
@@ -81,8 +83,16 @@ namespace RollfaehrenFury.Prototype
         {
             if (EventSystem.current != null)
             {
+                EventSystem.current.SetSelectedGameObject(null);
                 EventSystem.current.SetSelectedGameObject(target);
             }
+        }
+
+        private static void ResetMenuInputState()
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 }

@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.ReinforcedHullAugment
   displayName: Reinforced Hull
   description: +50 ferry max HP.
+  category: 0
+  benefitText: Increase ferry maximum health by 50 HP.
+  drawbackText: ''
+  unique: 0
   bonusHealth: 50

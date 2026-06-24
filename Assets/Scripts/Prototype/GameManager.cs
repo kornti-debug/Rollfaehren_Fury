@@ -532,7 +532,7 @@ namespace RollfaehrenFury.Prototype
         {
             float current = ferryHealth != null ? ferryHealth.CurrentHealth : 0f;
             float max = ferryHealth != null ? ferryHealth.MaxHealth : 1f;
-            float weaponDamage = weaponSystem != null ? weaponSystem.ActiveDamage : 0f;
+            string weaponDamage = weaponSystem != null ? weaponSystem.ActiveDamageDisplay : "0";
             float shotsPerSecond = weaponSystem != null ? weaponSystem.ActiveShotsPerSecond : 0f;
             string weaponName = weaponSystem != null ? weaponSystem.ActiveWeaponName : "None";
             int weaponSlot = weaponSystem != null ? weaponSystem.ActiveIndex + 1 : 0;

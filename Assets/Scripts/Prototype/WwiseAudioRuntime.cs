@@ -64,6 +64,7 @@ namespace RollfaehrenFury.Prototype
                 yield break;
             }
 
+            GameSettings.ApplyAudio();
             RefreshSceneContext();
         }
 
@@ -294,6 +295,7 @@ namespace RollfaehrenFury.Prototype
             SetMusicSwitch("GameState", "Docked");
             SetMusicSwitch("CombatIntensity", "Mid");
             StopPlaying(ref defeatMusicPlayingId, 100);
+            GameSettings.ApplyAudio();
             StartBackgroundMusic();
         }
 

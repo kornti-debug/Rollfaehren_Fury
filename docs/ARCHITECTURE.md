@@ -69,9 +69,22 @@ Planned systems and responsibilities:
 
 - `SceneFlow`: tiny static scene loader for bootstrap, menu, main, and quit.
 - `BootstrapLoader`: redirects the bootstrap scene to the menu scene.
-- `MainMenuController`: handles menu buttons and menu cancel input.
+- `MainMenuController`: handles menu buttons, settings navigation, and menu cancel input.
 - `GameplayMenuInput`: owns the in-game pause overlay. Cancel/Esc closes an
   open shop first, opens or resumes pause, and navigates back from pause settings.
+- `GameSettings`: persistent PlayerPrefs-backed settings service for master,
+  music, SFX, and mouse sensitivity. Audio values are applied as global Wwise
+  RTPCs (`MasterVolume`, `MusicVolume`, `SFXVolume`) when Wwise is initialized;
+  mouse sensitivity is pushed to active `SimpleFPSController` instances.
+- `SettingsPanelController`: binds reusable UGUI sliders to `GameSettings` in
+  both Menu and gameplay pause settings panels.
+- `SimpleHUD`: authored UGUI Canvas in `Main.unity`. It updates serialized
+  texts, bars, prompts, shop, augment, and game-over panels instead of creating
+  runtime UI objects. The current HUD layout keeps round, ferry health,
+  crossing progress, and money together in the top-left status block, with
+  weapon/ammo details in the bottom-right block. Health, crossing, and reload
+  bars resize their fill rects directly instead of using sprite-filled images,
+  so small percentages remain visually accurate.
 - `HealthSystem`: max health, current health, damage, death event.
 - `WeaponSystem`: implemented (Track A) — owns the player's weapons, per-run
   ownership state, and the firing input (`Player/Attack`). Fixed digit slots
@@ -90,17 +103,19 @@ Planned systems and responsibilities:
 - `WeaponVisuals`: implemented — per-weapon first-person visual layer. Reacts to `Weapon` events to show the model only while equipped, play a muzzle flash + recoil on fire, an impact effect at the hit point, fire/reload sounds, and a procedural reload dip (optional mag-drop) synced to the reload timer. Purely cosmetic — no gameplay logic. Models/FX come from the imported `Assets/Easy Weapons` art (its own scripts removed; materials converted to URP). The editor tool `WeaponViewmodelSetup` (`Tools > Rollfaehren Fury > Setup Weapon Viewmodels`) instantiates the Pistol/Shotgun/M4 models under the fire camera, forces their textured URP material on, and wires `WeaponVisuals` (cosmetic-only: colliders stripped, Ignore Raycast layer). The Harpoon has no gun model.
 - `SwarmMovement`: implemented — boids flocking auto-attached to each `SimpleEnemy` at runtime; blends separation/alignment/cohesion with a seek toward the ferry. Surface fish move on the water plane; flying birds cruise level at altitude and then, once within `diveRange` of the ferry, commit to a downward plunge onto it. `EnemySpawner` spawns continuous swarms with an intercept-lead origin ahead of and beside the moving ferry, constrained to the water bounds, and ramps difficulty per round: the swarm's max size grows by `swarmSizeGrowthPerRound` from `swarmSizeRound1Max` (capped at `swarmSizeCap`) and each swarm rolls a random size in `[max − swarmSizeRange, max]` (round 1 = 1, round 2 = 1-2, …), while the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored at `minSwarmInterval`); round 1 is extra-gentle (`firstRoundIntervalFactor`) so it is beatable with the harpoon/pistol. `SimpleHUD` shows the bottom-right weapon panel (RPM + ammo), animated HP/crossing bars, and a centered reload bar that appears only while reloading; `RoundStartConsole` shows a billboard "Start Crossing" label above the lever.
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
-- `UpgradeDefinition` (Track B): the original polymorphic ScriptableObject upgrade system (`WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, `RicochetUpgrade`, plus the runtime ammo set). The node-tree `ShopManager` no longer uses it (it applies upgrades to weapons directly), so these classes/assets are currently dormant — kept for reference, prune when convenient.
-- `ShopManager` (node-tree shop): implemented — keeps all weapon nodes visible.
-  Owned weapons show their existing upgrade branches; locked weapons show one
-  unlock node with predecessor, minimum-round, and price requirements.
-  Purchasing ownership equips the weapon immediately and replaces the unlock
-  node with Damage, Fire Rate, Magazine Size, Reserve Capacity, Reload/Refill,
-  or Harpoon Ricochet upgrades. Magazine and reserve capacity have three
-  levels; damage, fire rate, and reload have five; refill is repeatable and
-  restores the upgraded cap.
-  Spending goes through `GameManager.TrySpendMoney`; locked weapons cannot be
-  upgraded.
+- `UpgradeDefinition` (Track B): the original polymorphic ScriptableObject upgrade system (`WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, `RicochetUpgrade`, plus the runtime ammo set). The card-based `ShopManager` no longer uses it (it applies upgrades to weapons directly), so these classes/assets are currently dormant — kept for reference, prune when convenient.
+- `ShopManager` (card shop): implemented — binds serialized weapon tabs,
+  structured `UpgradeCardView` slots, `WeaponStatRowView` summary rows, and a
+  refill card from the authored HUD Canvas. Cards separate icon/title,
+  current-to-next values, level, and price. Hover or EventSystem selection
+  previews the affected value in the center summary without changing runtime
+  weapon stats. Owned weapons show their relevant card set; locked
+  weapons replace the cards with one unlock card containing predecessor,
+  minimum-round, and price requirements. Purchasing ownership equips the weapon
+  immediately and refreshes the card set. Extra Magazine has three levels;
+  damage, fire rate, and reload have five; refill is repeatable and restores
+  the upgraded cap. Spending goes through `GameManager.TrySpendMoney`; locked
+  weapons cannot be upgraded.
 - `ShopInteractable` (Track C): vending-machine interaction available while
   inside the shared shop during `Preparation`; it uses the shared
   `Player/Interact` action.
@@ -116,7 +131,7 @@ Planned systems and responsibilities:
   `ShopInteractable`; purchases happen through the NPC inside `ShopInterior`.
 - `RoundStartConsole`: ferry-house interaction available only during
   `Preparation`; `Player/Interact` starts the next crossing.
-- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Definitions are repeatable by default and can be explicitly unique; acquired unique definitions are removed from later drafts and reset on New Game. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (unique, 0.5 heal per kill capped at 10 actual HP per crossing), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
+- `AugmentSystem` / `AugmentDefinition` (Track C): implemented — round-end draft. At each round end the player picks 1 of 3 random augments (polymorphic `Apply(AugmentContext)`); picking advances the round. Definitions include presentation metadata for category, benefit, optional drawback, and uniqueness. `AugmentCardView` renders those as separate icon and text regions, making mixed choices such as Swarm and Bruisers explicit. Definitions are repeatable by default and can be explicitly unique; acquired unique definitions are removed from later drafts and reset on New Game. Pooled augments: Tailwind (faster crossing), Repair Kit (per-round heal), The Swarm (2× count / ½ HP), Bruisers (½ count / 2× HP), plus runtime-added Bilge Pump (unique, 0.5 heal per kill capped at 10 actual HP per crossing), Reload Fury (timed damage boost after each reload), Rapid Reload (−30% reload on all weapons), Adrenaline (+move speed for 5 s every 5th kill). `InitRuntime` configures runtime-created augments; kill-triggered effects route through `GameManager.RegisterEnemyKilled`.
 - `FerryController`: moves a kinematic ferry between two dock transforms,
   follows a sampled cubic route aligned to each dock's forward direction,
   carries the player through matching translation and rotation, reports
@@ -144,8 +159,8 @@ Planned systems and responsibilities:
   a final Stop Event.
 - `WwiseUIButtonAudio`: reusable EventSystem feedback for selectable gameplay
   UI. Pointer hover and controller selection share one guarded hover post;
-  pointer click and submit share one guarded click post. Runtime shop nodes
-  inherit the component from their cloned button template.
+  pointer click and submit share one guarded click post. The editor-authored
+  menu, pause, shop, augment, and game-over controls all carry this component.
 - `ShopScenePortal` / `ShopInteriorExit`: use the portal or exit object as a
   spatial door emitter and post `Play_RC_Door_Open` only after
   `ShopSceneCoordinator` accepts the transition.
@@ -153,6 +168,16 @@ Planned systems and responsibilities:
   and collisions. Its child `Fraunz Visual` now uses `Assets/Animations/FraunzAnimator.controller` to drive the idle/walk loop from `SimpleFPSController`, so the captain animates during movement instead of remaining in a static bind pose. Falling below `SimpleFPSController.fallDeathHeight` (into the river) calls `GameManager.TriggerGameOver`, so leaving the ferry ends the run.
 - `Cargo`: later destructible cargo with reward value.
 - Deck mirror (`MirrorInteractable` + the `DeckMirrorSetup` editor tool): a selfie-style camera mounted on the ferry renders the player into a RenderTexture shown — horizontally flipped, so it reads like a mirror — on a deck quad, making the otherwise-unseen first-person character animations visible. Pressing `Player/Interact` in front of it toggles a panel listing the run's active augments (`AugmentSystem.AcquiredAugments`, grouped with counts). `Tools > Rollfaehren Fury > Setup Deck Mirror` builds + wires the camera, RenderTexture, material, quad, and UI. Pure readout — it changes no game state.
+- `UiOverhaulBuilder`: editor-only repair/build tool. `Rollfaehren Fury >
+  Build Ferry Hazard UI` creates reusable theme prefabs, removes known generated
+  UI roots from Menu/Main canvases, recreates one clean layout, wires serialized
+  references, generates the tintable line-icon sprite set, and marks the Canvas
+  with `UiLayoutMarker`. The generated shop layout keeps funds in the centered
+  header area, a top-right close button, five structured action slots, and a
+  fixed weapon-stat preview area.
+- `UiLayoutMarker`: protects manually authored Canvas roots. Prototype scene
+  builders should repair references around a marked Canvas and must not delete
+  or recreate it.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
 prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
@@ -214,6 +239,7 @@ Assets/Scripts/Ferry/
 Assets/Scripts/Weapons/
 Assets/Scripts/Upgrades/
 Assets/Scripts/UI/
+Assets/UI/Prefabs/
 Assets/Prefabs/
 Assets/Scenes/
 ```

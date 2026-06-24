@@ -57,6 +57,7 @@ namespace RollfaehrenFury.Prototype
         {
             controller = GetComponent<CharacterController>();
             animator = GetComponentInChildren<Animator>();
+            mouseSensitivity = GameSettings.MouseSensitivity;
 
             
                 if (animator == null)
@@ -139,6 +140,14 @@ namespace RollfaehrenFury.Prototype
             }
 
             SetCursorLocked(isEnabled && lockCursorOnPlay);
+        }
+
+        public void SetMouseSensitivity(float value)
+        {
+            mouseSensitivity = Mathf.Clamp(
+                value,
+                GameSettings.MinMouseSensitivity,
+                GameSettings.MaxMouseSensitivity);
         }
 
         public void MoveWithPlatform(
