@@ -7,6 +7,7 @@ namespace RollfaehrenFury.Prototype
     public sealed class RadarHUD : MonoBehaviour
     {
         [Header("References")]
+        [SerializeField] private GameManager gameManager;
         [Tooltip("The spawner that owns the alive enemy list.")]
         [SerializeField] private EnemySpawner enemySpawner;
         [Tooltip("World-space pivot for the radar (ferry or player transform).")]
@@ -35,7 +36,9 @@ namespace RollfaehrenFury.Prototype
 
         private void Update()
         {
-            sweepAngle = (sweepAngle + sweepSpeed * Time.deltaTime) % 360f;
+            bool isCrossing = gameManager != null && gameManager.State == PrototypeGameState.Playing;
+            if (isCrossing)
+                sweepAngle = (sweepAngle + sweepSpeed * Time.deltaTime) % 360f;
             if (sweepLine != null)
                 sweepLine.localEulerAngles = new Vector3(0f, 0f, -sweepAngle);
 
