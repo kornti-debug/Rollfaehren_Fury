@@ -6,6 +6,11 @@ namespace RollfaehrenFury.Prototype
     {
         [SerializeField] private string menuSceneName = SceneFlow.MenuSceneName;
 
+        private void Awake()
+        {
+            WwiseInitializerRuntime.Ensure();
+        }
+
         private void Start()
         {
             SceneFlow.LoadScene(menuSceneName);

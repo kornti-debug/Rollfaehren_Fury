@@ -1882,7 +1882,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 10}
+  m_AnchoredPosition: {x: 0, y: 9}
   m_SizeDelta: {x: 230, y: 18}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &211262261
@@ -2181,6 +2181,8 @@ MonoBehaviour:
   - Ferry
   - Jetty
   - Shop Interior
+  grassTerrainLayerNames:
+  - NewLayer 4
 --- !u!114 &217455391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3974,7 +3976,7 @@ MonoBehaviour:
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 52
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -7727,11 +7729,11 @@ RectTransform:
   - {fileID: 633282497}
   m_Father: {fileID: 1511115724}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -11}
   m_SizeDelta: {x: 230, y: 12}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &732027498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8984,7 +8986,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 855206645}
-  - component: {fileID: 855206644}
   - component: {fileID: 855206647}
   - component: {fileID: 855206646}
   m_Layer: 0
@@ -8994,31 +8995,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &855206644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855206643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d04b72e30f0da5c4ca3593cb4c43eaf0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkInitializer
-  InitializationSettings: {fileID: 11400000, guid: d5a08736e65a2a941bcd17d6f75cd26a, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
 --- !u!4 &855206645
 Transform:
   m_ObjectHideFlags: 0
@@ -16596,7 +16572,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 74}
-  m_SizeDelta: {x: 280, y: 38}
+  m_SizeDelta: {x: 280, y: 44}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1511115725
 MonoBehaviour:
@@ -17636,6 +17612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.ShopSceneCoordinator
   gameManager: {fileID: 1557749295}
   playerController: {fileID: 217455385}
+  doorTransitionDelay: 0.35
 --- !u!1 &1558751696
 GameObject:
   m_ObjectHideFlags: 0

@@ -106,6 +106,7 @@ namespace RollfaehrenFury.Editor
             GameManager gameManager = Object.FindFirstObjectByType<GameManager>();
             WeaponSystem weaponSystem = Object.FindFirstObjectByType<WeaponSystem>();
             AugmentSystem augmentSystem = gameManager != null ? gameManager.GetComponent<AugmentSystem>() : null;
+            RemoveLegacySceneInitializer(FindSceneObject("WwiseGlobal"));
 
             GameObject canvasObject = FindSceneObject("Rollfaehren Fury Prototype HUD");
             if (canvasObject == null || canvasObject.GetComponent<UiLayoutMarker>() == null)
@@ -185,9 +186,9 @@ namespace RollfaehrenFury.Editor
             CreateText(gameplayPanel.transform, "Message Text", string.Empty, new Vector2(0f, 118f), new Vector2(760f, 34f), 22, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.LowerCenter);
             CreateText(gameplayPanel.transform, "Warning Text", string.Empty, new Vector2(0f, 164f), new Vector2(760f, 36f), 22, TextAnchor.MiddleCenter, UiTheme.Warning, TextAnchor.LowerCenter).gameObject.SetActive(false);
 
-            GameObject reload = CreatePanel(gameplayPanel.transform, "Reload Bar Root", new Vector2(0f, 74f), new Vector2(280f, 38f), TextAnchor.LowerCenter);
-            CreateBar(reload.transform, "Reload Bar", Vector2.zero, new Vector2(230f, 12f), UiTheme.Warning, out _);
-            CreateText(reload.transform, "Reload Label", "RELOADING", new Vector2(0f, 10f), new Vector2(230f, 18f), 13, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.MiddleCenter);
+            GameObject reload = CreatePanel(gameplayPanel.transform, "Reload Bar Root", new Vector2(0f, 74f), new Vector2(280f, 44f), TextAnchor.LowerCenter);
+            CreateBar(reload.transform, "Reload Bar", new Vector2(0f, -11f), new Vector2(230f, 12f), UiTheme.Warning, out _, TextAnchor.MiddleCenter);
+            CreateText(reload.transform, "Reload Label", "RELOADING", new Vector2(0f, 9f), new Vector2(230f, 18f), 13, TextAnchor.MiddleCenter, UiTheme.Foam, TextAnchor.MiddleCenter);
             reload.SetActive(false);
 
             BuildShopPanel(canvas);
@@ -839,13 +840,20 @@ namespace RollfaehrenFury.Editor
             button.colors = colors;
         }
 
-        private static Image CreateBar(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, Color fillColor, out Image fill)
+        private static Image CreateBar(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            Color fillColor,
+            out Image fill,
+            TextAnchor anchor = TextAnchor.UpperLeft)
         {
             GameObject backgroundObject = new GameObject(name);
             backgroundObject.transform.SetParent(parent, false);
             Image background = EnsureComponent<Image>(backgroundObject);
             background.color = UiTheme.WithAlpha(UiTheme.Hull, 0.92f);
-            ConfigureRect(background.rectTransform, TextAnchor.UpperLeft, anchoredPosition, size);
+            ConfigureRect(background.rectTransform, anchor, anchoredPosition, size);
 
             GameObject fillObject = new GameObject("Fill");
             fillObject.transform.SetParent(backgroundObject.transform, false);
@@ -932,11 +940,21 @@ namespace RollfaehrenFury.Editor
         private static void EnsureMenuWwiseAudio()
         {
             GameObject audioObject = FindSceneObject("Menu Wwise Audio") ?? new GameObject("Menu Wwise Audio");
-            EnsureComponent<AkInitializer>(audioObject);
+            RemoveLegacySceneInitializer(audioObject);
             EnsureComponent<AkGameObj>(audioObject);
             MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(audioObject);
             SetString(menuAudio, "mainBankName", "MainSoundBank");
             EditorUtility.SetDirty(audioObject);
+        }
+
+        private static void RemoveLegacySceneInitializer(GameObject target)
+        {
+            AkInitializer initializer = target != null ? target.GetComponent<AkInitializer>() : null;
+            if (initializer != null)
+            {
+                Object.DestroyImmediate(initializer);
+                EditorUtility.SetDirty(target);
+            }
         }
 
         private static void EnsureMenuCamera()

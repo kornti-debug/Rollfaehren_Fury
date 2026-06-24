@@ -118,7 +118,7 @@ namespace RollfaehrenFury.Prototype
             SceneManager.SetActiveScene(shopScene);
             playerController.Teleport(spawn.position, spawn.rotation);
             gameManager.CompleteShopEntry();
-            yield return null;
+            yield return WaitForDoor();
             PostDoor(WwiseAudioNames.PlayDoorClose, interiorDoorEmitter);
             IsTransitioning = false;
         }
@@ -148,7 +148,7 @@ namespace RollfaehrenFury.Prototype
             loadedSceneName = string.Empty;
             CurrentShopId = string.Empty;
             gameManager.CompleteShopExit();
-            yield return null;
+            yield return WaitForDoor();
             PostDoor(WwiseAudioNames.PlayDoorClose, exteriorDoorEmitter);
             interiorDoorEmitter = null;
             exteriorDoorEmitter = null;

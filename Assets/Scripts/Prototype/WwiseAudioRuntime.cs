@@ -27,6 +27,8 @@ namespace RollfaehrenFury.Prototype
 
         private void Awake()
         {
+            WwiseInitializerRuntime.Ensure();
+
             if (Instance != null && Instance != this)
             {
                 Destroy(this);
@@ -50,6 +52,12 @@ namespace RollfaehrenFury.Prototype
             while (!AkUnitySoundEngine.IsInitialized())
             {
                 yield return null;
+            }
+
+            AkGameObj emitter = GetComponent<AkGameObj>();
+            if (emitter != null && !emitter.GameObjIsRegistered())
+            {
+                emitter.Register();
             }
 
             mainBankLoaded = LoadBank(mainBankName);

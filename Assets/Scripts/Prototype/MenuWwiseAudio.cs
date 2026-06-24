@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace RollfaehrenFury.Prototype
 {
-    [RequireComponent(typeof(AkInitializer))]
     [RequireComponent(typeof(AkGameObj))]
     public sealed class MenuWwiseAudio : MonoBehaviour
     {
@@ -18,6 +17,8 @@ namespace RollfaehrenFury.Prototype
 
         private void Awake()
         {
+            WwiseInitializerRuntime.Ensure();
+
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
@@ -34,8 +35,16 @@ namespace RollfaehrenFury.Prototype
                 yield return null;
             }
 
+            AkGameObj emitter = GetComponent<AkGameObj>();
+            if (emitter != null && !emitter.GameObjIsRegistered())
+            {
+                emitter.Register();
+            }
+
             AkBankManager.LoadBank(mainBankName, false, false);
             bankLoaded = true;
+            yield return null;
+
             ready = true;
             GameSettings.ApplyAudio();
             titleMusicPlayingId = Post(WwiseAudioNames.PlayTitleMusic, gameObject);

@@ -181,9 +181,11 @@ Moving, Intense, and Shop music share the same baseline.
 
 Runtime ownership:
 
-- `Menu Wwise Audio/MenuWwiseAudio` initializes Wwise in `Menu.unity`, loads
-  `MainSoundBank`, plays/stops the looping title music, and acts as the emitter
-  for menu UI hover/click Events.
+- `WwiseInitializerRuntime` guarantees one separate persistent
+  `Wwise Initializer` across Bootstrap, Menu, and Main.
+- `Menu Wwise Audio/MenuWwiseAudio` loads `MainSoundBank`, plays/stops the
+  looping title music, and acts as the registered emitter for menu UI
+  hover/click Events. It does not own an `AkInitializer`.
 - `WwiseGlobal/WwiseAudioRuntime` loads `MainSoundBank` and
   `OutdoorSoundBank`; the previous `AkBank` component is removed to prevent
   duplicate loading.
@@ -201,7 +203,7 @@ Runtime ownership:
   nodes inherit it from their button template.
 - `ShopSceneCoordinator` sequences spatial door audio around additive
   transitions: open at the current door, delay briefly, teleport/load or
-  unload, then close at the destination door.
+  unload, wait briefly, then close at the destination door.
 - `IndoorSoundBank` remains empty, but its shop-entry load and shop-exit unload
   lifecycle is wired for later room tone, dialogue, and reverb content.
 

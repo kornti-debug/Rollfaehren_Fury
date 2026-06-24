@@ -326,7 +326,6 @@ namespace RollfaehrenFury.Editor
             MainMenuController controller = EnsureComponent<MainMenuController>(controllerObject);
 
             GameObject menuAudioObject = new GameObject("Menu Wwise Audio");
-            EnsureComponent<AkInitializer>(menuAudioObject);
             EnsureComponent<AkGameObj>(menuAudioObject);
             MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(menuAudioObject);
             SetString(menuAudio, "mainBankName", "MainSoundBank");
@@ -1175,6 +1174,12 @@ namespace RollfaehrenFury.Editor
             if (legacyBank != null)
             {
                 Object.DestroyImmediate(legacyBank);
+            }
+
+            AkInitializer legacyInitializer = wwiseGlobal.GetComponent<AkInitializer>();
+            if (legacyInitializer != null)
+            {
+                Object.DestroyImmediate(legacyInitializer);
             }
 
             EnsureComponent<AkGameObj>(wwiseGlobal);
