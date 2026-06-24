@@ -26,6 +26,7 @@ namespace RollfaehrenFury.Prototype
         private InputAction fireAction;
 
         public event Action Fired;
+        public event Action<Weapon> ReloadStarted;
         public event Action<Health> HitHealth;
         public event Action<Weapon> WeaponChanged;
         public event Action<Weapon> WeaponUnlocked;
@@ -422,6 +423,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             weapon.Fired += HandleActiveFired;
+            weapon.ReloadStarted += HandleActiveReloadStarted;
             weapon.HitHealth += HandleActiveHitHealth;
             subscribedWeapon = weapon;
         }
@@ -434,6 +436,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             weapon.Fired -= HandleActiveFired;
+            weapon.ReloadStarted -= HandleActiveReloadStarted;
             weapon.HitHealth -= HandleActiveHitHealth;
             subscribedWeapon = null;
         }
@@ -441,6 +444,11 @@ namespace RollfaehrenFury.Prototype
         private void HandleActiveFired()
         {
             Fired?.Invoke();
+        }
+
+        private void HandleActiveReloadStarted()
+        {
+            ReloadStarted?.Invoke(subscribedWeapon);
         }
 
         private void HandleActiveHitHealth(Health health)

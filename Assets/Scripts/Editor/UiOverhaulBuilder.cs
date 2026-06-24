@@ -59,6 +59,15 @@ namespace RollfaehrenFury.Editor
             BuildAll();
         }
 
+        public static void RepairMenuAudioFromCommandLine()
+        {
+            Scene scene = EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
+            EnsureMenuWwiseAudio();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, MenuScenePath);
+            AssetDatabase.SaveAssets();
+        }
+
         private static void BuildMenuScene()
         {
             Scene scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(MenuScenePath) != null
@@ -83,6 +92,7 @@ namespace RollfaehrenFury.Editor
             ClearGeneratedRoots(canvasObject.transform, MenuGeneratedRoots);
             BuildMenuCanvas(canvasObject.transform);
             MainMenuController controller = EnsureMenuController();
+            EnsureMenuWwiseAudio();
             WireMainMenu(canvasObject.transform, controller);
             EnsureEventSystem();
 
@@ -919,6 +929,16 @@ namespace RollfaehrenFury.Editor
             return EnsureComponent<MainMenuController>(controllerObject);
         }
 
+        private static void EnsureMenuWwiseAudio()
+        {
+            GameObject audioObject = FindSceneObject("Menu Wwise Audio") ?? new GameObject("Menu Wwise Audio");
+            EnsureComponent<AkInitializer>(audioObject);
+            EnsureComponent<AkGameObj>(audioObject);
+            MenuWwiseAudio menuAudio = EnsureComponent<MenuWwiseAudio>(audioObject);
+            SetString(menuAudio, "mainBankName", "MainSoundBank");
+            EditorUtility.SetDirty(audioObject);
+        }
+
         private static void EnsureMenuCamera()
         {
             GameObject cameraObject = FindSceneObject("Menu Camera") ?? new GameObject("Menu Camera");
@@ -1134,6 +1154,25 @@ namespace RollfaehrenFury.Editor
             }
 
             property.objectReferenceValue = value;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
+        }
+
+        private static void SetString(Object target, string propertyName, string value)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property == null)
+            {
+                return;
+            }
+
+            property.stringValue = value;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
         }

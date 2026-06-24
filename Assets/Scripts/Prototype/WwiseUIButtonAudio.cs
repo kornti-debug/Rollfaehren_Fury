@@ -73,8 +73,13 @@ namespace RollfaehrenFury.Prototype
 
         private GameObject ResolveEmitter()
         {
-            return WwiseAudioRuntime.Instance != null
-                ? WwiseAudioRuntime.Instance.gameObject
+            if (WwiseAudioRuntime.Instance != null)
+            {
+                return WwiseAudioRuntime.Instance.gameObject;
+            }
+
+            return MenuWwiseAudio.Instance != null
+                ? MenuWwiseAudio.Instance.gameObject
                 : gameObject;
         }
     }

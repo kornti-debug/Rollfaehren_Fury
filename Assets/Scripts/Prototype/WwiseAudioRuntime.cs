@@ -151,12 +151,14 @@ namespace RollfaehrenFury.Prototype
 
         public static uint Post(string eventName, GameObject emitter)
         {
-            if (!IsReady || string.IsNullOrWhiteSpace(eventName) || emitter == null)
+            if (string.IsNullOrWhiteSpace(eventName) || emitter == null)
             {
                 return AkUnitySoundEngine.AK_INVALID_PLAYING_ID;
             }
 
-            return PostEvent(eventName, emitter);
+            return IsReady
+                ? PostEvent(eventName, emitter)
+                : MenuWwiseAudio.Post(eventName, emitter);
         }
 
         public static bool SetSwitch(string groupName, string valueName, GameObject emitter)
@@ -334,6 +336,8 @@ namespace RollfaehrenFury.Prototype
     {
         public const string PlayBackgroundMusic = "Play_BackgroundMusic";
         public const string StopBackgroundMusic = "Stop_BackgroundMusic";
+        public const string PlayTitleMusic = "Play_TitleScreenMusic";
+        public const string StopTitleMusic = "Stop_TitleScreenMusic";
         public const string PlayDefeatMusic = "Play_DefeatMusic";
         public const string StopDefeatMusic = "Stop_DefeatMusic";
 
@@ -348,7 +352,9 @@ namespace RollfaehrenFury.Prototype
         public const string PlaySteps = "Play_Steps";
         public const string PlayHarpoon = "Play_HarpoonFired";
         public const string PlayPistol = "Play_PistolFired";
-        public const string PlayShotgun = "Play_ShotgunFiredAndReload";
+        public const string PlayShotgun = "Play_ShotgunFired";
+        public const string PlayShotgunReload = "Play_ShotgunReload";
+        public const string PlayGunReload = "Play_GunReload";
         public const string PlayAssaultRifle = "Play_AK47Fired";
         public const string PlayFishMovement = "Play_FishSwimming";
         public const string StopFishMovement = "Stop_FishSwimming";
@@ -362,5 +368,6 @@ namespace RollfaehrenFury.Prototype
         public const string PlayUiHover = "Play_RC_UI_Hover";
         public const string PlayUiClick = "Play_RC_UI_Click";
         public const string PlayDoorOpen = "Play_RC_Door_Open";
+        public const string PlayDoorClose = "Play_RC_Door_Close";
     }
 }

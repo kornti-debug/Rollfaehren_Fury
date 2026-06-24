@@ -42,6 +42,7 @@ namespace RollfaehrenFury.Prototype
             if (weaponSystem != null)
             {
                 weaponSystem.Fired += HandleWeaponFired;
+                weaponSystem.ReloadStarted += HandleWeaponReloadStarted;
                 weaponSystem.HitHealth += HandleWeaponHitHealth;
             }
 
@@ -57,6 +58,7 @@ namespace RollfaehrenFury.Prototype
             if (weaponSystem != null)
             {
                 weaponSystem.Fired -= HandleWeaponFired;
+                weaponSystem.ReloadStarted -= HandleWeaponReloadStarted;
                 weaponSystem.HitHealth -= HandleWeaponHitHealth;
             }
 
@@ -70,6 +72,12 @@ namespace RollfaehrenFury.Prototype
         private void HandleWeaponFired()
         {
             string eventName = WeaponEvent(weaponSystem != null ? weaponSystem.ActiveWeaponName : string.Empty);
+            Post(eventName, playerController != null ? playerController.gameObject : gameObject);
+        }
+
+        private void HandleWeaponReloadStarted(Weapon weapon)
+        {
+            string eventName = ReloadEvent(weapon != null ? weapon.DisplayName : string.Empty);
             Post(eventName, playerController != null ? playerController.gameObject : gameObject);
         }
 
@@ -141,6 +149,23 @@ namespace RollfaehrenFury.Prototype
                 || weaponName.IndexOf("Rifle", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return WwiseAudioNames.PlayAssaultRifle;
+            }
+
+            return string.Empty;
+        }
+
+        private static string ReloadEvent(string weaponName)
+        {
+            if (weaponName.IndexOf("Shotgun", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return WwiseAudioNames.PlayShotgunReload;
+            }
+
+            if (weaponName.IndexOf("Pistol", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || weaponName.IndexOf("Assault", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || weaponName.IndexOf("Rifle", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return WwiseAudioNames.PlayGunReload;
             }
 
             return string.Empty;

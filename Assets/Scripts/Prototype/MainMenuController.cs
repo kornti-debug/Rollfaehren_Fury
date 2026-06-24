@@ -40,6 +40,7 @@ namespace RollfaehrenFury.Prototype
 
         public void NewGame()
         {
+            MenuWwiseAudio.Instance?.StopTitleMusic();
             SceneFlow.StartNewGame();
         }
 
