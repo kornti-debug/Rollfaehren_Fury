@@ -350,10 +350,13 @@ namespace RollfaehrenFury.Prototype
         public const string PlayPistol = "Play_PistolFired";
         public const string PlayShotgun = "Play_ShotgunFiredAndReload";
         public const string PlayAssaultRifle = "Play_AK47Fired";
-        public const string PlayFishMovement = "Play_FishSwimming";
-        public const string StopFishMovement = "Stop_FishSwimming";
+        // public const string PlayFishMovement = "Play_FishSwimming";
+        // public const string StopFishMovement = "Stop_FishSwimming";
+        public const string PlayFishMovement = "Play_EnemyFishApproaching";
+        public const string StopFishMovement = "Stop_EnemyFishApproaching";
         public const string PlayPigeonMovement = "Play_BirdFlap";
         public const string StopPigeonMovement = "Stop_BirdFlap";
+        public const string PlayPigeonDive    = "Play_EnemyBirdStuka";
         public const string PlayFishHit = "Play_EnemyFishHit";
         public const string PlayPigeonHit = "Play_EnemyBirdHit";
         public const string PlayFishContact = "Play_EnemyFishReachFerry";
@@ -362,5 +365,8 @@ namespace RollfaehrenFury.Prototype
         public const string PlayUiHover = "Play_RC_UI_Hover";
         public const string PlayUiClick = "Play_RC_UI_Click";
         public const string PlayDoorOpen = "Play_RC_Door_Open";
+        public const string PlayFishRadioactive = "Play_EnemyFishRadioactive";
+        public const string PlayEnemyKilled      = "Play_EnemyKilled";
+        public const string PlayFallingOff       = "Play_FallingOffWilhelmScream";
     }
 }

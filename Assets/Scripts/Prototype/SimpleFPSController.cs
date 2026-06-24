@@ -123,6 +123,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             hasFallenInWater = true;
+            WwiseAudioRuntime.Post(WwiseAudioNames.PlayFallingOff, gameObject);
             GameManager.Instance?.TriggerGameOver();
         }
 
