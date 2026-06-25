@@ -82,6 +82,13 @@ the corrected defaults, close Wwise and delete the ignored
 `<project>.<username>.wsettings` file; Wwise recreates it from the shared
 defaults. This local file affects Authoring preview only, not Unity builds.
 
+`Assets/Wwise/ScriptableObjects/AkWwiseInitializationSettings.asset` must stay
+in Unity Player Settings under **Preloaded Assets**. Standalone players cannot
+discover this asset through the Editor `AssetDatabase`; preloading it registers
+the serialized Windows platform settings before the runtime-created
+`AkInitializer` starts. Without it, the player reports that no platform
+settings exist and Wwise initialization fails before any SoundBank can load.
+
 Authored content currently tracked in the repository:
 
 - A `SurfaceType` Switch Group with `Wood`, `Gravel`, and `Grass`
@@ -132,6 +139,10 @@ Local build checklist:
    the application automatically.
 4. Test title music, UI audio, footsteps, weapons, ferry loops, enemies, and
    shop audio in the executable.
+5. If the executable is silent, inspect
+   `%USERPROFILE%\AppData\LocalLow\DefaultCompany\Rollfaehren_Fury\Player.log`.
+   There should be no Wwise initialization exception and no warning that
+   platform-specific settings could not be created.
 
 `PlayerFootsteps` is attached to the player and references `Play_Steps`.
 `WwiseGlobal` is enabled and owns runtime loading for the Main and Outdoor

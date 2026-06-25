@@ -301,6 +301,8 @@ This list is the working task board for the prototype. Keep it practical and upd
   and fresh runtime sessions do not start muted.
 - [x] Enable the Wwise pre-build SoundBank copy; teammates still generate all
   three Windows banks locally before creating an executable.
+- [x] Preload `AkWwiseInitializationSettings` so standalone Windows builds use
+  the serialized platform configuration instead of failing during Wwise startup.
 - [ ] Run the complete first functional audio Play Mode checklist and tune
   volume, attenuation, loop transitions, and voice limits.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
