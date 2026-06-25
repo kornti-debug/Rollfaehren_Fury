@@ -2,6 +2,9 @@
 
 Rollfaehren Fury is a Unity 3D first-person ferry-defense prototype. The player protects a cable ferry while it crosses a river, shoots incoming enemies, earns money, and spends rewards on upgrades before the next harder round.
 
+User Guideline:
+Extract the submitted binary ZIP and launch Rollfaehren_Fury.exe, keeping the accompanying _Data folder beside it. To run the Unity source, open Assets/Scenes/Bootstrap.unity in Unity 6000.3.6f1 and press Play.
+
 Project page: https://kornti-debug.github.io/Rollfaehren_Fury/
 
 ## Current Prototype Goal
