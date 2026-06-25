@@ -57,6 +57,9 @@ Reference links:
 Important folders:
 
 - `Assets/`: Unity source assets
+- `Assets/Scripts/`: gameplay scripts grouped by domain (Core, Player,
+  Weapons, Enemies, Ferry, Shop, Augments, UI, Audio, Editor) — see
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - `Assets/Wwise/`: Wwise Unity integration
 - `Rollfaehren_Fury_WwiseProject/`: Wwise authoring project
 - `Packages/`: Unity package manifest and lock file

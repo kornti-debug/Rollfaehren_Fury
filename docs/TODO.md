@@ -171,7 +171,13 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Verify the card shop in Unity: weapon tabs switch correctly, locked
   requirements update, per-weapon purchases apply, Refill greys out when full,
   and Harpoon ricochet chains.
-- [ ] Later: more master upgrades (knockback, fuel); prune the dormant `UpgradeDefinition` assets/scripts.
+- [ ] Later: more master upgrades (knockback, fuel).
+- [x] Prune the dormant `UpgradeDefinition` assets/scripts (`UpgradeDefinition`,
+  `UpgradeContext`, `WeaponDamageUpgrade`, `FireRateUpgrade`,
+  `FerryHealthUpgrade`, `RicochetUpgrade`, `MagazineUpgrade`,
+  `ReloadSpeedUpgrade`, `ReserveAmmoUpgrade`, `ResupplyUpgrade`, and the
+  `Assets/Upgrades/` assets) and reorganized `Assets/Scripts/` into domain
+  folders (see [ARCHITECTURE.md](ARCHITECTURE.md)).
 - [x] Move shop access from the ferry into the shared shore-house interior.
 - [ ] Verify indoor shop interaction in Unity: enter with `E`, buy, close, and leave.
 - [x] Shop: Close/Exit button in the automat overlay; core weapon upgrades
