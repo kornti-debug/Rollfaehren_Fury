@@ -2920,11 +2920,6 @@
 						<MusicSegment Name="TitleScreenMusic" ID="{733F9919-9630-4AF7-B552-4CD4C29BC990}" ShortID="805577530">
 							<PropertyList>
 								<Property Name="EndPosition" Type="Real64" Value="146286.558060424"/>
-								<Property Name="Volume" Type="Real64">
-									<ValueList>
-										<Value>-8</Value>
-									</ValueList>
-								</Property>
 							</PropertyList>
 							<ReferenceList>
 								<Reference Name="Conversion">
