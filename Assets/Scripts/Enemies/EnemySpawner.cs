@@ -53,7 +53,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField] private FerryDamageTarget ferryTarget;
         [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
-        [SerializeField] private float spawnStartDelay = 1.5f;
+        [SerializeField] private float spawnStartDelay = 2f;
         [SerializeField] private int baseKillReward = 10;
         [Tooltip("Scales the per-kill reward. Flat (no per-round growth) so income grows with how many you kill, not exponentially. 0.3 x base 10 = 3 gold/kill.")]
         [SerializeField, Min(0f)] private float killRewardScale = 0.3f;
@@ -80,7 +80,7 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Hard cap on a single swarm so very late rounds stay sane.")]
         [SerializeField, Min(1)] private int swarmSizeCap = 16;
         [Tooltip("Seconds between swarm spawns in round 1 (before the first-round factor below).")]
-        [SerializeField, Min(0.2f)] private float baseSwarmInterval = 2.4f;
+        [SerializeField, Min(0.2f)] private float baseSwarmInterval = 2.8f;
         [Tooltip("Seconds shaved off the spawn interval each round, floored at minSwarmInterval.")]
         [SerializeField, Min(0f)] private float intervalStepPerRound = 0.18f;
         [Tooltip("Fastest the swarm interval ever gets, no matter how high the round.")]
@@ -97,6 +97,7 @@ namespace RollfaehrenFury.Prototype
         [Tooltip("Swarms only spawn over this water surface's XZ bounds. Found by name at runtime if not assigned.")]
         [SerializeField] private Renderer waterRenderer;
         [SerializeField] private string waterObjectName = "River Water Surface";
+        
         [Header("Enemy Speed")]
         [Tooltip("Absolute move speed (m/s) of a round-1 enemy. The ferry crosses at ~6 m/s; below that, enemies trail it.")]
         [SerializeField] private float enemyBaseSpeed = 7f;
@@ -212,23 +213,34 @@ namespace RollfaehrenFury.Prototype
 
             while (isSpawning)
             {
-                // One swarm = one enemy type, around one origin. Picking the profile per swarm (not
-                // per enemy) keeps fish and birds in separate clusters at their own spawn heights,
-                // so they no longer pile up on top of each other.
                 EnemySpawnProfile profile = SelectProfile();
                 Vector3 clusterCenter = GetClusterCenter(profile);
                 int burst = Mathf.Max(1, Mathf.RoundToInt(Random.Range(low, high + 1) * augmentCountMultiplier));
+                
+                bool giantSpawnedThisBurst = false;
+
                 for (int i = 0; i < burst; i++)
                 {
-                    SpawnEnemy(clusterCenter, profile);
+                    // Pass the out parameter to catch if a giant was rolled
+                    SpawnEnemy(clusterCenter, profile, out bool isGiant);
+                    
+                    if (isGiant)
+                    {
+                        giantSpawnedThisBurst = true;
+                    }
                 }
 
-                yield return new WaitForSeconds(interval);
+                // If a giant spawned, force an 8-second breather. Otherwise, use normal interval.
+                float currentWait = giantSpawnedThisBurst ? 8f : interval;
+                yield return new WaitForSeconds(currentWait);
             }
         }
 
-        private SimpleEnemy SpawnEnemy(Vector3 clusterCenter, EnemySpawnProfile profile)
+        // Add the 'out bool isGiant' parameter here
+        private SimpleEnemy SpawnEnemy(Vector3 clusterCenter, EnemySpawnProfile profile, out bool isGiant)
         {
+            isGiant = false; // Default out value
+
             if (ferryTarget == null)
             {
                 Debug.LogWarning("EnemySpawner is missing the ferry target.", this);
@@ -244,11 +256,19 @@ namespace RollfaehrenFury.Prototype
 
             Vector3 spawnPosition = ApplyClusterOffset(clusterCenter, profile);
             SimpleEnemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
+
+            // --- Size & Speed Variation ---
+            // 10% chance for a giant enemy
+            isGiant = Random.value <= 0.10f;
+            float sizeFactor = isGiant ? 2.0f : Random.Range(0.9f, 1.4f);
+            
+            enemy.transform.localScale *= sizeFactor;
+
             if (enemy.GetComponent<AkGameObj>() == null)
             {
                 enemy.gameObject.AddComponent<AkGameObj>();
             }
-
+            
             if (enemy.GetComponent<EnemyMovementAudio>() == null)
             {
                 enemy.gameObject.AddComponent<EnemyMovementAudio>();
@@ -268,6 +288,10 @@ namespace RollfaehrenFury.Prototype
 
             float speed = (enemyBaseSpeed + (activeRound - 1) * enemySpeedPerRound) * augmentSpeedMultiplier;
             float healthMultiplier = (1f + (activeRound - 1) * healthScalePerRound) * augmentHealthMultiplier;
+
+            speed /= sizeFactor; 
+            healthMultiplier *= sizeFactor;
+
             int reward = Mathf.RoundToInt(Mathf.Max(baseKillReward, enemy.KillReward) * killRewardScale * augmentRewardMultiplier);
             enemy.Initialize(ferryTarget, gameManager, reward, speed, healthMultiplier);
             return enemy;
