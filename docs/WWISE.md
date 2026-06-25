@@ -68,10 +68,19 @@ Wwise project files such as `.wproj` and `.wwu` are text files and should remain
 Generated SoundBanks are ignored by Git. `WwiseGlobal` is enabled in
 `Main.unity`, so each teammate must generate `MainSoundBank`,
 `OutdoorSoundBank`, and `IndoorSoundBank` locally before testing the complete
-audio setup. `WwiseAudioRuntime` loads Main and Outdoor after Wwise
+audio setup. Unity copies these locally generated banks into builds during the
+pre-build step; bank generation itself remains manual. Do not build until the
+Windows banks have been generated successfully. `WwiseAudioRuntime` loads Main and Outdoor after Wwise
 initialization. Indoor loads only while the additive shop visit is active and
 unloads after returning outside.
 `PrototypeAudioEvents.postEvents` is enabled.
+
+`MasterVolume`, `MusicVolume`, and `SFXVolume` use a `0` to `100` range and
+must have shared initial values of `100`. A value of `0` maps to `-96 dB` and
+mutes the corresponding bus. If Wwise Authoring remains silent after pulling
+the corrected defaults, close Wwise and delete the ignored
+`<project>.<username>.wsettings` file; Wwise recreates it from the shared
+defaults. This local file affects Authoring preview only, not Unity builds.
 
 Authored content currently tracked in the repository:
 
@@ -112,6 +121,17 @@ Local footsteps test:
 4. Confirm `WwiseGlobal` is enabled.
 5. Enter Play Mode and walk/sprint.
 6. Confirm `Play_Steps` plays at different walk and sprint intervals.
+
+Local build checklist:
+
+1. Generate all three Windows SoundBanks in Wwise.
+2. Confirm `MainSoundBank.bnk`, `OutdoorSoundBank.bnk`, and
+   `IndoorSoundBank.bnk` exist under the Wwise `GeneratedSoundBanks/Windows`
+   output.
+3. Build from Unity. The Wwise pre-build step copies the generated banks into
+   the application automatically.
+4. Test title music, UI audio, footsteps, weapons, ferry loops, enemies, and
+   shop audio in the executable.
 
 `PlayerFootsteps` is attached to the player and references `Play_Steps`.
 `WwiseGlobal` is enabled and owns runtime loading for the Main and Outdoor
