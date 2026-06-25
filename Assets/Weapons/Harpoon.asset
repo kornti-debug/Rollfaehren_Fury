@@ -16,8 +16,8 @@ MonoBehaviour:
   fireMode: 2
   damage: 140
   range: 300
-  fireCooldown: 1.4
-  aimAssistRadius: 0
+  fireCooldown: 1.2
+  aimAssistRadius: 1
   pelletsPerShot: 1
   spreadAngle: 0
   automatic: 0
@@ -27,6 +27,6 @@ MonoBehaviour:
   initiallyUnlocked: 1
   unlockPrice: 0
   minimumUnlockRound: 1
-  projectileSpeed: 45
-  projectileGravity: 18
-  projectileLifetime: 4
+  projectileSpeed: 50
+  projectileGravity: 12
+  projectileLifetime: 5

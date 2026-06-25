@@ -395,7 +395,7 @@ namespace RollfaehrenFury.Prototype
             }
 
             // PlayAnimationState(targetStateId, !isMoving);
-            animator.speed = isMoving && !isSprinting ? 0.85f : 1f;
+            animator.speed = isMoving && !isSprinting ? 1.2f : 1.4f;
         }
 
         private void ConfigureAnimator()
