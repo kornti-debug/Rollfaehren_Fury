@@ -297,6 +297,10 @@ This list is the working task board for the prototype. Keep it practical and upd
   teardown and refresh persistent audio state across Menu/Main scene loads.
 - [x] Force immediate Docked/Moving/Shop and Mid/Intense music changes and
   load `IndoorSoundBank` only during additive shop visits.
+- [x] Set shared Master/Music/SFX RTPC defaults to `100` so Wwise Authoring
+  and fresh runtime sessions do not start muted.
+- [x] Enable the Wwise pre-build SoundBank copy; teammates still generate all
+  three Windows banks locally before creating an executable.
 - [ ] Run the complete first functional audio Play Mode checklist and tune
   volume, attenuation, loop transitions, and voice limits.
 - [ ] Finalize all three SoundBanks, then generate and validate them locally.
