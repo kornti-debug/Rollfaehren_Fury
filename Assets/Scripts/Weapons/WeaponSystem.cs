@@ -203,12 +203,6 @@ namespace RollfaehrenFury.Prototype
                 weapons[i]?.EnableReloadDamageBuff(multiplier, duration);
             }
         }
-        
-        /// <summary>Augment hook: Enables AoE explosive damage on the currently active weapon.</summary>
-        public void EnableExplosiveShotsToActive(float radius, float damageMultiplier = 1f)
-        {
-            ActiveWeapon?.EnableExplosiveShots(radius, damageMultiplier);
-        }
 
         /// <summary>Augment hook: Enables AoE explosive damage on all weapons.</summary>
         public void EnableExplosiveShotsOnAll(float radius, float damageMultiplier = 1f)
