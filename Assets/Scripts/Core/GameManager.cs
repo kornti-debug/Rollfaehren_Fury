@@ -260,26 +260,6 @@ namespace RollfaehrenFury.Prototype
             return true;
         }
 
-        public bool TryPurchase(UpgradeDefinition upgrade, int cost)
-        {
-            if (upgrade == null)
-            {
-                return false;
-            }
-
-            if (!TrySpend(cost))
-            {
-                hud?.ShowMessage("Not enough money");
-                return false;
-            }
-
-            upgrade.Apply(new UpgradeContext(weaponSystem, ferryHealth));
-            UpgradeBought?.Invoke();
-            hud?.ShowMessage($"Bought {upgrade.DisplayName}");
-            RefreshHud();
-            return true;
-        }
-
         public bool IsShopOverlayOpen { get; private set; }
 
         public bool OpenShopOverlay()

@@ -112,7 +112,6 @@ Planned systems and responsibilities:
   without posting through destroyed scene objects.
 - `SwarmMovement`: implemented — boids flocking auto-attached to each `SimpleEnemy` at runtime; blends separation/alignment/cohesion with a seek toward the ferry. Surface fish move on the water plane; flying birds cruise level at altitude and then, once within `diveRange` of the ferry, commit to a downward plunge onto it. `EnemySpawner` spawns continuous swarms with an intercept-lead origin ahead of and beside the moving ferry, constrained to the water bounds, and ramps difficulty per round: the swarm's max size grows by `swarmSizeGrowthPerRound` from `swarmSizeRound1Max` (capped at `swarmSizeCap`) and each swarm rolls a random size in `[max − swarmSizeRange, max]` (round 1 = 1, round 2 = 1-2, …), while the spawn interval shrinks (`baseSwarmInterval` − `intervalStepPerRound`, floored at `minSwarmInterval`); round 1 is extra-gentle (`firstRoundIntervalFactor`) so it is beatable with the harpoon/pistol. `SimpleHUD` shows the bottom-right weapon panel (RPM + ammo), animated HP/crossing bars, and a centered reload bar that appears only while reloading; `RoundStartConsole` shows a billboard "Start Crossing" label above the lever.
 - Fire modes: `Hitscan`, `Spread`, `Projectile`. A new weapon is still just a `WeaponDefinition` asset; `Projectile` reuses the existing `Projectile` script.
-- `UpgradeDefinition` (Track B): the original polymorphic ScriptableObject upgrade system (`WeaponDamageUpgrade`, `FireRateUpgrade`, `FerryHealthUpgrade`, `RicochetUpgrade`, plus the runtime ammo set). The card-based `ShopManager` no longer uses it (it applies upgrades to weapons directly), so these classes/assets are currently dormant — kept for reference, prune when convenient.
 - `ShopManager` (card shop): implemented — binds serialized weapon tabs,
   structured `UpgradeCardView` slots, `WeaponStatRowView` summary rows, and a
   refill card from the authored HUD Canvas. Cards separate icon/title,
@@ -163,6 +162,12 @@ Planned systems and responsibilities:
 - `PlayerFootsteps`: reads the controller's movement, grounded, and sprint
   state, raycasts the current walking surface, sets `SurfaceType` to Wood,
   Gravel, or Grass, and posts `Play_Steps` at walk/sprint intervals.
+- `FishGeigerAudio`: tracks distance from the player to a spawned fish and
+  drives a Wwise `FishProximity` switch (`Close`/`Medium`/`Far`) for a
+  Geiger-counter-style proximity cue.
+- `RiverWaterScroller`: scrolls a water material's base-map UV offset over
+  time via a `MaterialPropertyBlock`, giving the river surface a flowing look
+  without animating geometry.
 - `PrototypeAudioEvents`: maps the active weapon to its authored fire and
   reload Events,
   posts fish/pigeon hit Events on the enemy emitter, posts enemy/ferry contact
@@ -192,6 +197,14 @@ Planned systems and responsibilities:
 - `UiLayoutMarker`: protects manually authored Canvas roots. Prototype scene
   builders should repair references around a marked Canvas and must not delete
   or recreate it.
+- `UiTheme`: static hazard-sign color palette (hull, river, warning, siren,
+  etc.) shared by generated UI so editor tooling and runtime views stay
+  visually consistent.
+- `TextPrompt`: tiny static helper that sets a legacy UI `Text` label and
+  toggles its `GameObject` active state; used by interaction prompts.
+- `RadarHUD`: draws a circular minimap-style radar centered on the ferry or
+  player, plotting alive enemies from `EnemySpawner` as blips with a rotating
+  sweep line.
 
 `EnemySpawner` uses weighted `EnemySpawnProfile` entries. Each profile owns its
 prefab, spawn-point pool, first eligible round, weight, and optional fixed spawn
@@ -223,8 +236,10 @@ From the pre-project design:
 - `Player` has a `WeaponSystem`.
 - `WeaponSystem` contains one or more `Weapon` instances.
 - `SpawnManager` creates enemies.
-- `ShopManager` uses `UpgradeSystem`.
-- `UpgradeSystem` modifies player, weapon, ferry, or later cargo values.
+- The card-based `ShopManager` applies weapon upgrades directly (no separate
+  `UpgradeSystem`) by spending through `GameManager.TrySpendMoney`.
+- Round-end modifiers go through `AugmentSystem`, applying `AugmentDefinition`
+  effects to player, weapon, or ferry values.
 - Current MVP `Enemy` attacks only the ferry.
 - Later `FerryController` can hold cargo and optional civilian NPCs.
 - Current MVP rewards enemy kills and crossing completion.
@@ -243,22 +258,37 @@ Current action usage:
 - `Player/Interact`: context interaction for the vending machine and ferry console.
 - `UI/Cancel`: menu back action and gameplay pause/resume navigation.
 
-## Suggested Project Structure
+## Project Structure
+
+Runtime scripts are grouped by gameplay domain under `Assets/Scripts/`:
 
 ```text
-Assets/Scripts/Core/
-Assets/Scripts/Characters/
-Assets/Scripts/Enemies/
-Assets/Scripts/Ferry/
-Assets/Scripts/Weapons/
-Assets/Scripts/Upgrades/
-Assets/Scripts/UI/
-Assets/UI/Prefabs/
-Assets/Prefabs/
-Assets/Scenes/
+Assets/Scripts/Core/      GameManager, GameSettings, SceneFlow, BootstrapLoader,
+                           PrototypeInputActions, Health
+Assets/Scripts/Player/    SimpleFPSController, PlayerFootsteps
+Assets/Scripts/Weapons/   Weapon, WeaponSystem, WeaponDefinition, WeaponTracer,
+                           WeaponVisuals, WeaponStatRowView, Projectile
+Assets/Scripts/Enemies/   SimpleEnemy, EnemySpawner, SwarmMovement
+Assets/Scripts/Ferry/     FerryController, FerryDamageTarget, RoundStartConsole,
+                           RiverWaterScroller
+Assets/Scripts/Shop/      ShopManager, ShopInteractable, ShopScenePortal,
+                           ShopSceneCoordinator, ShopInteriorExit, UpgradeCardView
+Assets/Scripts/Augments/  AugmentSystem, AugmentDefinition, AugmentContext,
+                           AugmentCardView, and the concrete augment classes
+Assets/Scripts/UI/        SimpleHUD, RadarHUD, GameplayMenuInput,
+                           MainMenuController, SettingsPanelController,
+                           TextPrompt, UiLayoutMarker, UiTheme, MirrorInteractable
+Assets/Scripts/Audio/     FerryAudio, EnemyMovementAudio, FishGeigerAudio,
+                           MenuWwiseAudio, PrototypeAudioEvents,
+                           WwiseAudioRuntime, WwiseInitializerRuntime,
+                           WwiseUIButtonAudio
+Assets/Scripts/Editor/    Editor-only tools (scene builders, setup wizards)
 ```
 
-Create folders when the first script or prefab needs them. Empty folders are not important.
+All scripts share the flat `RollfaehrenFury.Prototype` / `RollfaehrenFury.Editor`
+namespaces; folders organize files, not namespaces. Add new scripts to the
+folder matching their domain; create a new domain folder only once a script
+clearly doesn't fit an existing one.
 
 ## Bootstrap Implementation Order
 

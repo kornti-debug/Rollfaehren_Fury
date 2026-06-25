@@ -846,7 +846,7 @@
             <ul>
               <li>Spawn throughout crossing progress</li>
               <li>Fish use surface movement</li>
-              <li>Pigeons use full 3D movement</li>
+              <li>Pigeons cruise at altitude, then dive onto the ferry</li>
             </ul>
           </div>
           <div class="interaction-column">
@@ -911,7 +911,7 @@
           <h3>Progression</h3>
           <div class="system-list">
             <span>ShopManager</span>
-            <span>UpgradeDefinition</span>
+            <span>AugmentDefinition</span>
             <span>AugmentSystem</span>
           </div>
         </article>
@@ -919,8 +919,10 @@
           <h3>Presentation</h3>
           <div class="system-list">
             <span>SimpleHUD</span>
+            <span>RadarHUD</span>
             <span>GameplayMenuInput</span>
             <span>MainMenuController</span>
+            <span>MirrorInteractable (deck mirror)</span>
           </div>
         </article>
         <article class="system-group">
@@ -937,8 +939,9 @@
         <strong>Key relationships:</strong>
         <code>GameManager</code> coordinates run state.
         <code>WeaponSystem</code> owns active <code>Weapon</code> instances configured by
-        <code>WeaponDefinition</code>. Concrete upgrades inherit from <code>UpgradeDefinition</code>;
-        concrete round modifiers inherit from <code>AugmentDefinition</code>.
+        <code>WeaponDefinition</code>. The card-based <code>ShopManager</code> applies weapon
+        upgrades directly through <code>GameManager.TrySpendMoney</code>; concrete round
+        modifiers inherit from <code>AugmentDefinition</code>.
         <code>EnemySpawner</code> creates configured enemies that share <code>SimpleEnemy</code>,
         <code>SwarmMovement</code>, and <code>Health</code>.
       </p>
