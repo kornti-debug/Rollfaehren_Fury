@@ -17,33 +17,7 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Armature|Idle' has import animation warnings
-      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Leg.R' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'Leg.L' is inbetween
-      humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'Armature|IdleCrossing' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Leg.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'Armature|Jump_Land' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Leg.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'Armature|Jump_Start' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Leg.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'Armature|WalkCycle' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Leg.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Leg.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'FootLower.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
+    animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -68,7 +42,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 1
       loopBlendPositionY: 1
