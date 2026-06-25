@@ -111,6 +111,7 @@ namespace RollfaehrenFury.Prototype
         private float augmentRewardMultiplier = 1f;
 
         public int AliveCount => aliveEnemies.Count;
+        public IReadOnlyList<SimpleEnemy> AliveEnemies => aliveEnemies;
         public EnemySpawnProfile[] EnemyProfiles => enemyProfiles;
 
         public void Configure(SimpleEnemy prefab, FerryDamageTarget target, Transform[] points, GameManager manager)
