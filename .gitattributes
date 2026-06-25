@@ -25,7 +25,10 @@
 *.py text eol=lf
 *.yml text eol=lf
 *.wproj text eol=lf
-*.wwu text eol=lf
+# Wwise work units are structured XML: never let git auto-merge them line-by-line
+# (that silently produces invalid XML Wwise can't open). -merge forces a manual
+# conflict instead. Prefer per-author/feature work units to avoid conflicts.
+*.wwu text eol=lf -merge
 *.plist text eol=lf
 
 # Unity TerrainData assets are binary even when they use the .asset extension.
