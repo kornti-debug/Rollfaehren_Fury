@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDefinition
   displayName: Pistol
   fireMode: 0
-  damage: 25
+  damage: 30
   range: 300
   fireCooldown: 0.2
-  aimAssistRadius: 0.45
+  aimAssistRadius: 0.6
   pelletsPerShot: 1
   spreadAngle: 0
   automatic: 0
-  magazineSize: 6
+  magazineSize: 8
   reloadTime: 1.2
   reserveMagazines: 4
   initiallyUnlocked: 0

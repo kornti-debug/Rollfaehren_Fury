@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponDefinition
   displayName: Shotgun
   fireMode: 1
-  damage: 20
+  damage: 35
   range: 90
   fireCooldown: 0.8
   aimAssistRadius: 0

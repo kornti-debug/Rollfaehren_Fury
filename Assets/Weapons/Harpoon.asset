@@ -17,7 +17,7 @@ MonoBehaviour:
   damage: 140
   range: 300
   fireCooldown: 1.2
-  aimAssistRadius: 1
+  aimAssistRadius: 0.8
   pelletsPerShot: 1
   spreadAngle: 0
   automatic: 0
