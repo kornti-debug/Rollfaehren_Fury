@@ -21,7 +21,23 @@ namespace RollfaehrenFury.Prototype
         private int ricochetBounces;
         private float ricochetRange = 25f;
 
-        public void Initialize(Vector3 startVelocity, float gravityStrength, float impactDamage, float lifetime, Transform ignored, LayerMask mask, int bounces = 0)
+        // --- Explosive Shot Fields ---
+        private bool hasExplosiveShots;
+        private float explosionRadius;
+        private float explosionDamageMultiplier;
+        // -----------------------------
+
+        public void Initialize(
+            Vector3 startVelocity, 
+            float gravityStrength, 
+            float impactDamage, 
+            float lifetime, 
+            Transform ignored, 
+            LayerMask mask, 
+            int bounces = 0,
+            bool explosive = false,
+            float expRadius = 0f,
+            float expDamageMult = 1f)
         {
             velocity = startVelocity;
             gravity = Mathf.Max(0f, gravityStrength);
@@ -30,6 +46,11 @@ namespace RollfaehrenFury.Prototype
             ignoredRoot = ignored;
             hitMask = mask;
             ricochetBounces = Mathf.Max(0, bounces);
+            
+            hasExplosiveShots = explosive;
+            explosionRadius = expRadius;
+            explosionDamageMultiplier = expDamageMult;
+
             initialized = true;
 
             BuildVisual();
@@ -61,14 +82,20 @@ namespace RollfaehrenFury.Prototype
                 && !ShouldIgnore(hit.collider))
             {
                 Health health = hit.collider.GetComponentInParent<Health>();
-                if (health != null)
+
+                if (hasExplosiveShots)
+                {
+                    Explode(hit.point);
+                }
+                else if (health != null)
                 {
                     health.Damage(damage);
+                }
 
-                    if (ricochetBounces > 0)
-                    {
-                        Ricochet(hit.point, health.GetComponentInParent<SimpleEnemy>());
-                    }
+                // Ricochet logic chains instantly if it hit an enemy first
+                if (ricochetBounces > 0 && health != null)
+                {
+                    Ricochet(hit.point, health.GetComponentInParent<SimpleEnemy>());
                 }
 
                 transform.position = hit.point;
@@ -78,6 +105,28 @@ namespace RollfaehrenFury.Prototype
 
             transform.position = start + step;
             OrientAlongVelocity();
+        }
+
+        private void Explode(Vector3 center)
+        {
+            Collider[] colliders = Physics.OverlapSphere(center, explosionRadius, hitMask, QueryTriggerInteraction.Collide);
+            HashSet<Health> hitTargets = new HashSet<Health>();
+
+            foreach (Collider col in colliders)
+            {
+                if (ShouldIgnore(col))
+                {
+                    continue;
+                }
+
+                Health targetHealth = col.GetComponentInParent<Health>();
+                if (targetHealth != null && !hitTargets.Contains(targetHealth))
+                {
+                    hitTargets.Add(targetHealth);
+                    
+                    targetHealth.Damage(damage * explosionDamageMultiplier);
+                }
+            }
         }
 
         // Harpoon Ricochet upgrade: after the primary hit, chain damage to the nearest enemies.
@@ -101,7 +150,14 @@ namespace RollfaehrenFury.Prototype
                 Health nextHealth = next.GetComponent<Health>();
                 if (nextHealth != null)
                 {
-                    nextHealth.Damage(damage);
+                    if (hasExplosiveShots)
+                    {
+                        Explode(next.transform.position);
+                    }
+                    else
+                    {
+                        nextHealth.Damage(damage);
+                    }
                 }
 
                 alreadyHit.Add(next);

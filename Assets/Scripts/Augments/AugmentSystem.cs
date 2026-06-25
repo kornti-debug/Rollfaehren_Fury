@@ -92,6 +92,14 @@ namespace RollfaehrenFury.Prototype
                 true,
                 AugmentCategory.Player);
             pool.Add(adrenaline);
+
+            ExplodingShotAugment explodingShot = ScriptableObject.CreateInstance<ExplodingShotAugment>();
+            explodingShot.InitRuntime(
+                "Exploding Shot",
+                "Shots explode on hit and deal area damage",
+                true,
+                AugmentCategory.Weapon);
+            pool.Add(explodingShot);
         }
 
         /// <summary>Called by GameManager at round end.</summary>

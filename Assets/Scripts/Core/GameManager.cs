@@ -382,6 +382,11 @@ namespace RollfaehrenFury.Prototype
             ferryHealth.Heal(amount);
         }
 
+        public void EnableExplodingShot(float radius, float damageMultiplier)
+        {
+            weaponSystem?.EnableExplosiveShotsOnAll(radius, damageMultiplier);
+        }
+
         private void ApplyPerRoundHeal()
         {
             if (perRoundHealFraction > 0f && ferryHealth != null)

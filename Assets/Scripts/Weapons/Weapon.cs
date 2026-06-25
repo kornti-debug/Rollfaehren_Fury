@@ -35,6 +35,12 @@ namespace RollfaehrenFury.Prototype
         private float reloadRemaining;
         private bool isEquipped = true;
 
+        // --- Explosive Shot Fields ---
+        private bool hasExplosiveShots;
+        private float explosionRadius;
+        private float explosionDamageMultiplier;
+        // -----------------------------
+
         private float reloadDamageMultiplier = 1f;
         private float reloadDamageDuration;
         private float damageBuffUntil;
@@ -154,6 +160,22 @@ namespace RollfaehrenFury.Prototype
             ricochetBounces += Mathf.Max(0, bounces);
         }
 
+        /// <summary>Enables AoE explosive damage upon impact.</summary>
+        public void EnableExplosiveShots(float radius, float damageMultiplier = 1f)
+        {
+            if (hasExplosiveShots == false)
+            {
+                hasExplosiveShots = true;
+                explosionRadius = radius;
+                explosionDamageMultiplier = damageMultiplier;
+            }
+            else
+            {
+                explosionRadius += radius;
+                explosionDamageMultiplier += damageMultiplier;
+            }
+        }
+
         public bool CanFire()
         {
             EnsureStats();
@@ -223,6 +245,11 @@ namespace RollfaehrenFury.Prototype
             damageBuffUntil = 0f;
             nextFireTime = 0f;
             ricochetBounces = 0;
+            
+            hasExplosiveShots = false;
+            explosionRadius = 0f;
+            explosionDamageMultiplier = 1f;
+
             EnsureStats();
         }
 
@@ -332,7 +359,10 @@ namespace RollfaehrenFury.Prototype
                 definition.ProjectileLifetime,
                 ignoredRoot,
                 hitMask,
-                ricochetBounces);
+                ricochetBounces,
+                hasExplosiveShots, 
+                explosionRadius, 
+                explosionDamageMultiplier);
         }
 
         private void FireSingleRay(Camera fireCamera, Transform ignoredRoot, LayerMask hitMask)
@@ -353,15 +383,44 @@ namespace RollfaehrenFury.Prototype
             HitSomething?.Invoke(hit);
 
             Health health = hit.collider.GetComponentInParent<Health>();
-            if (health != null)
+
+            if (hasExplosiveShots)
+            {
+                Explode(hit.point, ignoredRoot, hitMask);
+            }
+            else if (health != null)
             {
                 health.Damage(EffectiveDamage);
                 hitHealth.Invoke();
                 HitHealth?.Invoke(health);
+            }
 
-                if (ricochetBounces > 0)
+            if (ricochetBounces > 0 && health != null)
+            {
+                Ricochet(hit.point, health.GetComponentInParent<SimpleEnemy>());
+            }
+        }
+
+        private void Explode(Vector3 center, Transform ignoredRoot, LayerMask hitMask)
+        {
+            Collider[] colliders = Physics.OverlapSphere(center, explosionRadius, hitMask, QueryTriggerInteraction.Collide);
+            HashSet<Health> hitTargets = new HashSet<Health>();
+
+            foreach (Collider col in colliders)
+            {
+                if (ShouldIgnoreHit(col, ignoredRoot))
                 {
-                    Ricochet(hit.point, health.GetComponentInParent<SimpleEnemy>());
+                    continue;
+                }
+
+                Health targetHealth = col.GetComponentInParent<Health>();
+                if (targetHealth != null && !hitTargets.Contains(targetHealth))
+                {
+                    hitTargets.Add(targetHealth);
+                    
+                    targetHealth.Damage(EffectiveDamage * explosionDamageMultiplier);
+                    hitHealth.Invoke();
+                    HitHealth?.Invoke(targetHealth);
                 }
             }
         }
@@ -383,14 +442,22 @@ namespace RollfaehrenFury.Prototype
                     break;
                 }
 
+                Vector3 to = next.transform.position;
                 Health nextHealth = next.GetComponent<Health>();
+                
                 if (nextHealth != null)
                 {
-                    nextHealth.Damage(EffectiveDamage);
-                    HitHealth?.Invoke(nextHealth);
+                    if (hasExplosiveShots)
+                    {
+                        Explode(to, null, ~0); 
+                    }
+                    else
+                    {
+                        nextHealth.Damage(EffectiveDamage);
+                        HitHealth?.Invoke(nextHealth);
+                    }
                 }
 
-                Vector3 to = next.transform.position;
                 tracer?.Show(from, to);
                 alreadyHit.Add(next);
                 from = to;
@@ -427,10 +494,6 @@ namespace RollfaehrenFury.Prototype
                 return;
             }
 
-            // A tracer exactly on the view axis is seen edge-on (nearly invisible) and is
-            // clipped by the near plane. Start a touch ahead of and below the eye so it is
-            // visible at every angle, while staying horizontally centered under the crosshair
-            // and converging on the actual aim/hit point.
             Transform cameraTransform = fireCamera.transform;
             Vector3 muzzle = cameraTransform.position
                 + cameraTransform.forward * 0.3f
