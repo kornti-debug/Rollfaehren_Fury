@@ -30,7 +30,6 @@
 				</SoundBank>
 				<SoundBank Name="OutdoorSoundBank" ID="{CA3D7CEF-4B9F-4D91-B03D-0DC5FF9F129C}">
 					<ObjectInclusionList>
-						<ObjectRef Name="Play_EnemyKilled" ID="{8B4E3D16-5DC3-401F-99E8-0E053E87C9A2}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BirdFlap" ID="{E756A537-D351-4065-95CD-25BCDB938778}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_GunReload" ID="{C2012EF5-5DD8-409D-B679-5EB40D7EA45A}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatEngine" ID="{25D6FAD2-B8C1-40EA-BFB7-872BB55F2047}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
@@ -43,16 +42,13 @@
 						<ObjectRef Name="Stop_FishSwimming" ID="{6A9C86E0-4BBE-4453-B892-F64570756D2E}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_EnemyFishReachFerry" ID="{5C9650CC-6F39-44CE-ACE1-10B154069800}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_ShotgunReload" ID="{A2FE6CC4-0B2F-46CD-9D39-165AC405B220}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
-						<ObjectRef Name="Play_EnemyFishRadioactive" ID="{4AD8C463-1E6A-4691-9051-52EDA26336A2}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BoatEngine" ID="{DB83B4BA-3307-46D9-ADB7-997C279B3F62}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatWaveStanding" ID="{89378F7A-5BFD-479E-968C-F7431DED50CF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatSteeringScreech" ID="{C0A79341-6BCE-48E6-AD6F-3ED57B873C96}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
-						<ObjectRef Name="Play_EnemyBirdStuka" ID="{727C868B-4801-4B2F-9882-2DB7ED0112E8}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BoatWaveMoving" ID="{84BA59E8-24E1-4B54-9AB0-873C0EF73F66}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_BoatWaveMoving" ID="{FD260B79-C915-4B84-BD0A-A4B99CDF51FF}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_ShotgunFired" ID="{1F7802E4-755C-4BB5-BCE0-96A2427B444A}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_FallingOffWilhelmScream" ID="{D3CEB409-D22B-4C9A-B71E-28EEEC77E3FD}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
-						<ObjectRef Name="Play_EnemyFishApproaching" ID="{C43FA00A-1447-4E85-9916-9A06C662A153}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
@@ -67,3 +63,4 @@
 		</WorkUnit>
 	</SoundBanks>
 </WwiseDocument>
+

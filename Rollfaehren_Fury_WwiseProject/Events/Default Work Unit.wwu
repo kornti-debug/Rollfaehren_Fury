@@ -459,51 +459,8 @@
 						</Action>
 					</ChildrenList>
 				</Event>
-				<Event Name="Play_EnemyFishRadioactive" ID="{4AD8C463-1E6A-4691-9051-52EDA26336A2}">
-					<ChildrenList>
-						<Action Name="" ID="{5EB4A1B2-AA69-47CF-B70E-2653DAC90F2F}" ShortID="389612053">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="EnemyFishRadioactive" ID="{86DC9266-47C8-4115-AC87-69F34B21D76C}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-					</ChildrenList>
-				</Event>
-				<Event Name="Play_EnemyFishApproaching" ID="{C43FA00A-1447-4E85-9916-9A06C662A153}">
-					<ChildrenList>
-						<Action Name="" ID="{3C946F61-D73E-494F-A663-AEC85A7C9901}" ShortID="768799647">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="EnemyFishApproaching" ID="{8B972C40-BEE4-40EB-BB52-83703028857D}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-					</ChildrenList>
-				</Event>
-				<Event Name="Play_EnemyBirdStuka" ID="{727C868B-4801-4B2F-9882-2DB7ED0112E8}">
-					<ChildrenList>
-						<Action Name="" ID="{8DB495A3-782F-495A-908F-6162DA59ED50}" ShortID="733788343">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="EnemyBirdStuka" ID="{1A1A6BA3-1D13-4E04-B806-0E444DF469C6}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-					</ChildrenList>
-				</Event>
-				<Event Name="Play_EnemyKilled" ID="{8B4E3D16-5DC3-401F-99E8-0E053E87C9A2}">
-					<ChildrenList>
-						<Action Name="" ID="{390F0299-0786-4FEF-A567-BF2A64309ADC}" ShortID="770114047">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="EnemyKilled" ID="{1A166EC7-ACA1-4651-A8F6-4C01873C6C20}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-					</ChildrenList>
-				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>
 </WwiseDocument>
+
