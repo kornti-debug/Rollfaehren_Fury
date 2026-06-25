@@ -17460,6 +17460,7 @@ MonoBehaviour:
     spawnWeight: 0.5
     useFixedSpawnHeight: 1
     fixedSpawnHeight: 7
+    hasGeigerAudio: 1
   - displayName: Pigeon
     prefab: {fileID: 5696318517125643136, guid: 5b095bef6a866194dba49a6f6dac1ba7, type: 3}
     spawnPoints:
@@ -17473,6 +17474,7 @@ MonoBehaviour:
     spawnWeight: 0.5
     useFixedSpawnHeight: 0
     fixedSpawnHeight: 0
+    hasGeigerAudio: 0
   enemyPrefab: {fileID: 3449651742218595715, guid: 0e033d2168fa09d44808313152dae514, type: 3}
   ferryTarget: {fileID: 797040558}
   ferryController: {fileID: 797040556}

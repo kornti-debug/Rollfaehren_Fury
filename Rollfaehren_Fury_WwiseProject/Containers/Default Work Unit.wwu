@@ -159,7 +159,7 @@
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -282,7 +282,7 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-10</Value>
+								<Value>6</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
@@ -327,7 +327,7 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Lowpass" Type="int16">
 							<ValueList>
-								<Value>30</Value>
+								<Value>60</Value>
 							</ValueList>
 						</Property>
 						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
@@ -343,13 +343,13 @@
 						<Property Name="RandomOrSequence" Type="int16" Value="0"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>8</Value>
+								<Value>30</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -610,7 +610,7 @@
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="4"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
-											<Property Name="Volume" Type="Real64">
+						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-12</Value>
 							</ValueList>
@@ -693,7 +693,7 @@
 						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
-											<Property Name="Volume" Type="Real64">
+						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-12</Value>
 							</ValueList>
@@ -803,6 +803,11 @@
 				<RandomSequenceContainer Name="EnemyFishHit" ID="{F509D88C-FBF6-4FEA-960E-ED3053F2EAD0}" ShortID="77431489">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>20</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
@@ -884,6 +889,112 @@
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="ShotgunFiredAndReload" ID="{A16DB7D4-E761-46D2-84AA-A08620B52171}" ShortID="937119489">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+						<Property Name="RandomOrSequence" Type="int16" Value="0"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-3</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="shotgun_fired" ID="{C6C2CCEA-14A4-460D-9426-8E0E5CF33638}" ShortID="460221760">
+							<PropertyList>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>6</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="shotgun_fired" ID="{8F7FB4D7-33D8-43F8-BB08-3AF90FCA41C5}">
+									<PropertyList>
+										<Property Name="LoopBegin" Type="Real64" Value="0"/>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+										<Property Name="TrimEnd" Type="Real64" Value="0.719389051788248"/>
+									</PropertyList>
+									<Language>SFX</Language>
+									<AudioFile>shotgun_fired.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="503920408"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="shotgun_fired" ID="{8F7FB4D7-33D8-43F8-BB08-3AF90FCA41C5}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="shotgun_reload" ID="{A0B7E5BE-9734-498B-82A8-A0746984C3B0}" ShortID="638507558">
+							<PropertyList>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-6</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="shotgun_reload" ID="{C39BB18D-D74C-4A02-BE87-18FD1BBA5DBF}">
+									<Language>SFX</Language>
+									<AudioFile>shotgun_reload.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="955893272"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="shotgun_reload" ID="{C39BB18D-D74C-4A02-BE87-18FD1BBA5DBF}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+					<ObjectLists>
+						<ObjectList Name="Playlist">
+							<PluginInnerObject Name="" ID="{2299D31F-3B76-4C4B-A62D-5D15B62C310B}" PluginName="PlaylistSlot" CompanyID="0" PluginID="86">
+								<ReferenceList>
+									<Reference Name="PlaylistObject">
+										<ObjectRef Name="shotgun_fired" ID="{C6C2CCEA-14A4-460D-9426-8E0E5CF33638}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+									</Reference>
+								</ReferenceList>
+							</PluginInnerObject>
+							<PluginInnerObject Name="" ID="{AEFC8757-6A07-438B-95E4-A4EEA3C86D95}" PluginName="PlaylistSlot" CompanyID="0" PluginID="86">
+								<ReferenceList>
+									<Reference Name="PlaylistObject">
+										<ObjectRef Name="shotgun_reload" ID="{A0B7E5BE-9734-498B-82A8-A0746984C3B0}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+									</Reference>
+								</ReferenceList>
+							</PluginInnerObject>
+						</ObjectList>
+					</ObjectLists>
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="HarpoonFired" ID="{A618A354-3EFA-496C-981B-FD2E0593FE7A}" ShortID="758159461">
 					<PropertyList>
@@ -2569,7 +2680,7 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>0</Value>
+								<Value>12</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
@@ -2640,18 +2751,47 @@
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
+								<AudioFileSource Name="fish_hit_boat" ID="{3B37BF9E-4E02-4928-A829-C76419C23259}">
 								<AudioFileSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}">
 									<Language>SFX</Language>
+									<AudioFile>fish_hit_boat.wav</AudioFile>
 									<AudioFile>bird_hit_boat.wav</AudioFile>
 									<MediaIDList>
+										<MediaID ID="1058523633"/>
 										<MediaID ID="422057610"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
+								<ActiveSource Name="fish_hit_boat" ID="{3B37BF9E-4E02-4928-A829-C76419C23259}" Platform="Linked"/>
 								<ActiveSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="EnemyBirdReachFerry" ID="{86F3E1C1-955D-4C40-B4D7-383E0C73C182}" ShortID="578856893">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>12</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="bird_hit_boat" ID="{6758F53B-2D65-4F0E-B209-B52FB4FB8C03}" ShortID="759871122">
+							<ReferenceList>
 					</ChildrenList>
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="ShotgunFired" ID="{3181FB12-2F3A-41A4-849C-2FCE810477F4}" ShortID="945503218">
@@ -2697,17 +2837,56 @@
 										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
 										<Property Name="TrimEnd" Type="Real64" Value="0.719389051788248"/>
 									</PropertyList>
+								<AudioFileSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}">
 									<Language>SFX</Language>
+									<AudioFile>bird_hit_boat.wav</AudioFile>
 									<AudioFile>shotgun_fired.wav</AudioFile>
 									<MediaIDList>
+										<MediaID ID="422057610"/>
 										<MediaID ID="503920408"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
+								<ActiveSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}" Platform="Linked"/>
 								<ActiveSource Name="shotgun_fired" ID="{8F7FB4D7-33D8-43F8-BB08-3AF90FCA41C5}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<SwitchContainer Name="EnemyFishRadioactive" ID="{86DC9266-47C8-4115-AC87-69F34B21D76C}" ShortID="1034983429">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="SwitchBehavior" Type="int16" Value="1"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-6</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="DefaultSwitchOrState">
+							<ObjectRef Name="Far" ID="{C4A8D74B-0490-48DA-8BCC-29F74DB528C2}" WorkUnitID="{E8DF619D-25B7-412A-B5D7-14F08AC250FF}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+						<Reference Name="SwitchGroupOrStateGroup">
+							<ObjectRef Name="FishProximity" ID="{491EF851-C480-4EE2-B01E-0187A10C6109}" WorkUnitID="{E8DF619D-25B7-412A-B5D7-14F08AC250FF}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}" ShortID="192110138">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
 					</ChildrenList>
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="ShotgunReload" ID="{42E164F2-8DFF-4A57-B44B-78FD7FC0251B}" ShortID="429498198">
@@ -2747,27 +2926,130 @@
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
+								<AudioFileSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}">
 								<AudioFileSource Name="shotgun_reload" ID="{C39BB18D-D74C-4A02-BE87-18FD1BBA5DBF}">
 									<Language>SFX</Language>
 									<AudioFile>shotgun_reload.wav</AudioFile>
+									<AudioFile>radiatin_high.wav</AudioFile>
 									<MediaIDList>
+										<MediaID ID="630049367"/>
 										<MediaID ID="955893272"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
 								<ActiveSource Name="shotgun_reload" ID="{C39BB18D-D74C-4A02-BE87-18FD1BBA5DBF}" Platform="Linked"/>
+								<ActiveSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}" ShortID="57135483">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="radiatin_low" ID="{BE772A23-913C-4EF4-A24F-DABAEE9D119B}">
+									<Language>SFX</Language>
+									<AudioFile>radiatin_low.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="874511023"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="radiatin_low" ID="{BE772A23-913C-4EF4-A24F-DABAEE9D119B}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}" ShortID="859416003">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="radiatin_mid" ID="{A889032B-8706-47A9-9A3D-F9687224BCA3}">
+									<Language>SFX</Language>
+									<AudioFile>radiatin_mid.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="242189267"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="radiatin_mid" ID="{A889032B-8706-47A9-9A3D-F9687224BCA3}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>
 				</RandomSequenceContainer>
 				<RandomSequenceContainer Name="GunReload" ID="{7EAC21BE-33B3-48E5-9DD5-079EE37BE566}" ShortID="138253236">
+					<GroupingInfo>
+						<GroupingBehaviorList>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}"/>
+							</GroupingBehavior>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}"/>
+							</GroupingBehavior>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}"/>
+							</GroupingBehavior>
+						</GroupingBehaviorList>
+						<GroupingList>
+							<Grouping>
+								<SwitchRef Name="Medium" ID="{B50FC719-1E82-4EAF-ADF3-05C2C4D46A98}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Far" ID="{C4A8D74B-0490-48DA-8BCC-29F74DB528C2}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Close" ID="{95A510C8-93CB-4A59-BB0A-8643F1A4E0CD}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}"/>
+								</ItemList>
+							</Grouping>
+						</GroupingList>
+					</GroupingInfo>
+				</SwitchContainer>
+				<RandomSequenceContainer Name="EnemyFishApproaching" ID="{8B972C40-BEE4-40EB-BB52-83703028857D}" ShortID="434694830">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Lowpass" Type="int16">
+							<ValueList>
+								<Value>10</Value>
+							</ValueList>
+						</Property>
+						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
+						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="4"/>
+						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-6</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2778,6 +3060,10 @@
 					</ReferenceList>
 					<ChildrenList>
 						<Sound Name="Machine gun reload" ID="{0E80ADB7-413A-47DE-A77C-57DB1E7A8E48}" ShortID="426219960">
+						<Sound Name="horn_blast" ID="{12459395-3D4F-4F40-92FB-61462DB02099}" ShortID="458481655">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
 							<ReferenceList>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2788,15 +3074,24 @@
 							</ReferenceList>
 							<ChildrenList>
 								<AudioFileSource Name="Machine gun reload" ID="{59FF3A0C-8F24-45AC-8D89-5F518D2D0F2F}">
+								<AudioFileSource Name="horn_blast" ID="{B9C80C45-DABB-41DA-9AA7-F1DCB48913FA}">
+									<PropertyList>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+										<Property Name="TrimBegin" Type="Real64" Value="0.596153846153846"/>
+										<Property Name="TrimEnd" Type="Real64" Value="4.1826923076923"/>
+									</PropertyList>
 									<Language>SFX</Language>
 									<AudioFile>Machine gun reload.wav</AudioFile>
+									<AudioFile>horn_blast.wav</AudioFile>
 									<MediaIDList>
 										<MediaID ID="391210344"/>
+										<MediaID ID="1052660794"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
 								<ActiveSource Name="Machine gun reload" ID="{59FF3A0C-8F24-45AC-8D89-5F518D2D0F2F}" Platform="Linked"/>
+								<ActiveSource Name="horn_blast" ID="{B9C80C45-DABB-41DA-9AA7-F1DCB48913FA}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>
@@ -2950,21 +3245,79 @@
 								</Reference>
 								<Reference Name="OutputBus">
 									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="EnemyBirdStuka" ID="{1A1A6BA3-1D13-4E04-B806-0E444DF469C6}" ShortID="59414613">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-2</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="stuka_dive" ID="{0762240F-3F99-43CF-8E0A-5F1D82246923}" ShortID="334824202">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
+								<AudioFileSource Name="stuka_dive" ID="{83C91BA6-D84E-410E-A5FF-FD1D5375B32F}">
 								<AudioFileSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}">
 									<Language>SFX</Language>
+									<AudioFile>stuka_dive.wav</AudioFile>
 									<AudioFile>radiatin_high.wav</AudioFile>
 									<MediaIDList>
+										<MediaID ID="723562104"/>
 										<MediaID ID="630049367"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
+								<ActiveSource Name="stuka_dive" ID="{83C91BA6-D84E-410E-A5FF-FD1D5375B32F}" Platform="Linked"/>
 								<ActiveSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="EnemyKilled" ID="{1A166EC7-ACA1-4651-A8F6-4C01873C6C20}" ShortID="1066798973">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>16</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="positiveUI" ID="{5C5C79E7-3AF5-445A-8B87-AC5AF2223E23}" ShortID="621599794">
 						<Sound Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}" ShortID="57135483">
 							<PropertyList>
 								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>

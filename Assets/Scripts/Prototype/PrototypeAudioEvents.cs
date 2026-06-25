@@ -48,8 +48,9 @@ namespace RollfaehrenFury.Prototype
 
             if (gameManager != null)
             {
+                gameManager.EnemyKilled       += HandleEnemyKilled;
                 gameManager.EnemyReachedFerry += HandleEnemyReachedFerry;
-                gameManager.RoundCompleted += HandleRoundCompleted;
+                gameManager.RoundCompleted    += HandleRoundCompleted;
             }
         }
 
@@ -64,9 +65,15 @@ namespace RollfaehrenFury.Prototype
 
             if (gameManager != null)
             {
+                gameManager.EnemyKilled       -= HandleEnemyKilled;
                 gameManager.EnemyReachedFerry -= HandleEnemyReachedFerry;
-                gameManager.RoundCompleted -= HandleRoundCompleted;
+                gameManager.RoundCompleted    -= HandleRoundCompleted;
             }
+        }
+
+        private void HandleEnemyKilled()
+        {
+            Post(WwiseAudioNames.PlayEnemyKilled, gameObject);
         }
 
         private void HandleWeaponFired()

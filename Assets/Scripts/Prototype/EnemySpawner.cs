@@ -14,6 +14,7 @@ namespace RollfaehrenFury.Prototype
         [SerializeField, Min(0f)] private float spawnWeight = 1f;
         [SerializeField] private bool useFixedSpawnHeight;
         [SerializeField] private float fixedSpawnHeight;
+        [SerializeField] private bool hasGeigerAudio;
 
         public string DisplayName => displayName;
         public SimpleEnemy Prefab => prefab;
@@ -22,6 +23,7 @@ namespace RollfaehrenFury.Prototype
         public float SpawnWeight => Mathf.Max(0f, spawnWeight);
         public bool UseFixedSpawnHeight => useFixedSpawnHeight;
         public float FixedSpawnHeight => fixedSpawnHeight;
+        public bool HasGeigerAudio => hasGeigerAudio;
 
         public void Configure(
             string profileName,
@@ -266,6 +268,11 @@ namespace RollfaehrenFury.Prototype
             if (enemy.GetComponent<EnemyMovementAudio>() == null)
             {
                 enemy.gameObject.AddComponent<EnemyMovementAudio>();
+            }
+
+            if (profile != null && profile.HasGeigerAudio && enemy.GetComponent<FishGeigerAudio>() == null)
+            {
+                enemy.gameObject.AddComponent<FishGeigerAudio>();
             }
 
             string profileName = profile != null && !string.IsNullOrWhiteSpace(profile.DisplayName)
