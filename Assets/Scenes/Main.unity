@@ -539,8 +539,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponVisuals
   weapon: {fileID: 0}
-  modelRoot: {fileID: 0}
-  muzzlePoint: {fileID: 0}
+  modelRoot: {fileID: 1254539479}
+  muzzlePoint: {fileID: 1018563825}
   magazineTransform: {fileID: 0}
   muzzleFlashPrefab: {fileID: 0}
   hitEffectPrefab: {fileID: 0}
@@ -4081,9 +4081,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponVisuals
   weapon: {fileID: 0}
-  modelRoot: {fileID: 0}
-  muzzlePoint: {fileID: 0}
-  magazineTransform: {fileID: 0}
+  modelRoot: {fileID: 2119552071}
+  muzzlePoint: {fileID: 1815958519}
+  magazineTransform: {fileID: 1793236432}
   muzzleFlashPrefab: {fileID: 0}
   hitEffectPrefab: {fileID: 0}
   effectLifetime: 1.5
@@ -4517,6 +4517,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 436003895}
   m_CullTransparentMesh: 1
+--- !u!1 &438377020 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: cd5a995e10fea044fb7b6d049050d6ca, type: 3}
+  m_PrefabInstance: {fileID: 961624012}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &448799763
 GameObject:
   m_ObjectHideFlags: 0
@@ -11085,7 +11090,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 9500000, guid: cd5a995e10fea044fb7b6d049050d6ca, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 400000, guid: cd5a995e10fea044fb7b6d049050d6ca, type: 3}
@@ -13212,8 +13218,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollfaehrenFury.Prototype.WeaponVisuals
   weapon: {fileID: 0}
-  modelRoot: {fileID: 0}
-  muzzlePoint: {fileID: 0}
+  modelRoot: {fileID: 438377020}
+  muzzlePoint: {fileID: 899874527}
   magazineTransform: {fileID: 0}
   muzzleFlashPrefab: {fileID: 0}
   hitEffectPrefab: {fileID: 0}
@@ -14350,6 +14356,11 @@ MonoBehaviour:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: df8bdaa6285803f409c3df4412578a4a, type: 3}
   m_PrefabInstance: {fileID: 2073981950}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1254539479 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100004, guid: a09611a72fb85ef408ed68feb637755b, type: 3}
+  m_PrefabInstance: {fileID: 2136833501}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1255815659
 GameObject:
@@ -21114,6 +21125,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 968904646}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1793236432 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400004, guid: 120f6c23f4f98984e97997d269880d04, type: 3}
+  m_PrefabInstance: {fileID: 810048940}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1808150632
 GameObject:
   m_ObjectHideFlags: 0
@@ -25453,6 +25469,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2117208307}
   m_CullTransparentMesh: 1
+--- !u!1 &2119552071 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 120f6c23f4f98984e97997d269880d04, type: 3}
+  m_PrefabInstance: {fileID: 810048940}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2129161485
 GameObject:
   m_ObjectHideFlags: 0
