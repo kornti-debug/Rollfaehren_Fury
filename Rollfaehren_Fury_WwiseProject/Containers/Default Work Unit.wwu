@@ -6,6 +6,11 @@
 				<RandomSequenceContainer Name="HaraldKrullSpeaking" ID="{536AE88E-1119-42CD-AC36-FE768F44849B}" ShortID="140904570">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="InitialDelay" Type="Real64">
+							<ValueList>
+								<Value>3</Value>
+							</ValueList>
+						</Property>
 						<Property Name="NormalOrShuffle" Type="int16" Value="0"/>
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="1"/>
@@ -20,7 +25,7 @@
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
 						<Reference Name="OutputBus">
-							<ObjectRef Name="Dialogue" ID="{3F8B2263-9632-4C24-B808-DE5A22BDE598}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
@@ -159,7 +164,7 @@
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -288,7 +293,7 @@
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -610,7 +615,7 @@
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="4"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
-											<Property Name="Volume" Type="Real64">
+						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-12</Value>
 							</ValueList>
@@ -693,7 +698,7 @@
 						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
-											<Property Name="Volume" Type="Real64">
+						<Property Name="Volume" Type="Real64">
 							<ValueList>
 								<Value>-12</Value>
 							</ValueList>
@@ -803,10 +808,15 @@
 				<RandomSequenceContainer Name="EnemyFishHit" ID="{F509D88C-FBF6-4FEA-960E-ED3053F2EAD0}" ShortID="77431489">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>6</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2569,13 +2579,13 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>0</Value>
+								<Value>6</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2614,13 +2624,13 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>0</Value>
+								<Value>6</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -2918,14 +2928,18 @@
 				</MusicPlaylistContainer>
 				<SwitchContainer Name="EnemyFishRadioactive" ID="{86DC9266-47C8-4115-AC87-69F34B21D76C}" ShortID="1034983429">
 					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="SwitchBehavior" Type="int16" Value="1"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-6</Value>
+								<Value>-14</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
@@ -3053,6 +3067,11 @@
 				<RandomSequenceContainer Name="EnemyFishApproaching" ID="{8B972C40-BEE4-40EB-BB52-83703028857D}" ShortID="434694830">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Inclusion" Type="bool">
+							<ValueList>
+								<Value>False</Value>
+							</ValueList>
+						</Property>
 						<Property Name="Lowpass" Type="int16">
 							<ValueList>
 								<Value>10</Value>
@@ -3117,13 +3136,13 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-2</Value>
+								<Value>-10</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
-							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
 						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
@@ -3161,11 +3180,14 @@
 					<PropertyList>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>0</Value>
+								<Value>10</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
 					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_VeryLong_200" ID="{401B9967-2040-4718-A972-661929188CAE}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
 						<Reference Name="Conversion">
 							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 						</Reference>
