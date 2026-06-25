@@ -23,6 +23,13 @@
 						<Switch Name="Moving" ID="{881AC0E9-FD37-4146-93E2-8B3DBAFDBD3E}"/>
 					</ChildrenList>
 				</SwitchGroup>
+				<SwitchGroup Name="FishProximity" ID="{491EF851-C480-4EE2-B01E-0187A10C6109}">
+					<ChildrenList>
+						<Switch Name="Far" ID="{C4A8D74B-0490-48DA-8BCC-29F74DB528C2}"/>
+						<Switch Name="Medium" ID="{B50FC719-1E82-4EAF-ADF3-05C2C4D46A98}"/>
+						<Switch Name="Close" ID="{95A510C8-93CB-4A59-BB0A-8643F1A4E0CD}"/>
+					</ChildrenList>
+				</SwitchGroup>
 			</ChildrenList>
 		</WorkUnit>
 	</Switches>

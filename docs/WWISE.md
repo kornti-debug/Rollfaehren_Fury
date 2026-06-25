@@ -76,6 +76,7 @@ unloads after returning outside.
 Authored content currently tracked in the repository:
 
 - A `SurfaceType` Switch Group with `Wood`, `Gravel`, and `Grass`
+- A `FishProximity` Switch Group with `Far`, `Medium`, and `Close`
 - A `SC_Footsteps` Switch Container with randomized material-specific
   footstep containers
 - Random/sequence containers for ferry, fish, pigeons, weapons, doors, and UI
@@ -88,6 +89,10 @@ Authored content currently tracked in the repository:
 - A looping `TitleScreenMusic_Loop` playlist controlled by dedicated Play/Stop
   Events
 - `BoatSpeed` game parameter for ferry engine pitch
+- A non-spatial `EnemyFishRadioactive` detector loop, a spatial pigeon
+  `EnemyBirdStuka` one-shot, and non-spatial enemy-kill feedback
+- Replacement fish/pigeon ferry-contact recordings with
+  `Attn_Medium_40m`
 - Shared distance-volume/low-pass attenuation
 - User-defined SoundBanks: `MainSoundBank`, `OutdoorSoundBank`, and
   `IndoorSoundBank`
@@ -142,6 +147,9 @@ ignore policy.
 - `Play_AK47Fired`
 - `Play_EnemyFishReachFerry`
 - `Play_EnemyBirdReachFerry`
+- `Play_EnemyFishRadioactive`
+- `Play_EnemyBirdStuka`
+- `Play_EnemyKilled`
 - `Play_BackgroundMusic` / `Stop_BackgroundMusic`
 - `Play_VictoryMusic` / `Stop_VictoryMusic`
 - `Play_DefeatMusic` / `Stop_DefeatMusic`
@@ -165,12 +173,18 @@ The first Unity integration uses these game syncs:
 - `SurfaceType`: `Wood`, `Gravel`, `Grass`
 - `GameState`: `Docked`, `Shop`, `Moving`
 - `CombatIntensity`: `Mid`, `Intense`
+- `FishProximity`: `Far`, `Medium`, `Close`
 - `BoatSpeed`: RTPC from `0` to `100`
 
 Weapons and enemy sounds use 3D positioning with `Attn_Medium_40m`. Ferry
 loops use the existing long-distance ferry attenuation. Shotgun fire and
 reload are separate Events; `Play_GunReload` is shared by the Pistol and
 Assault Rifle until dedicated reload recordings are added.
+
+The ferry standing water, moving wake, and engine containers currently start
+at `-12 dB`. The radioactive detector is intentionally non-spatial and has no
+long-range attenuation because Unity will run only one nearest-fish loop on
+the player-side emitter.
 
 The first in-game listening pass confirmed the main weapon, ferry, enemy,
 voice, and UI Events. Its latest authored level adjustments are kept as a

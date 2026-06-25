@@ -253,6 +253,11 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [ ] Collect and import UI purchase, back, and error sounds.
 - [x] Import assault-rifle fire, enemy/ferry contact, background, shop,
   victory, and defeat audio.
+- [x] Selectively integrate the Wwise polishing recordings: negative
+  fish/pigeon ferry impacts, Stuka dive, nearest-fish Geiger states, and
+  enemy-kill feedback without importing the outdated scene or Work Units.
+- [x] Validate the polished Wwise authoring with a successful Windows
+  SoundBank generation.
 - [ ] Collect and import missing pistol-reload, ferry-damage/docking,
   enemy-death, and ambience audio.
 - [ ] Split Wwise authoring into category Work Units and child SFX busses.

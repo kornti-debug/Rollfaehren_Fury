@@ -52,6 +52,9 @@
 						<ObjectRef Name="Play_EnemyBirdReachFerry" ID="{4488855E-8EC8-4EF2-98B3-49296D531234}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Play_HarpoonFired" ID="{88E8A078-BE05-4F3A-A1FD-4AA98300572C}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 						<ObjectRef Name="Stop_BirdFlap" ID="{E6AA64B7-082A-4F99-A62C-BCC38F5C2557}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyFishRadioactive" ID="{4AD8C463-1E6A-4691-9051-52EDA26336A2}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyBirdStuka" ID="{727C868B-4801-4B2F-9882-2DB7ED0112E8}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_EnemyKilled" ID="{8B4E3D16-5DC3-401F-99E8-0E053E87C9A2}" WorkUnitID="{D5018B31-2351-4898-87D9-D9CB2C2044FB}" Origin="Manual" Filter="7"/>
 					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>

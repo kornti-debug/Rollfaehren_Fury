@@ -610,6 +610,11 @@
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitionsType" Type="int16" Value="4"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+											<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-12</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
@@ -688,6 +693,11 @@
 						<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+											<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-12</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
@@ -738,7 +748,7 @@
 						<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-8</Value>
+								<Value>-12</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
@@ -2559,7 +2569,7 @@
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
 						<Property Name="Volume" Type="Real64">
 							<ValueList>
-								<Value>-8</Value>
+								<Value>0</Value>
 							</ValueList>
 						</Property>
 					</PropertyList>
@@ -2575,70 +2585,26 @@
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
-						<Sound Name="FishExplosion" ID="{3CB3556B-B4FC-4294-AA2B-209BB9051F0B}" ShortID="1026252090">
+						<Sound Name="fish_hit_boat" ID="{EAD13EC5-F5FC-4F96-BDDE-4050FB77B43A}" ShortID="74967481">
 							<ReferenceList>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 								</Reference>
 								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
-								<AudioFileSource Name="FishExplosion" ID="{C5EBE855-5D27-4DAE-82B5-721535EB2E57}">
+								<AudioFileSource Name="fish_hit_boat" ID="{3B37BF9E-4E02-4928-A829-C76419C23259}">
 									<Language>SFX</Language>
-									<AudioFile>FishExplosion.wav</AudioFile>
+									<AudioFile>fish_hit_boat.wav</AudioFile>
 									<MediaIDList>
-										<MediaID ID="687258698"/>
+										<MediaID ID="1058523633"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
-								<ActiveSource Name="FishExplosion" ID="{C5EBE855-5D27-4DAE-82B5-721535EB2E57}" Platform="Linked"/>
-							</ActiveSourceList>
-						</Sound>
-						<Sound Name="FishExplosion2" ID="{74B611A1-8425-4ADC-BA9B-BE30EADF4049}" ShortID="337023373">
-							<ReferenceList>
-								<Reference Name="Conversion">
-									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-								</Reference>
-								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-								</Reference>
-							</ReferenceList>
-							<ChildrenList>
-								<AudioFileSource Name="FishExplosion2" ID="{60653F0C-654D-4DA3-ABA5-FFDE4A6FD39B}">
-									<Language>SFX</Language>
-									<AudioFile>FishExplosion2.wav</AudioFile>
-									<MediaIDList>
-										<MediaID ID="100163517"/>
-									</MediaIDList>
-								</AudioFileSource>
-							</ChildrenList>
-							<ActiveSourceList>
-								<ActiveSource Name="FishExplosion2" ID="{60653F0C-654D-4DA3-ABA5-FFDE4A6FD39B}" Platform="Linked"/>
-							</ActiveSourceList>
-						</Sound>
-						<Sound Name="FishExplosion3" ID="{DF668546-BF0D-4C03-A144-22E6A1205856}" ShortID="68053372">
-							<ReferenceList>
-								<Reference Name="Conversion">
-									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-								</Reference>
-								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-								</Reference>
-							</ReferenceList>
-							<ChildrenList>
-								<AudioFileSource Name="FishExplosion3" ID="{37FCA217-8E53-4012-91E1-2C180A0F10BE}">
-									<Language>SFX</Language>
-									<AudioFile>FishExplosion3.wav</AudioFile>
-									<MediaIDList>
-										<MediaID ID="1029903881"/>
-									</MediaIDList>
-								</AudioFileSource>
-							</ChildrenList>
-							<ActiveSourceList>
-								<ActiveSource Name="FishExplosion3" ID="{37FCA217-8E53-4012-91E1-2C180A0F10BE}" Platform="Linked"/>
+								<ActiveSource Name="fish_hit_boat" ID="{3B37BF9E-4E02-4928-A829-C76419C23259}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>
@@ -2646,6 +2612,11 @@
 				<RandomSequenceContainer Name="EnemyBirdReachFerry" ID="{86F3E1C1-955D-4C40-B4D7-383E0C73C182}" ShortID="578856893">
 					<PropertyList>
 						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>0</Value>
+							</ValueList>
+						</Property>
 					</PropertyList>
 					<ReferenceList>
 						<Reference Name="Attenuation">
@@ -2659,70 +2630,26 @@
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
-						<Sound Name="Squish1" ID="{A0B1FDD0-008A-405A-B907-DE11C0E044C6}" ShortID="597680184">
+						<Sound Name="bird_hit_boat" ID="{6758F53B-2D65-4F0E-B209-B52FB4FB8C03}" ShortID="759871122">
 							<ReferenceList>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
 								</Reference>
 								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
-								<AudioFileSource Name="Squish1" ID="{F2710275-5E7C-41B7-B9F2-36738A657802}">
+								<AudioFileSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}">
 									<Language>SFX</Language>
-									<AudioFile>Squish1.wav</AudioFile>
+									<AudioFile>bird_hit_boat.wav</AudioFile>
 									<MediaIDList>
-										<MediaID ID="164427408"/>
+										<MediaID ID="422057610"/>
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
 							<ActiveSourceList>
-								<ActiveSource Name="Squish1" ID="{F2710275-5E7C-41B7-B9F2-36738A657802}" Platform="Linked"/>
-							</ActiveSourceList>
-						</Sound>
-						<Sound Name="Squish2" ID="{00481D35-85EF-46B7-A747-5C68D3BAF08B}" ShortID="969333049">
-							<ReferenceList>
-								<Reference Name="Conversion">
-									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-								</Reference>
-								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-								</Reference>
-							</ReferenceList>
-							<ChildrenList>
-								<AudioFileSource Name="Squish2" ID="{8296E163-2A83-410E-B5B5-F7F2BD279AA1}">
-									<Language>SFX</Language>
-									<AudioFile>Squish2.wav</AudioFile>
-									<MediaIDList>
-										<MediaID ID="804912377"/>
-									</MediaIDList>
-								</AudioFileSource>
-							</ChildrenList>
-							<ActiveSourceList>
-								<ActiveSource Name="Squish2" ID="{8296E163-2A83-410E-B5B5-F7F2BD279AA1}" Platform="Linked"/>
-							</ActiveSourceList>
-						</Sound>
-						<Sound Name="Squish3" ID="{61ED140B-0C2B-4766-8FA3-C608B01B9909}" ShortID="232704115">
-							<ReferenceList>
-								<Reference Name="Conversion">
-									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
-								</Reference>
-								<Reference Name="OutputBus">
-									<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
-								</Reference>
-							</ReferenceList>
-							<ChildrenList>
-								<AudioFileSource Name="Squish3" ID="{758D673E-C1A5-4C96-8494-3C222A95142B}">
-									<Language>SFX</Language>
-									<AudioFile>Squish3.wav</AudioFile>
-									<MediaIDList>
-										<MediaID ID="378098177"/>
-									</MediaIDList>
-								</AudioFileSource>
-							</ChildrenList>
-							<ActiveSourceList>
-								<ActiveSource Name="Squish3" ID="{758D673E-C1A5-4C96-8494-3C222A95142B}" Platform="Linked"/>
+								<ActiveSource Name="bird_hit_boat" ID="{E1772305-B444-40A5-B5AB-5D1CBFA4B6BC}" Platform="Linked"/>
 							</ActiveSourceList>
 						</Sound>
 					</ChildrenList>
@@ -2989,6 +2916,226 @@
 						</MusicSegment>
 					</ChildrenList>
 				</MusicPlaylistContainer>
+				<SwitchContainer Name="EnemyFishRadioactive" ID="{86DC9266-47C8-4115-AC87-69F34B21D76C}" ShortID="1034983429">
+					<PropertyList>
+						<Property Name="SwitchBehavior" Type="int16" Value="1"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-6</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="DefaultSwitchOrState">
+							<ObjectRef Name="Far" ID="{C4A8D74B-0490-48DA-8BCC-29F74DB528C2}" WorkUnitID="{E8DF619D-25B7-412A-B5D7-14F08AC250FF}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+						<Reference Name="SwitchGroupOrStateGroup">
+							<ObjectRef Name="FishProximity" ID="{491EF851-C480-4EE2-B01E-0187A10C6109}" WorkUnitID="{E8DF619D-25B7-412A-B5D7-14F08AC250FF}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}" ShortID="192110138">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}">
+									<Language>SFX</Language>
+									<AudioFile>radiatin_high.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="630049367"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="radiatin_high" ID="{D1A1D6B7-FFDD-4A89-9CF4-FDE9FDB43729}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}" ShortID="57135483">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="radiatin_low" ID="{BE772A23-913C-4EF4-A24F-DABAEE9D119B}">
+									<Language>SFX</Language>
+									<AudioFile>radiatin_low.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="874511023"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="radiatin_low" ID="{BE772A23-913C-4EF4-A24F-DABAEE9D119B}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}" ShortID="859416003">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="radiatin_mid" ID="{A889032B-8706-47A9-9A3D-F9687224BCA3}">
+									<Language>SFX</Language>
+									<AudioFile>radiatin_mid.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="242189267"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="radiatin_mid" ID="{A889032B-8706-47A9-9A3D-F9687224BCA3}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+					<GroupingInfo>
+						<GroupingBehaviorList>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}"/>
+							</GroupingBehavior>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}"/>
+							</GroupingBehavior>
+							<GroupingBehavior>
+								<ItemRef Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}"/>
+							</GroupingBehavior>
+						</GroupingBehaviorList>
+						<GroupingList>
+							<Grouping>
+								<SwitchRef Name="Medium" ID="{B50FC719-1E82-4EAF-ADF3-05C2C4D46A98}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_mid" ID="{3D03013A-C4E1-4020-950B-CBE85B617104}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Far" ID="{C4A8D74B-0490-48DA-8BCC-29F74DB528C2}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_low" ID="{E0719EF0-BF63-4190-8152-D173861D1B27}"/>
+								</ItemList>
+							</Grouping>
+							<Grouping>
+								<SwitchRef Name="Close" ID="{95A510C8-93CB-4A59-BB0A-8643F1A4E0CD}"/>
+								<ItemList>
+									<ItemRef Name="radiatin_high" ID="{A2EA4A6E-DFB4-4DED-9882-318427F29D62}"/>
+								</ItemList>
+							</Grouping>
+						</GroupingList>
+					</GroupingInfo>
+				</SwitchContainer>
+				<RandomSequenceContainer Name="EnemyBirdStuka" ID="{1A1A6BA3-1D13-4E04-B806-0E444DF469C6}" ShortID="59414613">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-2</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="Attn_Medium_40m" ID="{2704EADE-6164-47E7-B61D-FA815174BE02}" WorkUnitID="{6179F785-858A-4571-B8F2-D36D5B173488}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="stuka_dive" ID="{0762240F-3F99-43CF-8E0A-5F1D82246923}" ShortID="334824202">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="stuka_dive" ID="{83C91BA6-D84E-410E-A5FF-FD1D5375B32F}">
+									<Language>SFX</Language>
+									<AudioFile>stuka_dive.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="723562104"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="stuka_dive" ID="{83C91BA6-D84E-410E-A5FF-FD1D5375B32F}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
+				<RandomSequenceContainer Name="EnemyKilled" ID="{1A166EC7-ACA1-4651-A8F6-4C01873C6C20}" ShortID="1066798973">
+					<PropertyList>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>0</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Sound Name="positiveUI" ID="{5C5C79E7-3AF5-445A-8B87-AC5AF2223E23}" ShortID="621599794">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F00CFEC4-35F2-43A1-9B27-67C319FA3D7A}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="SFX" ID="{5AD8BF24-5027-445A-B3CC-36CFF8A8BDFF}" WorkUnitID="{391E2877-FF40-402B-A5B6-9213323BC49F}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="positiveUI" ID="{2B4B3F5F-5877-4D24-B4F7-BC20FA721797}">
+									<Language>SFX</Language>
+									<AudioFile>positiveUI.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="495556987"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="positiveUI" ID="{2B4B3F5F-5877-4D24-B4F7-BC20FA721797}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</RandomSequenceContainer>
 			</ChildrenList>
 		</WorkUnit>
 	</Containers>
