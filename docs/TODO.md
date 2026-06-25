@@ -36,6 +36,8 @@ This list is the working task board for the prototype. Keep it practical and upd
 - [x] Add additive shared-shop transition state and reusable shore-house portals.
 - [x] Build and validate the shared `ShopInterior.unity` scene.
 - [x] Isolate the additive shop interior outside the exterior terrain without rebuilding manual room edits.
+- [x] Preserve the decorated shop while applying the taller walls, ceiling,
+  counter, NPC scale, and URP light data from the latest gameplay scene.
 - [x] Prevent the two shore portals from fighting over the shared interaction prompt.
 - [ ] Verify both doors show `Press E - Enter shop` and return the player to the correct entrance.
 - [ ] Verify entering, buying, exiting, and returning to both doors in Play Mode.

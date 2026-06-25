@@ -26,6 +26,10 @@ audio, and managers remain owned by Main.
 Its complete room hierarchy lives below `Shop Interior Root` at an isolated
 world position outside the terrain bounds. This prevents exterior TerrainData
 from intersecting the indoor floor while preserving the additive state flow.
+`ShopSceneBuilder.RepairSharedShopInterior` repairs named structural objects,
+parents loose decoration below that root without moving it in world space, and
+only creates the counter when it is missing. It does not rebuild the authored
+room or remove manually placed props.
 
 ## Entity Hierarchy
 

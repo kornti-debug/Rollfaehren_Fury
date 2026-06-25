@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -180,6 +181,8 @@ namespace RollfaehrenFury.Editor
                 root.transform.position = ShopInteriorWorldPosition;
             }
 
+            ApplyRoomPolish(shopScene, root.transform);
+
             foreach (ShopInteriorExit exit in root.GetComponentsInChildren<ShopInteriorExit>(true))
             {
                 EnsureComponent<AkGameObj>(exit.gameObject);
@@ -190,6 +193,64 @@ namespace RollfaehrenFury.Editor
             EditorSceneManager.SaveScene(shopScene);
             AssetDatabase.SaveAssets();
             Debug.Log("Shared ShopInterior.unity repaired without rebuilding manual room content.");
+        }
+
+        private static void ApplyRoomPolish(Scene shopScene, Transform room)
+        {
+            SetLocalTransform(shopScene, "Ceiling", new Vector3(0f, 4.964f, 0f), new Vector3(8f, 0.2f, 10f));
+            SetLocalTransform(shopScene, "Back Wall", new Vector3(0f, 2f, -5f), new Vector3(8f, 6f, 0.2f));
+            SetLocalTransform(shopScene, "Left Wall", new Vector3(-4f, 2f, 0f), new Vector3(0.2f, 6f, 10f));
+            SetLocalTransform(shopScene, "Right Wall", new Vector3(4f, 2f, 0f), new Vector3(0.2f, 6f, 10f));
+            SetLocalTransform(shopScene, "Front Wall Left", new Vector3(-2.5f, 2f, 5f), new Vector3(3f, 6f, 0.2f));
+            SetLocalTransform(shopScene, "Front Wall Right", new Vector3(2.5f, 2f, 5f), new Vector3(3f, 6f, 0.2f));
+
+            GameObject counter = FindSceneObjectInScene(shopScene, "Counter");
+            if (counter == null)
+            {
+                Material counterMaterial = EnsureMaterial(
+                    "Assets/Materials/ShopInteriorCounter.mat",
+                    new Color(0.48f, 0.2f, 0.12f));
+                counter = CreateBlock(
+                    room,
+                    "Counter",
+                    new Vector3(0f, 0.71f, -2f),
+                    new Vector3(4.5f, 2.24f, 1f),
+                    counterMaterial);
+            }
+            else
+            {
+                counter.transform.SetLocalPositionAndRotation(new Vector3(0f, 0.71f, -2f), Quaternion.identity);
+                counter.transform.localScale = new Vector3(4.5f, 2.24f, 1f);
+            }
+
+            GameObject npc = FindSceneObjectInScene(shopScene, "NPC_Shop");
+            if (npc != null)
+            {
+                npc.transform.localScale = Vector3.one * 1.5f;
+            }
+
+            GameObject shopLight = FindSceneObjectInScene(shopScene, "Shop Light");
+            if (shopLight != null)
+            {
+                EnsureComponent<UniversalAdditionalLightData>(shopLight);
+            }
+        }
+
+        private static void SetLocalTransform(
+            Scene scene,
+            string objectName,
+            Vector3 localPosition,
+            Vector3 localScale)
+        {
+            GameObject target = FindSceneObjectInScene(scene, objectName);
+            if (target == null)
+            {
+                Debug.LogWarning($"Shop interior object '{objectName}' was not found; manual content was left unchanged.");
+                return;
+            }
+
+            target.transform.localPosition = localPosition;
+            target.transform.localScale = localScale;
         }
 
         public static void RepairSharedShopInteriorFromCommandLine()
