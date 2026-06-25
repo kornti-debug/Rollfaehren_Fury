@@ -459,8 +459,18 @@
 						</Action>
 					</ChildrenList>
 				</Event>
+				<Event Name="Play_EnemyFishApproaching" ID="{C43FA00A-1447-4E85-9916-9A06C662A153}">
+					<ChildrenList>
+						<Action Name="" ID="{3C946F61-D73E-494F-A663-AEC85A7C9901}" ShortID="768799647">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="EnemyFishApproaching" ID="{8B972C40-BEE4-40EB-BB52-83703028857D}" WorkUnitID="{E956995F-0D45-451F-B194-075DF45E94ED}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
 			</ChildrenList>
 		</WorkUnit>
 	</Events>
 </WwiseDocument>
-
