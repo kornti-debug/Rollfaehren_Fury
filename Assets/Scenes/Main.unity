@@ -18342,6 +18342,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 296bf4b7db9d43342b3efcf931834899, type: 2}
   - {fileID: 11400000, guid: e9350f104b464294b8717c9c93a679e8, type: 2}
   - {fileID: 11400000, guid: a66275923cbfe734d97f3fa6e5140fb8, type: 2}
+  - {fileID: 11400000, guid: d612b34ce578f2a4396f1b043a06086d, type: 2}
+  - {fileID: 11400000, guid: a35007d8e0d6f01449193be6252e9841, type: 2}
+  - {fileID: 11400000, guid: a820279ca0a9cb041a6b01dcf4a445a3, type: 2}
+  - {fileID: 11400000, guid: 2bd02a9f7f748b4469666e5c7236adc3, type: 2}
   draftCards:
   - {fileID: 1394087451}
   - {fileID: 6657573}

@@ -80,3 +80,5 @@ Desktop.ini
 # Packages/
 # ProjectSettings/
 # Keep all .meta files committed.
+mono_crash.*
+*.log
