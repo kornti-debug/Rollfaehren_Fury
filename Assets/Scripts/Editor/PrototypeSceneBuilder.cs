@@ -283,13 +283,11 @@ namespace RollfaehrenFury.Editor
         private static void EnsureProjectFolders()
         {
             EnsureFolder("Assets", "Scripts");
-            EnsureFolder("Assets/Scripts", "Prototype");
             EnsureFolder("Assets/Scripts", "Editor");
             EnsureFolder("Assets", "Prefabs");
             EnsureFolder("Assets", "Materials");
             EnsureFolder("Assets", "UI");
             EnsureFolder("Assets", "Weapons");
-            EnsureFolder("Assets", "Upgrades");
             EnsureFolder("Assets", "Augments");
         }
 
@@ -1286,24 +1284,6 @@ namespace RollfaehrenFury.Editor
             SetObject(shopManager, "refillButton", FindSceneButton("Refill Ammo Button"));
             SetObject(gameManager, "shopManager", shopManager);
             return shopManager;
-        }
-
-        private static T EnsureUpgrade<T>(string path, string displayName, string description, int cost, int maxPurchases, System.Action<T> configure)
-            where T : UpgradeDefinition
-        {
-            T upgrade = AssetDatabase.LoadAssetAtPath<T>(path);
-            if (upgrade == null)
-            {
-                upgrade = ScriptableObject.CreateInstance<T>();
-                AssetDatabase.CreateAsset(upgrade, path);
-            }
-
-            SetString(upgrade, "displayName", displayName);
-            SetString(upgrade, "description", description);
-            SetInt(upgrade, "cost", cost);
-            SetInt(upgrade, "maxPurchases", maxPurchases);
-            configure?.Invoke(upgrade);
-            return upgrade;
         }
 
         private static void EnsureVendingMachine(GameManager gameManager)
