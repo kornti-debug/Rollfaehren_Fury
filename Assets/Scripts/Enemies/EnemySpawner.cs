@@ -49,11 +49,11 @@ namespace RollfaehrenFury.Prototype
         [Header("Enemy Types")]
         [SerializeField] private EnemySpawnProfile[] enemyProfiles;
 
-        [Header("Legacy Fish Setup")]
-        [SerializeField] private SimpleEnemy enemyPrefab;
+        [Header("Basic Setup")]
         [SerializeField] private FerryDamageTarget ferryTarget;
         [SerializeField] private FerryController ferryController;
         [SerializeField] private Transform[] spawnPoints;
+        [SerializeField] private float spawnStartDelay = 1.5f;
         [SerializeField] private int baseKillReward = 10;
         [Tooltip("Scales the per-kill reward. Flat (no per-round growth) so income grows with how many you kill, not exponentially. 0.3 x base 10 = 3 gold/kill.")]
         [SerializeField, Min(0f)] private float killRewardScale = 0.3f;
@@ -112,26 +112,7 @@ namespace RollfaehrenFury.Prototype
         private float augmentSpeedMultiplier = 1f;
         private float augmentRewardMultiplier = 1f;
 
-        public int AliveCount => aliveEnemies.Count;
         public IReadOnlyList<SimpleEnemy> AliveEnemies => aliveEnemies;
-        public EnemySpawnProfile[] EnemyProfiles => enemyProfiles;
-
-        public void Configure(SimpleEnemy prefab, FerryDamageTarget target, Transform[] points, GameManager manager)
-        {
-            enemyPrefab = prefab;
-            ferryTarget = target;
-            spawnPoints = points;
-            gameManager = manager;
-            ferryController = target != null ? target.GetComponentInParent<FerryController>() : null;
-        }
-
-        public void ConfigureProfiles(EnemySpawnProfile[] profiles, FerryDamageTarget target, GameManager manager)
-        {
-            enemyProfiles = profiles;
-            ferryTarget = target;
-            gameManager = manager;
-            ferryController = target != null ? target.GetComponentInParent<FerryController>() : null;
-        }
 
         public void BeginRound(int round, GameManager manager)
         {
@@ -207,6 +188,9 @@ namespace RollfaehrenFury.Prototype
 
         private IEnumerator SpawnRound()
         {
+            // Short delay to allow the ferry to leave the coast before spawning starts
+            yield return new WaitForSeconds(spawnStartDelay);
+            
             // Progressive difficulty: swarms grow and arrive faster every round. Round 1 stays
             // small + slow (beatable with just harpoon/pistol); later rounds ramp up.
             // Swarm size scales with the round: the MAX grows by one per round (R1 max = 1, R2 = 2, ...)
@@ -251,7 +235,7 @@ namespace RollfaehrenFury.Prototype
                 return null;
             }
 
-            SimpleEnemy prefab = profile != null ? profile.Prefab : enemyPrefab;
+            SimpleEnemy prefab = profile.Prefab;
             if (prefab == null)
             {
                 Debug.LogWarning("EnemySpawner has no eligible enemy prefab for this round.", this);
@@ -486,21 +470,6 @@ namespace RollfaehrenFury.Prototype
             const float margin = 12f; // keep spawns off the shoreline / dock edges
             return position.x >= bounds.min.x + margin && position.x <= bounds.max.x - margin
                 && position.z >= bounds.min.z + margin && position.z <= bounds.max.z - margin;
-        }
-
-        private Vector3 ClampToWater(Vector3 position)
-        {
-            Renderer water = GetWaterRenderer();
-            if (water == null)
-            {
-                return position;
-            }
-
-            Bounds bounds = water.bounds;
-            const float margin = 4f;
-            position.x = Mathf.Clamp(position.x, bounds.min.x + margin, bounds.max.x - margin);
-            position.z = Mathf.Clamp(position.z, bounds.min.z + margin, bounds.max.z - margin);
-            return position;
         }
 
         private void HandleEnemyRemoved(SimpleEnemy enemy)
