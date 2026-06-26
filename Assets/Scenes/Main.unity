@@ -13649,22 +13649,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 497625291}
     m_Modifications:
-    - target: {fileID: -7042538023525029817, guid: 3fd53980374139c44921f17308cbff71, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
-    - target: {fileID: -3050827508140182532, guid: 3fd53980374139c44921f17308cbff71, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
-    - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
-    - target: {fileID: 2692722865676117092, guid: 3fd53980374139c44921f17308cbff71, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
     - target: {fileID: 1445410525038570221, guid: d5c48f8c7f9db3949ae614aae988d548, type: 3}
       propertyPath: m_Name
       value: jetty
@@ -13725,6 +13709,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7042538023525029817, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
+    - target: {fileID: -3050827508140182532, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
+    - target: {fileID: 2061326482337138638, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
+    - target: {fileID: 2692722865676117092, guid: 3fd53980374139c44921f17308cbff71, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5be6732b207627e4f968f2145976f283, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17924,7 +17924,7 @@ MonoBehaviour:
     spawnWeight: 0.5
     useFixedSpawnHeight: 1
     fixedSpawnHeight: 7
-    hasGeigerAudio: 0
+    hasGeigerAudio: 1
   - displayName: Pigeon
     prefab: {fileID: 5696318517125643136, guid: 5b095bef6a866194dba49a6f6dac1ba7, type: 3}
     spawnPoints:
@@ -17939,7 +17939,6 @@ MonoBehaviour:
     useFixedSpawnHeight: 0
     fixedSpawnHeight: 0
     hasGeigerAudio: 0
-  enemyPrefab: {fileID: 3449651742218595715, guid: 0e033d2168fa09d44808313152dae514, type: 3}
   ferryTarget: {fileID: 797040558}
   ferryController: {fileID: 797040556}
   spawnPoints:
@@ -17949,6 +17948,7 @@ MonoBehaviour:
   - {fileID: 2112217346}
   - {fileID: 271402681}
   - {fileID: 2134003221}
+  spawnStartDelay: 2
   baseKillReward: 10
   killRewardScale: 0.3
   healthScalePerRound: 0.35
