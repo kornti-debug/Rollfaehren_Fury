@@ -24300,7 +24300,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: df8bdaa6285803f409c3df4412578a4a, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 58fd9cd34fce12f4b97732cda2f17ae9, type: 2}
+      objectReference: {fileID: 2100000, guid: 20bd7581b7034334ab0d046c3adbcc02, type: 2}
     - target: {fileID: -6537069937053548516, guid: df8bdaa6285803f409c3df4412578a4a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -24308,7 +24308,7 @@ PrefabInstance:
     - target: {fileID: -6537069937053548516, guid: df8bdaa6285803f409c3df4412578a4a, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 751e9ced35d32ca40a7cfb76a2629559, type: 2}
+      objectReference: {fileID: 2100000, guid: 30eb632f6689c3d4dac4880a0202651f, type: 2}
     - target: {fileID: -4775899091727229543, guid: df8bdaa6285803f409c3df4412578a4a, type: 3}
       propertyPath: m_RayTracingMode
       value: 2
